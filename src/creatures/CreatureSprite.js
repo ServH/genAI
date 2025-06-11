@@ -54,15 +54,44 @@ class CreatureSprite {
         this.container.x = this.creature.x;
         this.container.y = this.creature.y;
         
+        // Actualizar opacidad basada en energía
+        this.updateEnergyVisuals();
+        
         // Redibujar forma orgánica
         this.updateVisuals();
         
         if (window.eventBus) {
             eventBus.emit('creature:rendered', { 
                 id: this.creature.id,
-                frame: Math.floor(this.animationTime * 10) % 60
+                frame: Math.floor(this.animationTime * 10) % 60,
+                energy: this.creature.energy
             });
         }
+    }
+
+    /**
+     * Actualiza los efectos visuales basados en energía
+     */
+    updateEnergyVisuals() {
+        if (!this.creature || typeof this.creature.energy === 'undefined') return;
+        
+        // Calcular opacidad basada en energía (0-100 -> 0.1-1.0)
+        const energyPercentage = this.creature.getEnergyPercentage();
+        const minAlpha = 0.1;
+        const maxAlpha = 0.8;
+        this.alpha = minAlpha + (energyPercentage * (maxAlpha - minAlpha));
+        
+        // Efecto de pulso cuando energía es crítica (< 20%)
+        if (this.creature.energy <= 20 && this.creature.isAlive) {
+            const pulseIntensity = Math.sin(this.animationTime * 8) * 0.2;
+            this.alpha += pulseIntensity;
+        }
+        
+        // Asegurar que alpha esté en rango válido
+        this.alpha = Math.max(0.05, Math.min(1.0, this.alpha));
+        
+        // Aplicar opacidad al container
+        this.container.alpha = this.alpha;
     }
 
     /**

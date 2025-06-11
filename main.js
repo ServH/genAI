@@ -75,7 +75,11 @@ console.log(`
 GenAI - Simulador de Vida Emergente
 ===================================
 Fase: ${CONSTANTS.CURRENT_PHASE}
-Objetivo: 10 criaturas orgánicas con movimiento browniano
+Objetivo: Sistema de energía y muerte por inanición
+- Energía inicial: 100 puntos
+- Pérdida: 1 energía/segundo
+- Visual: opacidad = energía/100
+- Respawn automático
 Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
 ===================================
 `); 

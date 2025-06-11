@@ -21,6 +21,10 @@ class Creature {
         this.isAlive = true;
         this.age = 0;
         
+        // Sistema de energía
+        this.energy = CONSTANTS.ENERGY ? CONSTANTS.ENERGY.INITIAL : 100;
+        this.maxEnergy = this.energy;
+        
         // Configuración de movimiento browniano
         this.directionTimer = 1 + Math.random() * 2; // 1-3 segundos
         this.directionChangeRate = 0.5; // Intensidad del cambio
@@ -29,14 +33,20 @@ class Creature {
         this.radius = CONSTANTS.CREATURES.BASE_RADIUS * (0.8 + Math.random() * 0.4);
         this.color = this.getRandomColor();
         
-        console.log(`Creature: Criatura ${this.id} creada en (${Math.round(x)}, ${Math.round(y)})`);
+        console.log(`Creature: Criatura ${this.id} creada en (${Math.round(x)}, ${Math.round(y)}) con ${this.energy} energía`);
+        
+        // Registrar en sistema de energía
+        if (window.gameEnergy) {
+            gameEnergy.registerCreature(this);
+        }
         
         if (window.eventBus) {
             eventBus.emit('creature:created', { 
                 id: this.id, 
                 x: this.x, 
                 y: this.y,
-                color: this.color
+                color: this.color,
+                energy: this.energy
             });
         }
     }
@@ -168,10 +178,66 @@ class Creature {
     }
 
     /**
+     * Consume energía de la criatura
+     */
+    consumeEnergy(amount) {
+        if (!this.isAlive) return;
+        
+        this.energy = Math.max(0, this.energy - amount);
+        
+        if (window.eventBus) {
+            eventBus.emit('creature:energy_consumed', {
+                id: this.id,
+                amount: amount,
+                currentEnergy: this.energy
+            });
+        }
+    }
+    
+    /**
+     * Verifica si la criatura está muriendo
+     */
+    isDying() {
+        return this.energy <= 10;
+    }
+    
+    /**
+     * Obtiene el porcentaje de energía
+     */
+    getEnergyPercentage() {
+        return this.energy / this.maxEnergy;
+    }
+    
+    /**
+     * Mata la criatura
+     */
+    die(cause = 'unknown') {
+        if (!this.isAlive) return;
+        
+        this.isAlive = false;
+        this.energy = 0;
+        
+        // Desregistrar del sistema de energía
+        if (window.gameEnergy) {
+            gameEnergy.unregisterCreature(this);
+        }
+        
+        console.log(`Creature: Criatura ${this.id} murió por ${cause}`);
+        
+        if (window.eventBus) {
+            eventBus.emit('creature:died', { 
+                id: this.id,
+                cause: cause,
+                age: this.age
+            });
+        }
+    }
+
+    /**
      * Destruye la criatura
      */
     destroy() {
-        this.isAlive = false;
+        this.die('destroyed');
         
         if (window.eventBus) {
             eventBus.emit('creature:destroyed', { id: this.id });

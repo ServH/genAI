@@ -48,6 +48,8 @@ class Engine {
                    window.CreatureSprite &&
                    window.CreatureFactory &&
                    window.CreatureManager &&
+                   window.Energy &&
+                   window.gameEnergy &&
                    typeof PIXI !== 'undefined';
         };
         

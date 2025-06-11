@@ -148,6 +148,11 @@ class CreatureManager {
         
         this.updateCounter++;
         
+        // Actualizar sistema de energía
+        if (window.gameEnergy) {
+            gameEnergy.update(deltaTime);
+        }
+        
         // Actualizar criaturas
         for (const creature of this.creatures.values()) {
             if (creature.isAlive) {
@@ -160,10 +165,17 @@ class CreatureManager {
             sprite.update(deltaTime);
         }
         
+        // Limpiar criaturas muertas cada 2 segundos
+        if (this.updateCounter % 120 === 0) {
+            this.cleanup();
+            this.checkRespawn();
+        }
+        
         // Emitir evento de actualización cada 60 frames
         if (this.updateCounter % 60 === 0 && window.eventBus) {
             eventBus.emit('creatures:updated', {
                 count: this.creatures.size,
+                aliveCount: this.getAliveCount(),
                 deltaTime: deltaTime,
                 frame: this.updateCounter
             });
@@ -192,11 +204,18 @@ class CreatureManager {
     }
 
     /**
+     * Obtiene el número de criaturas vivas
+     */
+    getAliveCount() {
+        return Array.from(this.creatures.values())
+            .filter(c => c.isAlive).length;
+    }
+
+    /**
      * Obtiene estadísticas del manager
      */
     getStats() {
-        const aliveCount = Array.from(this.creatures.values())
-            .filter(c => c.isAlive).length;
+        const aliveCount = this.getAliveCount();
         
         return {
             totalCreatures: this.creatures.size,
@@ -204,8 +223,36 @@ class CreatureManager {
             sprites: this.sprites.size,
             maxCreatures: this.maxCreatures,
             updateCounter: this.updateCounter,
-            factoryStats: this.factory ? this.factory.getStats() : null
+            factoryStats: this.factory ? this.factory.getStats() : null,
+            energyStats: window.gameEnergy ? gameEnergy.getStats() : null
         };
+    }
+
+    /**
+     * Verifica si necesita respawn automático
+     */
+    checkRespawn() {
+        const aliveCount = this.getAliveCount();
+        const targetCount = CONSTANTS.CREATURES.INITIAL_COUNT;
+        
+        if (aliveCount < targetCount) {
+            const toSpawn = targetCount - aliveCount;
+            console.log(`CreatureManager: Respawning ${toSpawn} criaturas (${aliveCount}/${targetCount})`);
+            
+            for (let i = 0; i < toSpawn; i++) {
+                const creature = this.factory.createCreature();
+                if (creature) {
+                    this.addCreature(creature);
+                }
+            }
+            
+            if (window.eventBus) {
+                eventBus.emit('creatures:respawned', {
+                    spawned: toSpawn,
+                    aliveCount: this.getAliveCount()
+                });
+            }
+        }
     }
 
     /**

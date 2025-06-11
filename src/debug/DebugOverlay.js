@@ -234,6 +234,18 @@ class DebugOverlay {
                 <div class="debug-info">Sprites: ${stats.sprites}</div>
                 <div class="debug-info">Updates: ${stats.updateCounter}</div>
             `;
+            
+            // Agregar información de energía si está disponible
+            if (stats.energyStats) {
+                const energyStats = stats.energyStats;
+                content += `
+                    <div class="debug-info">--- Energía ---</div>
+                    <div class="debug-info">Promedio: ${energyStats.averageEnergy}</div>
+                    <div class="debug-info">Muertes: ${energyStats.totalDeaths}</div>
+                    <div class="debug-info">Pérdida/s: ${energyStats.drainRate}</div>
+                    <div class="debug-info">Total perdida: ${energyStats.totalEnergyLost}</div>
+                `;
+            }
         }
         
         creaturesDiv.innerHTML = content;

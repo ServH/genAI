@@ -79,9 +79,18 @@ const CONSTANTS = {
         REPRODUCTION_THRESHOLD: 80
     },
 
+    // Configuración de Energía
+    ENERGY: {
+        INITIAL: 100,
+        DRAIN_RATE: 1.0, // energía por segundo
+        CRITICAL_THRESHOLD: 20,
+        DEATH_THRESHOLD: 0,
+        RESPAWN_DELAY: 2000 // ms para respawn automático
+    },
+
     // Versión del proyecto
     VERSION: "2.0.0-alpha",
-    CURRENT_PHASE: "CAJA 2 - Fase 2.0: Criatura Mínima"
+    CURRENT_PHASE: "CAJA 2 - Fase 2.1: Energía y Muerte"
 };
 
 // Hacer disponible globalmente
