@@ -139,8 +139,11 @@ class CreatureSprite {
     drawSmoothShape(points) {
         if (points.length < 3) return;
         
+        // Color genético o color base - Fase 3.0
+        const displayColor = this.creature.geneticColor || this.color;
+        
         // Configurar estilo
-        this.graphics.beginFill(this.color, this.alpha);
+        this.graphics.beginFill(displayColor, this.alpha);
         this.graphics.lineStyle(1, this.color, 0.3);
         
         // Comenzar desde el primer punto

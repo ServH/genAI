@@ -59,6 +59,10 @@ class DebugOverlay {
                     <div id="debug-creatures">Cargando...</div>
                 </div>
                 <div class="debug-section">
+                    <h4>Genética</h4>
+                    <div id="debug-genetics">Cargando...</div>
+                </div>
+                <div class="debug-section">
                     <h4>Controles</h4>
                     <div id="debug-controls">
                         <div class="debug-info">D: Toggle Debug</div>
@@ -165,6 +169,7 @@ class DebugOverlay {
         this.updatePerformance();
         this.updateCamera();
         this.updateCreatures();
+        this.updateGenetics();
         this.lastUpdate = now;
     }
 
@@ -273,6 +278,57 @@ class DebugOverlay {
         }
         
         creaturesDiv.innerHTML = content;
+    }
+
+    /**
+     * Actualiza la sección de genética - Fase 3.0
+     * CORREGIDO: Usa getAllCreatures() en lugar de getAliveCreatures()
+     */
+    updateGenetics() {
+        const geneticsDiv = document.getElementById('debug-genetics');
+        if (!geneticsDiv) return;
+        
+        let content = '<div class="debug-info">Cargando genética...</div>';
+        
+        if (window.gameEngine && window.gameEngine.creatureManager) {
+            const manager = window.gameEngine.creatureManager;
+            const allCreatures = manager.getAllCreatures();
+            const creatures = allCreatures.filter(c => c.isAlive);
+            
+            if (creatures.length > 0) {
+                // Estadísticas de población genética
+                const dnaArray = creatures.map(c => c.dna).filter(dna => dna);
+                
+                if (dnaArray.length > 0) {
+                    // Diversidad genética
+                    const diversity = GeneticUtils.calculatePopulationDiversity(dnaArray);
+                    
+                    // Estadísticas por gen
+                    const speedStats = GeneticUtils.getGeneStats(dnaArray, 'SPEED');
+                    const sizeStats = GeneticUtils.getGeneStats(dnaArray, 'SIZE');
+                    const visionStats = GeneticUtils.getGeneStats(dnaArray, 'VISION');
+                    
+                    content = `
+                        <div class="debug-info">Población: ${dnaArray.length}</div>
+                        <div class="debug-info">Diversidad: ${(diversity * 100).toFixed(1)}%</div>
+                        <div class="debug-info">--- Velocidad ---</div>
+                        <div class="debug-info">Min: ${speedStats.min.toFixed(2)}</div>
+                        <div class="debug-info">Max: ${speedStats.max.toFixed(2)}</div>
+                        <div class="debug-info">Prom: ${speedStats.avg.toFixed(2)}</div>
+                        <div class="debug-info">--- Tamaño ---</div>
+                        <div class="debug-info">Min: ${sizeStats.min.toFixed(2)}</div>
+                        <div class="debug-info">Max: ${sizeStats.max.toFixed(2)}</div>
+                        <div class="debug-info">Prom: ${sizeStats.avg.toFixed(2)}</div>
+                        <div class="debug-info">--- Visión ---</div>
+                        <div class="debug-info">Min: ${Math.round(visionStats.min)}</div>
+                        <div class="debug-info">Max: ${Math.round(visionStats.max)}</div>
+                        <div class="debug-info">Prom: ${Math.round(visionStats.avg)}</div>
+                    `;
+                }
+            }
+        }
+        
+        geneticsDiv.innerHTML = content;
     }
 
     /**

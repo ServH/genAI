@@ -46,8 +46,14 @@ class CreatureFactory {
             spawnY = pos.y;
         }
         
-        // Crear criatura
-        const creature = new Creature(spawnX, spawnY);
+        // Crear ADN para la criatura - Fase 3.0
+        const dna = new DNA();
+        
+        // Crear criatura con ADN
+        const creature = new Creature(spawnX, spawnY, dna);
+        
+        // Aplicar efectos genéticos
+        Genes.applyToCreature(creature, dna);
         
         // Actualizar estadísticas
         this.creaturesCreated++;

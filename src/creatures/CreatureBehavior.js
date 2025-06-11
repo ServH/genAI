@@ -27,11 +27,6 @@ class CreatureBehavior {
     update(deltaTime) {
         if (!this.creature.isAlive) return;
         
-        // Debug: Verificar que se está llamando
-        if (Math.random() < 0.001) { // Muy ocasional
-            console.log(`CreatureBehavior: ${this.creature.id} update() llamado`);
-        }
-        
         // Actualizar sistemas modulares
         this.updateBehaviorSystems(deltaTime);
         
@@ -52,11 +47,6 @@ class CreatureBehavior {
         // 2. Buscar comida con visión si está en IDLE
         if (this.states.isInState(CREATURE_STATES.IDLE)) {
             this.searchForFood();
-        } else {
-            // Debug: ¿Por qué no está en IDLE?
-            if (Math.random() < 0.01) {
-                console.log(`CreatureBehavior: ${this.creature.id} no está en IDLE, estado actual: ${this.states.getCurrentState()}`);
-            }
         }
         
         // 3. Verificar si llegó al objetivo
@@ -75,20 +65,15 @@ class CreatureBehavior {
      */
     searchForFood() {
         if (!window.gameResources) {
-            console.log(`CreatureBehavior: ${this.creature.id} - gameResources no disponible`);
             return;
         }
         
         const foods = gameResources.getAllFood();
-        // Solo log ocasional para no saturar
-        if (Math.random() < 0.01) {
-            console.log(`CreatureBehavior: ${this.creature.id} buscando comida - ${foods.size} items disponibles`);
-        }
-        
         const nearestFood = this.vision.getNearestVisibleFood(foods);
         
+
+        
         if (nearestFood) {
-            console.log(`CreatureBehavior: ${this.creature.id} detectó comida ${nearestFood.id}, cambiando a SEEKING`);
             // Cambiar a estado SEEKING con objetivo
             this.states.setState(CREATURE_STATES.SEEKING, nearestFood);
             
@@ -114,7 +99,6 @@ class CreatureBehavior {
         
         // Verificar si el objetivo (comida) aún existe
         if (!window.gameResources || !gameResources.food.has(target.id)) {
-            console.log(`CreatureBehavior: ${this.creature.id} - Objetivo ${target.id} ya no existe, volviendo a IDLE`);
             this.states.setState(CREATURE_STATES.IDLE);
             return;
         }
@@ -122,14 +106,8 @@ class CreatureBehavior {
         const distance = this.vision.getDistance(target.x, target.y);
         const minDistance = CONSTANTS.MOVEMENT.MIN_TARGET_DISTANCE;
         
-        // Debug: Log de distancia al objetivo
-        if (Math.random() < 0.01) { // Solo 1% de las veces para no saturar
-            console.log(`CreatureBehavior: ${this.creature.id} - Distancia al objetivo: ${distance.toFixed(1)}px (min: ${minDistance}px)`);
-        }
-        
         if (distance <= minDistance) {
             // Cambiar a estado EATING
-            console.log(`CreatureBehavior: ${this.creature.id} llegó al objetivo, cambiando a EATING`);
             this.states.setState(CREATURE_STATES.EATING, target);
         }
     }
@@ -199,7 +177,6 @@ class CreatureBehavior {
         if (this.states.isInState(CREATURE_STATES.EATING)) {
             const result = gameResources.checkFoodConsumption(this.creature);
             if (result) {
-                console.log(`CreatureBehavior: ${this.creature.id} consumió comida (+${result.energyGained} energía)`);
                 // Volver a IDLE después de comer
                 this.states.setState(CREATURE_STATES.IDLE);
                 

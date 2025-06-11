@@ -22,15 +22,18 @@ class CreatureVision {
      * Detecta toda la comida visible en el cono de visión
      */
     detectFood(foods) {
-        if (!foods || foods.size === 0) return [];
+        if (!foods || foods.size === 0) {
+            return [];
+        }
         
         const visibleFood = [];
         
-        for (const food of foods) {
+        for (const food of foods.values()) {
+            const distance = CreatureVisionUtils.calculateDistance(
+                this.creature.x, this.creature.y, food.x, food.y
+            );
+            
             if (this.isInVisionCone(food.x, food.y)) {
-                const distance = CreatureVisionUtils.calculateDistance(
-                    this.creature.x, this.creature.y, food.x, food.y
-                );
                 visibleFood.push({
                     food: food,
                     distance: distance

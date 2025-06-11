@@ -41,7 +41,9 @@ class CreatureVisionUtils {
     static isInVisionCone(creatureX, creatureY, creatureDirection, targetX, targetY, range, angleRad) {
         // Calcular distancia
         const distance = this.calculateDistance(creatureX, creatureY, targetX, targetY);
-        if (distance > range) return false;
+        if (distance > range) {
+            return false;
+        }
         
         // Calcular ángulo hacia el objetivo
         const angleToTarget = Math.atan2(targetY - creatureY, targetX - creatureX);
@@ -56,8 +58,11 @@ class CreatureVisionUtils {
             angleDiff = 2 * Math.PI - angleDiff;
         }
         
+        const halfAngle = angleRad / 2;
+        const isVisible = angleDiff <= halfAngle;
+        
         // Verificar si está dentro del cono
-        return angleDiff <= angleRad / 2;
+        return isVisible;
     }
     
     /**

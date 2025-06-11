@@ -75,11 +75,11 @@ console.log(`
 GenAI - Simulador de Vida Emergente
 ===================================
 Fase: ${CONSTANTS.CURRENT_PHASE}
-Objetivo: Comportamiento de búsqueda inteligente
-- Estados: Idle/Seeking/Eating con transiciones suaves
-- Visión: Cono de 120°, 200px de alcance
-- Movimiento: Suave hacia objetivos, no robótico
-- Priorización: Comida más cercana visible
+Objetivo: Sistema de ADN básico
+- Genes: speed (0.5-2.0), size (0.7-1.3), vision (100-300px)
+- Colores: RGB genéticos mapeados a paleta bioluminiscente
+- Diversidad: Cada criatura única en características
+- Debug: Panel genético con estadísticas de población
 Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
 ===================================
 `); 

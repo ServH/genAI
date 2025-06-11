@@ -6,7 +6,7 @@
  */
 
 class Creature {
-    constructor(x = 0, y = 0) {
+    constructor(x = 0, y = 0, dna = null) {
         // Identificación única
         this.id = this.generateId();
         
@@ -24,6 +24,11 @@ class Creature {
         // Propiedades visuales básicas
         this.radius = CONSTANTS.CREATURES.BASE_RADIUS * (0.8 + Math.random() * 0.4);
         this.color = this.getRandomColor();
+        
+        // Sistema genético - Fase 3.0
+        this.dna = dna;
+        this.geneticColor = null;
+        this.baseSpeed = this.speed; // Guardar velocidad base para aplicar genes
         
         // Sistemas modulares
         this.energySystem = new CreatureEnergy(this);

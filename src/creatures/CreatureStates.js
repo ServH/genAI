@@ -64,7 +64,10 @@ class CreatureStates {
         this.stateTimer = 0;
         this.lastStateChange = now;
         
-        console.log(`CreatureStates: ${this.creature.id} cambió de ${previousState} a ${newState}`);
+        // Log solo cambios importantes
+        if (newState === CREATURE_STATES.SEEKING || newState === CREATURE_STATES.EATING) {
+            console.log(`ESTADO: ${this.creature.id} cambió de ${previousState} a ${newState}${target ? ` (objetivo: ${target.id})` : ''}`);
+        }
         
         // Emitir evento de cambio de estado
         CreatureStatesUtils.emitStateChangeEvent(

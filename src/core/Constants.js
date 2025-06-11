@@ -102,7 +102,7 @@ const CONSTANTS = {
 
     // Configuración de Visión
     VISION: {
-        ANGLE: 360, // grados del cono de visión (360° = visión completa para debug)
+        ANGLE: 120, // grados del cono de visión
         RANGE: 200, // pixels de alcance
         DEBUG_SHOW: false // mostrar cono en debug
     },
@@ -122,9 +122,21 @@ const CONSTANTS = {
         DIRECTION_VARIANCE: 0.3 // variación en movimiento browniano
     },
 
+    // Configuración Genética - Fase 3.0
+    GENETICS: {
+        GENES: {
+            SPEED: { min: 0.5, max: 2.0, default: 1.0 },
+            SIZE: { min: 0.7, max: 1.3, default: 1.0 },
+            VISION: { min: 100, max: 300, default: 200 },
+            COLOR_R: { min: 0.0, max: 1.0, default: 0.5 },
+            COLOR_G: { min: 0.0, max: 1.0, default: 0.5 },
+            COLOR_B: { min: 0.0, max: 1.0, default: 0.5 }
+        }
+    },
+
     // Versión del proyecto
-    VERSION: "2.3.0-alpha",
-    CURRENT_PHASE: "CAJA 2 - Fase 2.3: Comportamiento de Búsqueda"
+    VERSION: "3.0.0-alpha",
+    CURRENT_PHASE: "CAJA 3 - Fase 3.0: Sistema de ADN"
 };
 
 // Hacer disponible globalmente
