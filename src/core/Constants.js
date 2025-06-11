@@ -61,18 +61,27 @@ const CONSTANTS = {
         MAX_VELOCITY: 5
     },
 
-    // Configuración de Criaturas (para fases futuras)
+    // Configuración de Criaturas
     CREATURES: {
+        INITIAL_COUNT: 10,
+        MAX_COUNT: 50,
+        BASE_RADIUS: 20,
+        MIN_SPEED: 20, // px/s
+        MAX_SPEED: 80, // px/s
+        DEFORM_POINTS: 8,
+        DEFORM_AMOUNT: 0.3,
+        WORLD_MARGIN: 50,
+        // Para fases futuras
         INITIAL_ENERGY: 100,
-        ENERGY_DECAY_RATE: 1, // por segundo
+        ENERGY_DECAY_RATE: 1,
         VISION_RANGE: 200,
-        VISION_ANGLE: 120, // grados
+        VISION_ANGLE: 120,
         REPRODUCTION_THRESHOLD: 80
     },
 
     // Versión del proyecto
-    VERSION: "1.2.0-alpha",
-    CURRENT_PHASE: "CAJA 1 - Fase 1.2: Rendering Base"
+    VERSION: "2.0.0-alpha",
+    CURRENT_PHASE: "CAJA 2 - Fase 2.0: Criatura Mínima"
 };
 
 // Hacer disponible globalmente

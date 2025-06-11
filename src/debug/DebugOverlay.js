@@ -55,6 +55,10 @@ class DebugOverlay {
                     <div id="debug-camera">Cargando...</div>
                 </div>
                 <div class="debug-section">
+                    <h4>Criaturas</h4>
+                    <div id="debug-creatures">Cargando...</div>
+                </div>
+                <div class="debug-section">
                     <h4>Controles</h4>
                     <div id="debug-controls">
                         <div class="debug-info">D: Toggle Debug</div>
@@ -160,6 +164,7 @@ class DebugOverlay {
         
         this.updatePerformance();
         this.updateCamera();
+        this.updateCreatures();
         this.lastUpdate = now;
     }
 
@@ -208,6 +213,30 @@ class DebugOverlay {
         }
         
         cameraDiv.innerHTML = content;
+    }
+
+    /**
+     * Actualiza la sección de criaturas
+     */
+    updateCreatures() {
+        const creaturesDiv = document.getElementById('debug-creatures');
+        if (!creaturesDiv) return;
+        
+        let content = '<div class="debug-info">Sin datos</div>';
+        
+        if (window.gameEngine && window.gameEngine.creatureManager) {
+            const manager = window.gameEngine.creatureManager;
+            const stats = manager.getStats();
+            
+            content = `
+                <div class="debug-info">Activas: ${stats.totalCreatures}/${stats.maxCreatures}</div>
+                <div class="debug-info">Vivas: ${stats.aliveCreatures}</div>
+                <div class="debug-info">Sprites: ${stats.sprites}</div>
+                <div class="debug-info">Updates: ${stats.updateCounter}</div>
+            `;
+        }
+        
+        creaturesDiv.innerHTML = content;
     }
 
     /**

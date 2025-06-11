@@ -19,6 +19,9 @@ class Engine {
         this.grid = null;
         this.worldContainer = null;
         
+        // Sistema de criaturas
+        this.creatureManager = null;
+        
         // Esperar a que todos los módulos estén cargados
         this.waitForModules().then(() => {
             this.init();
@@ -41,6 +44,10 @@ class Engine {
                    window.Camera &&
                    window.Background &&
                    window.Grid &&
+                   window.Creature &&
+                   window.CreatureSprite &&
+                   window.CreatureFactory &&
+                   window.CreatureManager &&
                    typeof PIXI !== 'undefined';
         };
         
@@ -76,6 +83,10 @@ class Engine {
             
             // Hacer cámara disponible globalmente
             window.gameCamera = this.camera;
+            
+            // Inicializar sistema de criaturas
+            this.creatureManager = new CreatureManager();
+            await this.creatureManager.init(this.worldContainer, this.camera);
             
             // Configurar canvas legacy (para compatibilidad)
             this.canvas = new EngineCanvas();
@@ -169,6 +180,11 @@ class Engine {
                 if (this.camera) {
                     this.camera.update(deltaTime);
                 }
+                
+                // Actualizar criaturas
+                if (this.creatureManager) {
+                    this.creatureManager.update(deltaTime);
+                }
             }
         }
         
@@ -199,6 +215,10 @@ class Engine {
         
         if (this.grid) {
             this.grid.destroy();
+        }
+        
+        if (this.creatureManager) {
+            this.creatureManager.destroy();
         }
         
         if (this.renderer) {

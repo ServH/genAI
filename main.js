@@ -75,7 +75,7 @@ console.log(`
 GenAI - Simulador de Vida Emergente
 ===================================
 Fase: ${CONSTANTS.CURRENT_PHASE}
-Objetivo: Rendering Base con PixiJS, Cámara, Fondo y Grid
+Objetivo: 10 criaturas orgánicas con movimiento browniano
 Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
 ===================================
 `); 
