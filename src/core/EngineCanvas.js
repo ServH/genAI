@@ -13,26 +13,50 @@ class EngineCanvas {
     }
 
     /**
-     * Configura el canvas principal
+     * Configura el canvas principal (legacy para compatibilidad)
      */
     setupCanvas() {
-        this.canvas = document.getElementById('gameCanvas');
-        if (!this.canvas) {
-            throw new Error('EngineCanvas: Canvas con ID "gameCanvas" no encontrado');
-        }
+        // En Fase 1.2, PixiJS maneja el canvas principal
+        // Este módulo se mantiene para compatibilidad
+        this.canvas = document.querySelector('#pixiCanvas') || document.querySelector('canvas');
         
-        this.ctx = this.canvas.getContext('2d');
-        this.resizeCanvas();
+        if (!this.canvas) {
+            console.warn('EngineCanvas: Canvas no encontrado, creando canvas legacy');
+            this.createLegacyCanvas();
+        } else {
+            console.log('EngineCanvas: Usando canvas de PixiJS');
+        }
         
         // Escuchar cambios de tamaño
         window.addEventListener('resize', () => this.resizeCanvas());
     }
 
     /**
+     * Crea un canvas legacy si es necesario
+     */
+    createLegacyCanvas() {
+        this.canvas = document.createElement('canvas');
+        this.canvas.id = 'legacyCanvas';
+        this.canvas.style.display = 'none'; // Oculto, solo para compatibilidad
+        document.body.appendChild(this.canvas);
+        this.ctx = this.canvas.getContext('2d');
+        this.resizeCanvas();
+    }
+
+    /**
      * Ajusta el tamaño del canvas
      */
     resizeCanvas() {
-        const rect = this.canvas.parentElement.getBoundingClientRect();
+        if (!this.canvas) return;
+        
+        // Si es canvas de PixiJS, no redimensionar (PixiJS lo maneja)
+        if (this.canvas.id === 'pixiCanvas') {
+            return;
+        }
+        
+        // Solo para canvas legacy
+        const rect = this.canvas.parentElement?.getBoundingClientRect() || 
+                    { width: window.innerWidth, height: window.innerHeight };
         this.canvas.width = rect.width;
         this.canvas.height = rect.height;
         
@@ -45,10 +69,16 @@ class EngineCanvas {
     }
 
     /**
-     * Renderizado básico
+     * Renderizado básico (legacy)
      */
     render() {
-        // Limpiar canvas
+        // En Fase 1.2, PixiJS maneja el renderizado
+        // Este método se mantiene para compatibilidad
+        if (!this.ctx || this.canvas.id === 'pixiCanvas') {
+            return;
+        }
+        
+        // Solo renderizar en canvas legacy
         this.ctx.fillStyle = CONSTANTS.COLORS.BACKGROUND;
         this.ctx.fillRect(0, 0, this.canvas.width, this.canvas.height);
         

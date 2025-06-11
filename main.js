@@ -75,7 +75,7 @@ console.log(`
 GenAI - Simulador de Vida Emergente
 ===================================
 Fase: ${CONSTANTS.CURRENT_PHASE}
-Objetivo: Sistema Core con EventBus, Time y Random
-Controles: D = Debug overlay, Espacio = Pausa
+Objetivo: Rendering Base con PixiJS, Cámara, Fondo y Grid
+Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
 ===================================
 `); 
