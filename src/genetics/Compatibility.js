@@ -5,8 +5,8 @@
 class Compatibility {
     constructor() {
         this.config = {
-            maxGeneticDistance: 0.7,    // máxima distancia permitida
-            minGeneticDistance: 0.1,    // mínima distancia (evita clones)
+            maxGeneticDistance: 0.8,    // máxima distancia permitida (más permisivo)
+            minGeneticDistance: 0.05,   // mínima distancia (evita clones, más permisivo)
             compatibilityThreshold: 0.5, // umbral de compatibilidad general
             geneWeights: {              // peso de cada gen en compatibilidad
                 SPEED: 1.0,
@@ -45,6 +45,7 @@ class Compatibility {
             (this.stats.averageDistance * (this.stats.totalChecks - 1) + distance) / 
             this.stats.totalChecks;
         
+        // Compatibilidad basada en distancia genética
         const isCompatible = distance >= this.config.minGeneticDistance && 
                            distance <= this.config.maxGeneticDistance;
         

@@ -152,7 +152,7 @@ class CreatureStats {
     }
     
     /**
-     * Obtiene estadísticas de comportamiento (Fase 2.3)
+     * Obtiene estadísticas de comportamiento (Fase 2.3 + 3.1)
      */
     getBehaviorStats() {
         const creatures = Array.from(this.manager.creatures.values())
@@ -163,6 +163,7 @@ class CreatureStats {
                 idleCount: 0,
                 seekingCount: 0,
                 eatingCount: 0,
+                matingCount: 0,
                 totalWithBehavior: 0
             };
         }
@@ -170,6 +171,7 @@ class CreatureStats {
         let idleCount = 0;
         let seekingCount = 0;
         let eatingCount = 0;
+        let matingCount = 0;
         let totalWithBehavior = 0;
         
         for (const creature of creatures) {
@@ -187,6 +189,9 @@ class CreatureStats {
                     case 'eating':
                         eatingCount++;
                         break;
+                    case 'mating':
+                        matingCount++;
+                        break;
                 }
             }
         }
@@ -195,6 +200,7 @@ class CreatureStats {
             idleCount,
             seekingCount,
             eatingCount,
+            matingCount,
             totalWithBehavior
         };
     }

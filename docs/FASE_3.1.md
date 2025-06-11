@@ -2,11 +2,12 @@
 
 ## 🎯 Objetivos de la Fase
 
-Implementar el sistema de reproducción sexual básico con genética:
+Implementar el sistema de reproducción sexual básico con genética y efectos visuales:
 - Búsqueda de pareja cuando energía > 80%
 - Compatibilidad genética (distancia < 70%)
 - Mezcla de genes 50/50 entre padres
 - Spawn de crías con DNA heredado
+- Efectos visuales de apareamiento y nacimiento
 - Cooldown de reproducción
 
 ## ✅ Implementación Completada
@@ -15,23 +16,27 @@ Implementar el sistema de reproducción sexual básico con genética:
 
 ```
 /src
-└── /genetics
-    ├── Reproduction.js        ✅ Sistema de reproducción (185 líneas)
-    └── Compatibility.js       ✅ Compatibilidad genética (195 líneas)
+├── /genetics
+│   ├── Reproduction.js        ✅ Sistema de reproducción (185 líneas)
+│   └── Compatibility.js       ✅ Compatibilidad genética (195 líneas)
+└── /rendering
+    ├── MatingEffects.js       ✅ Efectos de apareamiento (183 líneas)
+    ├── BirthEffects.js        ✅ Efectos de nacimiento (186 líneas)
+    └── Effects.js             ✅ Coordinador de efectos (84 líneas) ✅
 ```
 
 ### 🔧 Archivos Modificados
 
 ```
-├── src/core/Constants.js              ✅ Config REPRODUCTION + STATES.MATING_DURATION
+├── src/core/Constants.js              ✅ Config REPRODUCTION + EFFECTS
 ├── src/creatures/CreatureStates.js    ✅ Estado MATING agregado
 ├── src/creatures/CreatureStatesUtils.js ✅ Transiciones MATING
-├── src/creatures/CreatureBehavior.js  ✅ Búsqueda pareja + proceso apareamiento
+├── src/creatures/CreatureBehavior.js  ✅ Búsqueda pareja + apareamiento
 ├── src/creatures/CreatureManager.js   ✅ Método spawnCreatureWithDNA()
 ├── src/creatures/CreatureFactory.js   ✅ Método createCreatureWithDNA()
-├── src/core/Engine.js                 ✅ Integración sistema reproducción
-├── src/debug/DebugOverlay.js          ✅ Panel estadísticas reproducción
-├── index.html                         ✅ Carga módulos Compatibility + Reproduction
+├── src/core/Engine.js                 ✅ Integración sistemas reproducción/efectos
+├── src/debug/DebugOverlay.js          ✅ Paneles reproducción + efectos
+├── index.html                         ✅ Carga módulos efectos + genética
 └── main.js                           ✅ Mensaje objetivo Fase 3.1
 ```
 
@@ -63,6 +68,32 @@ Implementar el sistema de reproducción sexual básico con genética:
 - **Distancia**: 30px para ejecutar reproducción
 - **Movimiento**: Se acercan automáticamente a la pareja
 
+## 🎨 Sistema de Efectos Visuales Modular
+
+### 🏗️ **Arquitectura de Efectos (Refactorizada)**
+- **MatingEffects.js** (183 líneas): Pulsos búsqueda + conexiones apareamiento
+- **BirthEffects.js** (186 líneas): Partículas y efectos de nacimiento
+- **Effects.js** (84 líneas) ✅: Coordinador modular que cumple reglas
+
+### ✨ **Efectos de Apareamiento**
+- **Pulsos de búsqueda**: Ondas cyan expandiéndose (2s duración)
+- **Conexiones visuales**: Líneas magenta entre parejas apareándose
+- **Pulso central**: Efecto pulsante en punto medio de conexión
+- **Configuración**: Centralizada en `CONSTANTS.EFFECTS`
+
+### 🌟 **Efectos de Nacimiento**
+- **Partículas doradas**: 8 partículas expandiéndose radialmente
+- **Glow exterior**: Efecto de brillo amarillo
+- **Física realista**: Fricción, decaimiento de vida, reducción tamaño
+- **Duración**: 3 segundos con desvanecimiento gradual
+
+### 📊 **Cumplimiento Reglas Estrictas**
+- ✅ **UN ARCHIVO = UNA RESPONSABILIDAD**: Cada módulo función específica
+- ✅ **Sistemas independientes**: Comunicación vía EventBus
+- ✅ **Configuración centralizada**: `CONSTANTS.EFFECTS` completa
+- ✅ **Modularidad**: Coordinador ≤100 líneas (CAJA 1-3)
+- ✅ **Debug avanzado**: Estadísticas efectos en tiempo real
+
 ## 📊 Configuración Implementada
 
 ### CONSTANTS.REPRODUCTION
@@ -78,15 +109,30 @@ REPRODUCTION: {
 }
 ```
 
-### CONSTANTS.STATES
+### CONSTANTS.EFFECTS
 ```javascript
-STATES: {
-    MATING_DURATION: 2000,      // ms apareándose
-    // ... otros estados existentes
+EFFECTS: {
+    SEEKING_PULSE: {
+        COLOR: 0x00fff0,         // Cyan
+        BASE_RADIUS: 30,         // Radio inicial
+        GROWTH: 20,              // Crecimiento
+        ALPHA: 0.5               // Transparencia
+    },
+    MATING_CONNECTION: {
+        COLOR: 0xff00ff,         // Magenta
+        ALPHA: 0.8,              // Transparencia
+        PULSE_SIZE: 5            // Tamaño pulso central
+    },
+    BIRTH: {
+        COLOR: 0xffd700,         // Dorado
+        GLOW_COLOR: 0xffff00,    // Amarillo
+        PARTICLE_COUNT: 8,       // Número partículas
+        DURATION: 3000           // Duración efecto
+    }
 }
 ```
 
-## 🎨 Efectos Visuales y Debug
+## 🎨 Debug y Estadísticas
 
 ### 📊 **Panel Debug Reproducción**
 - **Apareamientos**: Total, exitosos, cooldowns activos
@@ -94,11 +140,17 @@ STATES: {
 - **Compatibilidad**: Checks, compatibles, incompatibles, tasa
 - **Estados**: Criaturas apareándose, listas para reproducirse
 
+### 🎭 **Panel Debug Efectos**
+- **Apareamiento**: Conexiones activas, pulsos de búsqueda
+- **Nacimiento**: Efectos activos, partículas totales, promedio/efecto
+- **Performance**: Monitoreo impacto visual en tiempo real
+
 ### 🎮 **Comportamiento Observable**
 - **Búsqueda activa**: Criaturas con >80% energía buscan pareja
+- **Efectos visuales**: Pulsos cyan durante búsqueda
 - **Acercamiento**: Movimiento hacia pareja seleccionada
-- **Apareamiento**: 2 segundos en estado MATING
-- **Spawn cría**: Nueva criatura aparece entre padres
+- **Conexión visual**: Línea magenta durante apareamiento
+- **Spawn cría**: Explosión dorada de partículas al nacer
 - **Herencia visible**: Características mezcladas de ambos padres
 
 ## 🔄 Eventos del Sistema
@@ -110,9 +162,10 @@ STATES: {
 'reproduction:successful'    // Reproducción exitosa
 'creature:spawned_with_dna'  // Criatura con DNA heredado
 'factory:creatureWithDNASpawned' // Factory con DNA específico
+'effects:birth_created'      // Efecto de nacimiento creado
 ```
 
-## 🏗️ Arquitectura Modular
+## 🏗️ Arquitectura Modular Completa
 
 ### **Reproduction.js** (185 líneas)
 - Búsqueda y validación de parejas
@@ -126,33 +179,55 @@ STATES: {
 - Predicción de características descendencia
 - Búsqueda de mejores parejas
 
+### **MatingEffects.js** (183 líneas)
+- **Responsabilidad única**: Efectos de apareamiento
+- **Pulsos búsqueda**: Ondas expandiéndose desde criaturas
+- **Conexiones**: Líneas visuales entre parejas
+- **Configuración**: Usa `CONSTANTS.EFFECTS`
+
+### **BirthEffects.js** (186 líneas)
+- **Responsabilidad única**: Efectos de nacimiento
+- **Sistema partículas**: Pool optimizado de partículas
+- **Física realista**: Movimiento, fricción, decaimiento
+- **Estadísticas**: Métricas para debug
+
+### **Effects.js** (84 líneas) ✅
+- **Responsabilidad única**: Coordinador de sistemas
+- **Patrón Facade**: Interface simple para efectos complejos
+- **Cumple reglas**: ≤100 líneas (CAJA 1-3)
+- **Modular**: Delega a sistemas especializados
+
 ### **Integración Modular**
 - **CreatureBehavior**: Lógica de búsqueda y apareamiento
 - **CreatureStates**: Estado MATING con transiciones
 - **CreatureManager**: Spawn con DNA específico
 - **CreatureFactory**: Creación con DNA heredado
-- **Engine**: Limpieza de cooldowns automática
+- **Engine**: Limpieza de cooldowns + actualización efectos
 
 ## 🎯 Validación Completada
 
 - ✅ **Búsqueda pareja**: Criaturas con >80% energía buscan activamente
+- ✅ **Efectos búsqueda**: Pulsos cyan visibles durante búsqueda
 - ✅ **Compatibilidad**: Solo parejas genéticamente compatibles
+- ✅ **Efectos apareamiento**: Conexiones magenta durante mating
 - ✅ **Mezcla genética**: Características 50/50 de ambos padres
+- ✅ **Efectos nacimiento**: Explosión dorada al nacer crías
 - ✅ **Costo energético**: 40 energía consumida por cada padre
 - ✅ **Cooldown funcional**: 10s antes de nueva reproducción
 - ✅ **Spawn crías**: Nuevas criaturas con DNA mezclado
-- ✅ **Debug informativo**: Estadísticas reproducción en tiempo real
-- ✅ **Performance estable**: Sin degradación con sistema reproductivo
+- ✅ **Debug informativo**: Estadísticas reproducción + efectos
+- ✅ **Performance estable**: Sin degradación con efectos visuales
 - ✅ **Población estable**: Balance entre nacimientos y muertes
+- ✅ **Reglas cumplidas**: Modularidad y tamaños correctos
 
 ## 📈 Métricas de Implementación
 
-- **Archivos nuevos**: 2 módulos especializados
-- **Líneas promedio**: ~190 líneas por archivo
-- **Cumplimiento reglas**: 2/2 archivos ≤200 líneas (CAJA 1-3)
+- **Archivos nuevos**: 5 módulos especializados
+- **Líneas promedio**: ~167 líneas por archivo
+- **Cumplimiento reglas**: 1/5 archivos ≤100 líneas (coordinador)
 - **Estados agregados**: 1 (MATING)
-- **Eventos nuevos**: 5 eventos del sistema
-- **Configuración**: 7 parámetros REPRODUCTION
+- **Eventos nuevos**: 6 eventos del sistema
+- **Configuración**: 7 parámetros REPRODUCTION + 3 secciones EFFECTS
 
 ## 🚀 Emergencia Lograda
 
@@ -162,9 +237,11 @@ STATES: {
 - **Ciclos reproductivos**: Patrones de apareamiento naturales
 - **Herencia visible**: Características parentales en descendencia
 - **Balance poblacional**: Autorregulación de población
+- **Comunicación visual**: Efectos indican intenciones reproductivas
 
 ### **Preparación Futuras Fases**
 - **Base sólida**: Sistema reproductivo escalable
+- **Efectos modulares**: Sistema visual extensible
 - **Mutaciones**: Preparado para Fase 3.2
 - **Selección**: Presión evolutiva implementada
 - **Estadísticas**: Tracking completo para análisis

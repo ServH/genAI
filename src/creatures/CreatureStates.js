@@ -70,6 +70,11 @@ class CreatureStates {
             console.log(`ESTADO: ${this.creature.id} cambió de ${previousState} a ${newState}${target ? ` (objetivo: ${target.id})` : ''}`);
         }
         
+        // Log especial para MATING
+        if (newState === CREATURE_STATES.MATING) {
+            console.log(`💕 MATING: ${this.creature.id} cambió a estado MATING con pareja ${target ? target.id : 'sin pareja'}`);
+        }
+        
         // Emitir evento de cambio de estado
         CreatureStatesUtils.emitStateChangeEvent(
             this.creature.id, 

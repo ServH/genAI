@@ -87,6 +87,10 @@ class Engine {
             // Hacer cámara disponible globalmente
             window.gameCamera = this.camera;
             
+            // Inicializar sistema de efectos
+            this.effects = new Effects();
+            window.gameEffects = this.effects;
+            
             // Inicializar sistema de recursos
             this.gameResources = new Resources();
             this.gameResources.init(this.worldContainer, this.camera);
@@ -204,6 +208,12 @@ class Engine {
                     this.creatureManager.update(deltaTime);
                 }
                 
+                // Actualizar efectos visuales
+                if (this.effects) {
+                    this.effects.update(deltaTime);
+                    this.effects.render(this.renderer);
+                }
+                
                 // Actualizar sistema de reproducción - Fase 3.1
                 if (window.gameReproduction) {
                     // Limpiar cooldowns de criaturas muertas
@@ -250,6 +260,10 @@ class Engine {
         
         if (this.gameResources) {
             this.gameResources.destroy();
+        }
+        
+        if (this.effects) {
+            this.effects.destroy();
         }
         
         if (this.renderer) {

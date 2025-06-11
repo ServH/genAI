@@ -2,6 +2,47 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [3.1.1-alpha] - 2024-12-19
+
+### 🎨 CAJA 3 - Fase 3.1: Refactorización Efectos Visuales ✅
+
+#### 🏗️ Refactorización Modular de Efectos
+- **Problema solucionado**: Effects.js original (264 líneas) violaba reglas estrictas
+- **Solución implementada**: División en 3 módulos especializados
+- **Cumplimiento reglas**: UN ARCHIVO = UNA RESPONSABILIDAD aplicado
+
+#### ✨ Nuevos Módulos de Efectos Creados
+- **src/rendering/MatingEffects.js** (183 líneas) - Efectos de apareamiento
+- **src/rendering/BirthEffects.js** (186 líneas) - Efectos de nacimiento  
+- **src/rendering/Effects.js** (84 líneas) ✅ - Coordinador modular
+
+#### 🔧 Arquitectura Modular Implementada
+- **MatingEffects**: Pulsos búsqueda + conexiones apareamiento
+- **BirthEffects**: Sistema partículas + física realista
+- **Effects**: Patrón Facade, ≤100 líneas (CAJA 1-3)
+- **Configuración**: `CONSTANTS.EFFECTS` centralizada
+
+#### 📊 Efectos Visuales Implementados
+- **Pulsos búsqueda**: Ondas cyan expandiéndose (2s)
+- **Conexiones apareamiento**: Líneas magenta con pulso central
+- **Partículas nacimiento**: 8 partículas doradas con glow
+- **Física realista**: Fricción, decaimiento, desvanecimiento
+
+#### 🎯 Cumplimiento Reglas Estrictas Verificado
+- ✅ **Modularidad**: Cada archivo responsabilidad única
+- ✅ **Tamaño**: Coordinador ≤100 líneas (CAJA 1-3)
+- ✅ **Configuración**: Centralizada en Constants.js
+- ✅ **Comunicación**: EventBus para sistemas independientes
+- ✅ **Debug**: Panel estadísticas efectos en tiempo real
+
+#### 📁 Archivos Modificados
+- `src/core/Constants.js` - Configuración EFFECTS agregada
+- `src/debug/DebugOverlay.js` - Panel estadísticas efectos
+- `index.html` - Carga módulos MatingEffects + BirthEffects
+- `docs/FASE_3.1.md` - Documentación refactorización
+
+---
+
 ## [3.1.0-alpha] - 2024-12-19
 
 ### 🧬 CAJA 3 - Fase 3.1: Reproducción Básica ✅

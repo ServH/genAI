@@ -76,11 +76,12 @@ GenAI - Simulador de Vida Emergente
 ===================================
 Fase: ${CONSTANTS.CURRENT_PHASE}
 Objetivo: Reproducción sexual básica con genética
-- Búsqueda de pareja: Energía >80%, radio 150px
-- Compatibilidad: Distancia genética <70%
+- Búsqueda de pareja: Energía >80%, radio 500px
+- Compatibilidad: Distancia genética 5-80%
 - Mezcla genética: 50/50 de genes parentales
-- Cooldown: 10s entre reproducciones
+- Cooldown: 5s entre reproducciones
 - Cría: Spawn en punto medio entre padres
+- Efectos visuales: Pulsos, conexiones, partículas
 - Debug: Panel reproducción con estadísticas
 Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
 ===================================

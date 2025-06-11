@@ -67,6 +67,10 @@ class DebugOverlay {
                     <div id="debug-reproduction">Cargando...</div>
                 </div>
                 <div class="debug-section">
+                    <h4>Efectos</h4>
+                    <div id="debug-effects">Cargando...</div>
+                </div>
+                <div class="debug-section">
                     <h4>Controles</h4>
                     <div id="debug-controls">
                         <div class="debug-info">D: Toggle Debug</div>
@@ -175,6 +179,7 @@ class DebugOverlay {
         this.updateCreatures();
         this.updateGenetics();
         this.updateReproduction();
+        this.updateEffects();
         this.lastUpdate = now;
     }
 
@@ -270,7 +275,7 @@ class DebugOverlay {
                 `;
             }
             
-            // Estadísticas de comportamiento (Fase 2.3)
+            // Estadísticas de comportamiento (Fase 2.3 + 3.1)
             if (stats.behavior) {
                 const behaviorStats = stats.behavior;
                 content += `
@@ -278,6 +283,7 @@ class DebugOverlay {
                     <div class="debug-info">Idle: ${behaviorStats.idleCount}</div>
                     <div class="debug-info">Seeking: ${behaviorStats.seekingCount}</div>
                     <div class="debug-info">Eating: ${behaviorStats.eatingCount}</div>
+                    <div class="debug-info">Mating: ${behaviorStats.matingCount || 0}</div>
                 `;
             }
         }
@@ -384,6 +390,32 @@ class DebugOverlay {
         }
         
         reproductionDiv.innerHTML = content;
+    }
+
+    /**
+     * Actualiza la sección de efectos - Fase 3.1
+     */
+    updateEffects() {
+        const effectsDiv = document.getElementById('debug-effects');
+        if (!effectsDiv) return;
+        
+        let content = '<div class="debug-info">Sin datos</div>';
+        
+        if (window.gameEffects) {
+            const stats = window.gameEffects.getStats();
+            
+            content = `
+                <div class="debug-info">--- Apareamiento ---</div>
+                <div class="debug-info">Conexiones: ${stats.mating.connections}</div>
+                <div class="debug-info">Pulsos: ${stats.mating.seekingPulses}</div>
+                <div class="debug-info">--- Nacimiento ---</div>
+                <div class="debug-info">Efectos: ${stats.birth.activeEffects}</div>
+                <div class="debug-info">Partículas: ${stats.birth.totalParticles}</div>
+                <div class="debug-info">Prom/Efecto: ${stats.birth.averageParticlesPerEffect}</div>
+            `;
+        }
+        
+        effectsDiv.innerHTML = content;
     }
 
     /**

@@ -46,11 +46,24 @@ class CreatureBehavior {
         
         // 2. Buscar comida o pareja con visión si está en IDLE
         if (this.states.isInState(CREATURE_STATES.IDLE)) {
+            const reproductionThreshold = CONSTANTS.REPRODUCTION.ENERGY_THRESHOLD;
+            const hungerThreshold = 60; // Solo buscar comida si energía < 60
+            
             // Priorizar reproducción si tiene suficiente energía
-            if (this.creature.energy >= 80 && window.gameReproduction) {
+            if (this.creature.energy >= reproductionThreshold && window.gameReproduction) {
+                // Activar efecto visual de búsqueda
+                if (window.gameEffects) {
+                    window.gameEffects.startSeekingPulse(this.creature);
+                }
                 this.searchForMate();
-            } else {
+            } 
+            // Solo buscar comida si realmente tiene hambre
+            else if (this.creature.energy < hungerThreshold) {
                 this.searchForFood();
+            }
+            // Si no tiene hambre ni energía para reproducirse, simplemente vagar
+            else {
+                // Movimiento browniano normal
             }
         }
         
@@ -78,15 +91,21 @@ class CreatureBehavior {
             return;
         }
         
-        const allCreatures = gameEngine.creatureManager.getAllCreatures();
-        const mate = gameReproduction.findMate(this.creature, allCreatures);
+        const allCreatures = window.gameEngine.creatureManager.getAllCreatures();
+        const mate = window.gameReproduction.findMate(this.creature, allCreatures);
         
         if (mate) {
+            console.log(`💕 MATING: ${this.creature.id} cambió a estado MATING con pareja ${mate.id}`);
             // Cambiar a estado MATING con objetivo
             this.states.setState(CREATURE_STATES.MATING, mate);
             
+            // Activar efecto visual de conexión
+            if (window.gameEffects) {
+                window.gameEffects.startMatingConnection(this.creature, mate);
+            }
+            
             if (window.eventBus) {
-                eventBus.emit('creature:mate_found', {
+                window.eventBus.emit('creature:mate_found', {
                     id: this.creature.id,
                     mateId: mate.id,
                     distance: this.distanceTo(mate.x, mate.y)
@@ -103,7 +122,7 @@ class CreatureBehavior {
             return;
         }
         
-        const foods = gameResources.getAllFood();
+        const foods = window.gameResources.getAllFood();
         const nearestFood = this.vision.getNearestVisibleFood(foods);
         
 
@@ -113,7 +132,7 @@ class CreatureBehavior {
             this.states.setState(CREATURE_STATES.SEEKING, nearestFood);
             
             if (window.eventBus) {
-                eventBus.emit('creature:food_spotted', {
+                window.eventBus.emit('creature:food_spotted', {
                     id: this.creature.id,
                     foodId: nearestFood.id,
                     distance: this.vision.getDistance(nearestFood.x, nearestFood.y)
@@ -138,17 +157,22 @@ class CreatureBehavior {
         
         if (distance <= matingDistance && window.gameReproduction) {
             // Intentar reproducción
-            const offspringDNA = gameReproduction.reproduce(this.creature, mate);
+            const offspringDNA = window.gameReproduction.reproduce(this.creature, mate);
             
             if (offspringDNA && window.gameEngine && window.gameEngine.creatureManager) {
                 // Calcular posición de la cría
-                const position = gameReproduction.calculateOffspringPosition(this.creature, mate);
+                const position = window.gameReproduction.calculateOffspringPosition(this.creature, mate);
                 
                 // Crear nueva criatura con DNA mezclado
-                const offspring = gameEngine.creatureManager.spawnCreatureWithDNA(position.x, position.y, offspringDNA);
+                const offspring = window.gameEngine.creatureManager.spawnCreatureWithDNA(position.x, position.y, offspringDNA);
+                
+                // Activar efecto visual de nacimiento
+                if (window.gameEffects) {
+                    window.gameEffects.createBirthEffect(position.x, position.y);
+                }
                 
                 if (offspring && window.eventBus) {
-                    eventBus.emit('creature:offspring_born', {
+                    window.eventBus.emit('creature:offspring_born', {
                         parent1: this.creature.id,
                         parent2: mate.id,
                         offspring: offspring.id,
@@ -174,7 +198,7 @@ class CreatureBehavior {
         }
         
         // Verificar si el objetivo (comida) aún existe
-        if (!window.gameResources || !gameResources.food.has(target.id)) {
+        if (!window.gameResources || !window.gameResources.food.has(target.id)) {
             this.states.setState(CREATURE_STATES.IDLE);
             return;
         }
@@ -193,7 +217,7 @@ class CreatureBehavior {
      */
     emitUpdateEvent() {
         if (window.eventBus) {
-            eventBus.emit('creature:behavior_updated', {
+            window.eventBus.emit('creature:behavior_updated', {
                 id: this.creature.id,
                 state: this.states.getCurrentState(),
                 target: this.states.getTarget(),
