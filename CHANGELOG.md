@@ -2,6 +2,68 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [2.2.0-alpha] - 2024-12-19
+
+### 🍯 CAJA 2 - Fase 2.2: Comida Básica ✅
+
+#### ✨ Sistema de Recursos Implementado
+- **src/environment/Resources.js** - Sistema completo de comida (319 líneas)
+- **Spawn automático**: Cada 2 segundos hasta máximo 20 items
+- **Detección inteligente**: Radio 50px, comida más cercana prioritaria
+- **Restauración energía**: +30 energía por consumo
+- **Efectos visuales**: Pulso dorado, rotación, glow brillante
+
+#### 🏗️ Refactorización Modular Completada
+- **Creature.js**: 248→170 líneas (sistemas modulares integrados)
+- **CreatureManager.js**: 310→245 líneas (lifecycle/stats separados)
+- **CreatureEnergy.js**: 120 líneas (gestión completa de energía)
+- **CreatureBehavior.js**: 171 líneas (movimiento browniano + búsqueda)
+- **CreatureLifecycle.js**: 185 líneas (spawn/muerte/respawn/limpieza)
+- **CreatureStats.js**: 216 líneas (métricas y estadísticas avanzadas)
+
+#### 🔧 Integraciones del Sistema
+- **Engine.js** - Sistema de recursos en gameloop principal
+- **Constants.js** - Configuración RESOURCES completa
+- **DebugOverlay.js** - Panel estadísticas recursos en tiempo real
+- **index.html** - Carga ordenada de nuevos módulos
+- **CreatureBehavior.js** - Búsqueda automática de comida
+
+#### 🎮 Comportamientos Implementados
+- **Búsqueda automática**: Criaturas detectan comida en radio 50px
+- **Consumo inteligente**: Prioriza comida más cercana disponible
+- **Spawn inicial**: 30% del máximo (6 items) al inicializar
+- **Respawn continuo**: Mantiene disponibilidad constante
+- **Feedback visual**: Efectos de consumo y spawn
+
+#### 📊 Configuración de Recursos
+- **MAX_FOOD**: 20 items máximo simultáneos
+- **SPAWN_INTERVAL**: 2000ms entre spawns automáticos
+- **ENERGY_VALUE**: 30 puntos de energía por consumo
+- **DETECTION_RADIUS**: 50px de alcance de detección
+- **FOOD_RADIUS**: 8-12px tamaño variable
+
+#### 🎯 Validación Completada
+- ✅ **Spawn automático**: Cada 2 segundos funcionando
+- ✅ **Detección funcional**: Radio 50px operativo
+- ✅ **Energía restaurada**: +30 por consumo confirmado
+- ✅ **Efectos visuales**: Pulso y rotación implementados
+- ✅ **Debug informativo**: Estadísticas en tiempo real
+- ✅ **Performance estable**: Sin degradación con recursos
+
+#### 🏗️ Arquitectura Modular
+- **UN ARCHIVO = UNA RESPONSABILIDAD** aplicado estrictamente
+- **Sistemas independientes** con comunicación EventBus
+- **Pool management** optimizado para performance
+- **Limpieza automática** sin memory leaks
+- **Escalabilidad** preparada para futuras fases
+
+#### 🚨 Pendiente Refactorización
+- Varios archivos aún exceden 100 líneas (CAJA 1-3)
+- Resources.js necesita división modular
+- Continuar aplicando reglas de tamaño
+
+---
+
 ## [2.1.0-alpha] - 2024-12-19
 
 ### ⚡ CAJA 2 - Fase 2.1: Energía y Muerte ✅
