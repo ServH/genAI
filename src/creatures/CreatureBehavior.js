@@ -1,21 +1,24 @@
 /**
  * GenAI - Comportamientos de Criaturas
- * CAJA 2 - Fase 2.0: Criatura Mínima
+ * CAJA 2 - Fase 2.3: Comportamiento de Búsqueda
  * 
- * Gestión de movimiento browniano y comportamientos
+ * Coordinador de sistemas de comportamiento modular
  */
 
 class CreatureBehavior {
     constructor(creature) {
         this.creature = creature;
         
-        // Configuración de movimiento browniano
-        this.directionTimer = 1 + Math.random() * 2; // 1-3 segundos
-        this.directionChangeRate = 0.5; // Intensidad del cambio
+        // Sistemas modulares independientes
+        this.vision = new CreatureVision(creature);
+        this.states = new CreatureStates(creature);
+        this.movement = new CreatureMovement(creature);
         
         // Estado de movimiento
         this.isMoving = true;
         this.lastPosition = { x: creature.x, y: creature.y };
+        
+        console.log(`CreatureBehavior: Coordinador inicializado para ${creature.id} con sistemas modulares`);
     }
     
     /**
@@ -24,101 +27,92 @@ class CreatureBehavior {
     update(deltaTime) {
         if (!this.creature.isAlive) return;
         
-        // Verificar si puede comer comida cercana
+        // Actualizar sistemas modulares
+        this.updateBehaviorSystems(deltaTime);
+        
+        // Verificar consumo de comida
         this.checkFoodConsumption();
         
-        // Actualizar movimiento browniano
-        this.updateMovement(deltaTime);
-        
-        // Mover criatura
-        this.move(deltaTime);
-        
-        // Verificar límites del mundo
-        this.checkWorldBounds();
+        // Emitir evento de actualización
+        this.emitUpdateEvent();
     }
     
     /**
-     * Actualiza el movimiento browniano
+     * Actualiza los sistemas de comportamiento modulares
      */
-    updateMovement(deltaTime) {
-        // Reducir timer de cambio de dirección
-        this.directionTimer -= deltaTime;
+    updateBehaviorSystems(deltaTime) {
+        // 1. Actualizar sistema de estados
+        this.states.update(deltaTime);
         
-        // Cambiar dirección aleatoriamente
-        if (this.directionTimer <= 0) {
-            const directionChange = (Math.random() - 0.5) * Math.PI * this.directionChangeRate;
-            this.creature.direction += directionChange;
-            this.directionTimer = 1 + Math.random() * 2; // Nuevo timer aleatorio
+        // 2. Buscar comida con visión si está en IDLE
+        if (this.states.isInState(CREATURE_STATES.IDLE)) {
+            this.searchForFood();
         }
         
-        // Pequeñas variaciones constantes para movimiento más orgánico
-        this.creature.direction += (Math.random() - 0.5) * 0.1 * deltaTime;
+        // 3. Verificar si llegó al objetivo
+        if (this.states.isInState(CREATURE_STATES.SEEKING)) {
+            this.checkTargetReached();
+        }
+        
+        // 4. Actualizar movimiento según estado
+        const currentState = this.states.getCurrentState();
+        const target = this.states.getTarget();
+        this.movement.update(deltaTime, currentState, target);
     }
     
     /**
-     * Mueve la criatura según su dirección y velocidad
+     * Busca comida usando el sistema de visión
      */
-    move(deltaTime) {
-        const oldX = this.creature.x;
-        const oldY = this.creature.y;
+    searchForFood() {
+        if (!window.gameResources) return;
         
-        this.creature.x += Math.cos(this.creature.direction) * this.creature.speed * deltaTime;
-        this.creature.y += Math.sin(this.creature.direction) * this.creature.speed * deltaTime;
+        const foods = gameResources.getAllFood();
+        const nearestFood = this.vision.getNearestVisibleFood(foods);
         
-        // Emitir evento si se movió significativamente
-        const distance = Math.sqrt((this.creature.x - oldX) ** 2 + (this.creature.y - oldY) ** 2);
-        if (distance > 1 && window.eventBus) {
-            eventBus.emit('creature:moved', {
+        if (nearestFood) {
+            // Cambiar a estado SEEKING con objetivo
+            this.states.setState(CREATURE_STATES.SEEKING, nearestFood);
+            
+            if (window.eventBus) {
+                eventBus.emit('creature:food_spotted', {
+                    id: this.creature.id,
+                    foodId: nearestFood.id,
+                    distance: this.vision.getDistance(nearestFood.x, nearestFood.y)
+                });
+            }
+        }
+    }
+    
+    /**
+     * Verifica si llegó al objetivo
+     */
+    checkTargetReached() {
+        const target = this.states.getTarget();
+        if (!target) {
+            this.states.setState(CREATURE_STATES.IDLE);
+            return;
+        }
+        
+        const distance = this.vision.getDistance(target.x, target.y);
+        const minDistance = CONSTANTS.MOVEMENT.MIN_TARGET_DISTANCE;
+        
+        if (distance <= minDistance) {
+            // Cambiar a estado EATING
+            this.states.setState(CREATURE_STATES.EATING, target);
+        }
+    }
+    
+    /**
+     * Emite evento de actualización de comportamiento
+     */
+    emitUpdateEvent() {
+        if (window.eventBus) {
+            eventBus.emit('creature:behavior_updated', {
                 id: this.creature.id,
-                x: this.creature.x,
-                y: this.creature.y,
-                direction: this.creature.direction,
-                distance: distance
-            });
-        }
-        
-        // Actualizar última posición
-        this.lastPosition.x = oldX;
-        this.lastPosition.y = oldY;
-    }
-    
-    /**
-     * Verifica y maneja los límites del mundo
-     */
-    checkWorldBounds() {
-        const margin = CONSTANTS.CREATURES.WORLD_MARGIN;
-        const worldWidth = window.innerWidth;
-        const worldHeight = window.innerHeight;
-        
-        let bounced = false;
-        
-        // Rebote en bordes horizontales
-        if (this.creature.x - this.creature.radius < margin) {
-            this.creature.x = margin + this.creature.radius;
-            this.creature.direction = Math.PI - this.creature.direction;
-            bounced = true;
-        } else if (this.creature.x + this.creature.radius > worldWidth - margin) {
-            this.creature.x = worldWidth - margin - this.creature.radius;
-            this.creature.direction = Math.PI - this.creature.direction;
-            bounced = true;
-        }
-        
-        // Rebote en bordes verticales
-        if (this.creature.y - this.creature.radius < margin) {
-            this.creature.y = margin + this.creature.radius;
-            this.creature.direction = -this.creature.direction;
-            bounced = true;
-        } else if (this.creature.y + this.creature.radius > worldHeight - margin) {
-            this.creature.y = worldHeight - margin - this.creature.radius;
-            this.creature.direction = -this.creature.direction;
-            bounced = true;
-        }
-        
-        if (bounced && window.eventBus) {
-            eventBus.emit('creature:bounced', { 
-                id: this.creature.id,
-                x: this.creature.x,
-                y: this.creature.y
+                state: this.states.getCurrentState(),
+                target: this.states.getTarget(),
+                position: { x: this.creature.x, y: this.creature.y },
+                direction: this.creature.direction
             });
         }
     }
@@ -169,24 +163,46 @@ class CreatureBehavior {
     checkFoodConsumption() {
         if (!window.gameResources) return;
         
-        const result = gameResources.checkFoodConsumption(this.creature);
-        if (result) {
-            // Emitir evento de alimentación exitosa
-            if (window.eventBus) {
-                eventBus.emit('creature:fed', {
-                    creatureId: this.creature.id,
-                    foodId: result.foodItem.id,
-                    energyGained: result.energyGained,
-                    newEnergy: this.creature.energy
-                });
+        // Solo consumir si está en estado EATING
+        if (this.states.isInState(CREATURE_STATES.EATING)) {
+            const result = gameResources.checkFoodConsumption(this.creature);
+            if (result) {
+                // Volver a IDLE después de comer
+                this.states.setState(CREATURE_STATES.IDLE);
+                
+                // Emitir evento de alimentación exitosa
+                if (window.eventBus) {
+                    eventBus.emit('creature:fed', {
+                        creatureId: this.creature.id,
+                        foodId: result.foodItem.id,
+                        energyGained: result.energyGained,
+                        newEnergy: this.creature.energy
+                    });
+                }
             }
         }
     }
     
     /**
-     * Limpia el comportamiento
+     * Obtiene información de debug del comportamiento
+     */
+    getDebugInfo() {
+        return {
+            state: this.states.getCurrentState(),
+            target: this.states.getTarget(),
+            vision: this.vision.getDebugInfo(),
+            isMoving: this.isMoving
+        };
+    }
+    
+    /**
+     * Limpia el comportamiento y sistemas modulares
      */
     destroy() {
+        if (this.vision) this.vision.destroy();
+        if (this.states) this.states.destroy();
+        if (this.movement) this.movement.destroy();
+        
         this.creature = null;
     }
 }

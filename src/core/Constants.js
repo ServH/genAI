@@ -100,9 +100,31 @@ const CONSTANTS = {
         INITIAL_FOOD_RATIO: 0.3 // 30% del máximo al inicio
     },
 
+    // Configuración de Visión
+    VISION: {
+        ANGLE: 120, // grados del cono de visión
+        RANGE: 200, // pixels de alcance
+        DEBUG_SHOW: false // mostrar cono en debug
+    },
+
+    // Configuración de Estados
+    STATES: {
+        IDLE_DURATION: 2000, // ms mínimo en idle
+        SEEKING_TIMEOUT: 5000, // ms máximo buscando
+        EATING_DURATION: 500, // ms consumiendo
+        STATE_CHANGE_COOLDOWN: 200 // ms entre cambios de estado
+    },
+
+    // Configuración de Movimiento
+    MOVEMENT: {
+        SMOOTHING_FACTOR: 0.1, // suavidad interpolación (0-1)
+        MIN_TARGET_DISTANCE: 10, // pixels para "llegar" al objetivo
+        DIRECTION_VARIANCE: 0.3 // variación en movimiento browniano
+    },
+
     // Versión del proyecto
-    VERSION: "2.2.0-alpha",
-    CURRENT_PHASE: "CAJA 2 - Fase 2.2: Comida Básica"
+    VERSION: "2.3.0-alpha",
+    CURRENT_PHASE: "CAJA 2 - Fase 2.3: Comportamiento de Búsqueda"
 };
 
 // Hacer disponible globalmente

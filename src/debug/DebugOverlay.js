@@ -259,6 +259,17 @@ class DebugOverlay {
                     <div class="debug-info">Próximo: ${((resourceStats.spawnInterval - resourceStats.spawnTimer) / 1000).toFixed(1)}s</div>
                 `;
             }
+            
+            // Estadísticas de comportamiento (Fase 2.3)
+            if (stats.behavior) {
+                const behaviorStats = stats.behavior;
+                content += `
+                    <div class="debug-info">--- Estados ---</div>
+                    <div class="debug-info">Idle: ${behaviorStats.idleCount}</div>
+                    <div class="debug-info">Seeking: ${behaviorStats.seekingCount}</div>
+                    <div class="debug-info">Eating: ${behaviorStats.eatingCount}</div>
+                `;
+            }
         }
         
         creaturesDiv.innerHTML = content;

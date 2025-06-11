@@ -75,11 +75,11 @@ console.log(`
 GenAI - Simulador de Vida Emergente
 ===================================
 Fase: ${CONSTANTS.CURRENT_PHASE}
-Objetivo: Sistema de comida básica
-- Spawn automático: Cada 2 segundos hasta máximo 20 items
-- Detección: Radio 50px, comida más cercana prioritaria
-- Restauración: +30 energía por consumo
-- Efectos visuales: Pulso dorado, rotación, glow brillante
+Objetivo: Comportamiento de búsqueda inteligente
+- Estados: Idle/Seeking/Eating con transiciones suaves
+- Visión: Cono de 120°, 200px de alcance
+- Movimiento: Suave hacia objetivos, no robótico
+- Priorización: Comida más cercana visible
 Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
 ===================================
 `); 

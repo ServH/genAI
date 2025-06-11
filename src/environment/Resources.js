@@ -274,6 +274,13 @@ class Resources {
     }
     
     /**
+     * Obtiene toda la comida disponible
+     */
+    getAllFood() {
+        return this.food;
+    }
+    
+    /**
      * Obtiene estadísticas del sistema
      */
     getStats() {

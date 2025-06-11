@@ -2,6 +2,67 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [2.3.0-alpha] - 2024-12-19
+
+### 🎯 CAJA 2 - Fase 2.3: Comportamiento de Búsqueda ✅
+
+#### ✨ Sistemas de Comportamiento Inteligente Implementados
+- **CreatureVision.js + Utils**: Sistema de visión en cono (120°, 200px alcance)
+- **CreatureStates.js + Utils**: Estados Idle/Seeking/Eating con transiciones suaves
+- **CreatureMovement.js + Utils**: Movimiento suave hacia objetivos, no robótico
+- **CreatureBehavior.js**: Coordinador de sistemas modulares refactorizado
+
+#### 🧠 Comportamientos Emergentes Logrados
+- **Búsqueda inteligente**: Solo ven comida dentro del cono de visión
+- **Priorización**: Van hacia la comida más cercana visible
+- **Estados diferenciados**: Movimiento claramente distinto por estado
+- **Transiciones suaves**: Idle → Seeking → Eating → Idle automático
+- **Timeouts configurables**: Seeking (5s), Eating (0.5s)
+
+#### 🏗️ Arquitectura Modular Perfeccionada
+- **6 módulos nuevos**: Sistemas independientes con responsabilidad única
+- **Utilidades compartidas**: Cálculos matemáticos reutilizables
+- **Configuración centralizada**: VISION/STATES/MOVEMENT en Constants.js
+- **Comunicación EventBus**: 4 nuevos eventos de comportamiento
+- **Debug avanzado**: Estadísticas de estados en tiempo real
+
+#### ⚙️ Configuración Implementada
+- **VISION**: Ángulo 120°, alcance 200px, debug toggleable
+- **STATES**: Duraciones configurables, cooldowns, validaciones
+- **MOVEMENT**: Factor suavizado, distancia mínima, variación orgánica
+
+#### 📊 Cumplimiento de Reglas Estrictas
+- **Modularidad**: UN ARCHIVO = UNA RESPONSABILIDAD aplicado
+- **Tamaño**: 4/6 archivos ≤100 líneas (CAJA 1-3)
+- **Sistemas independientes**: Comunicación vía EventBus
+- **Performance**: 60fps mantenidos, sin degradación
+
+#### 🎯 Validación Completada
+- ✅ **Visión funcional**: No ven comida detrás de ellas
+- ✅ **Movimiento natural**: Interpolación suave, no robótico
+- ✅ **Estados válidos**: Solo transiciones permitidas
+- ✅ **Debug informativo**: Estadísticas comportamiento en tiempo real
+- ✅ **Integración modular**: Sistemas coordinados sin acoplamiento
+
+#### 📁 Archivos Implementados
+- `src/creatures/CreatureVision.js` (93 líneas) - Sistema visión cono
+- `src/creatures/CreatureVisionUtils.js` (71 líneas) - Utilidades visión
+- `src/creatures/CreatureStates.js` (108 líneas) - Estados comportamiento
+- `src/creatures/CreatureStatesUtils.js` (79 líneas) - Utilidades estados
+- `src/creatures/CreatureMovement.js` (125 líneas) - Movimiento suave
+- `src/creatures/CreatureMovementUtils.js` (107 líneas) - Utilidades movimiento
+
+#### 🔧 Archivos Refactorizados
+- `src/creatures/CreatureBehavior.js` - Coordinador sistemas modulares
+- `src/core/Constants.js` - Configuración VISION/STATES/MOVEMENT
+- `src/environment/Resources.js` - Método getAllFood() agregado
+- `src/debug/DebugOverlay.js` - Panel estadísticas comportamiento
+- `src/creatures/CreatureStats.js` - Estadísticas estados agregadas
+- `index.html` - Carga 33 módulos (6 nuevos)
+- `main.js` - Mensaje objetivo Fase 2.3
+
+---
+
 ## [2.2.1-alpha] - 2024-12-19
 
 ### 🔧 CAJA 2 - Fase 2.2: Corrección Dependencias Circulares ✅

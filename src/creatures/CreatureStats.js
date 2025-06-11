@@ -152,12 +152,61 @@ class CreatureStats {
     }
     
     /**
+     * Obtiene estadísticas de comportamiento (Fase 2.3)
+     */
+    getBehaviorStats() {
+        const creatures = Array.from(this.manager.creatures.values())
+            .filter(c => c.isAlive);
+        
+        if (creatures.length === 0) {
+            return {
+                idleCount: 0,
+                seekingCount: 0,
+                eatingCount: 0,
+                totalWithBehavior: 0
+            };
+        }
+        
+        let idleCount = 0;
+        let seekingCount = 0;
+        let eatingCount = 0;
+        let totalWithBehavior = 0;
+        
+        for (const creature of creatures) {
+            if (creature.behavior && creature.behavior.states) {
+                totalWithBehavior++;
+                const state = creature.behavior.states.getCurrentState();
+                
+                switch (state) {
+                    case 'idle':
+                        idleCount++;
+                        break;
+                    case 'seeking':
+                        seekingCount++;
+                        break;
+                    case 'eating':
+                        eatingCount++;
+                        break;
+                }
+            }
+        }
+        
+        return {
+            idleCount,
+            seekingCount,
+            eatingCount,
+            totalWithBehavior
+        };
+    }
+    
+    /**
      * Obtiene estadísticas completas
      */
     getCompleteStats() {
         const basic = this.getBasicStats();
         const energy = this.getEnergyStats();
         const movement = this.getMovementStats();
+        const behavior = this.getBehaviorStats();
         const lifecycle = this.manager.lifecycle ? this.manager.lifecycle.getStats() : null;
         const factory = this.manager.factory ? this.manager.factory.getStats() : null;
         const globalEnergy = window.gameEnergy ? gameEnergy.getStats() : null;
@@ -166,6 +215,7 @@ class CreatureStats {
             basic,
             energy,
             movement,
+            behavior,
             lifecycle,
             factory,
             globalEnergy,
