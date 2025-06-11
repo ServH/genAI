@@ -228,22 +228,35 @@ class DebugOverlay {
             const manager = window.gameEngine.creatureManager;
             const stats = manager.getStats();
             
-            content = `
-                <div class="debug-info">Activas: ${stats.totalCreatures}/${stats.maxCreatures}</div>
-                <div class="debug-info">Vivas: ${stats.aliveCreatures}</div>
-                <div class="debug-info">Sprites: ${stats.sprites}</div>
-                <div class="debug-info">Updates: ${stats.updateCounter}</div>
-            `;
+            // Estadísticas básicas
+            if (stats.basic) {
+                content = `
+                    <div class="debug-info">Activas: ${stats.basic.aliveCreatures}/${stats.basic.totalCreatures}</div>
+                    <div class="debug-info">Sprites: ${stats.basic.sprites}</div>
+                    <div class="debug-info">Updates: ${stats.basic.updateCounter}</div>
+                `;
+            }
             
-            // Agregar información de energía si está disponible
-            if (stats.energyStats) {
-                const energyStats = stats.energyStats;
+            // Estadísticas de energía
+            if (stats.energy) {
+                const energyStats = stats.energy;
                 content += `
                     <div class="debug-info">--- Energía ---</div>
-                    <div class="debug-info">Promedio: ${energyStats.averageEnergy}</div>
-                    <div class="debug-info">Muertes: ${energyStats.totalDeaths}</div>
-                    <div class="debug-info">Pérdida/s: ${energyStats.drainRate}</div>
-                    <div class="debug-info">Total perdida: ${energyStats.totalEnergyLost}</div>
+                    <div class="debug-info">Promedio: ${energyStats.avgEnergy.toFixed(1)}</div>
+                    <div class="debug-info">Críticas: ${energyStats.criticalCount}</div>
+                    <div class="debug-info">Muriendo: ${energyStats.dyingCount}</div>
+                `;
+            }
+            
+            // Estadísticas de recursos
+            if (window.gameResources) {
+                const resourceStats = window.gameResources.getStats();
+                content += `
+                    <div class="debug-info">--- Recursos ---</div>
+                    <div class="debug-info">Comida: ${resourceStats.currentFood}/${resourceStats.maxFood}</div>
+                    <div class="debug-info">Spawneada: ${resourceStats.totalSpawned}</div>
+                    <div class="debug-info">Consumida: ${resourceStats.totalConsumed}</div>
+                    <div class="debug-info">Próximo: ${((resourceStats.spawnInterval - resourceStats.spawnTimer) / 1000).toFixed(1)}s</div>
                 `;
             }
         }

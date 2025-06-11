@@ -1,8 +1,8 @@
 /**
  * GenAI - Criatura Base
- * CAJA 2 - Fase 2.0: Criatura Mínima
+ * CAJA 2 - Fase 2.2: Comida Básica (Refactorizada)
  * 
- * Entidad lógica de criatura con movimiento browniano
+ * Entidad lógica de criatura con sistemas modulares
  */
 
 class Creature {
@@ -21,24 +21,15 @@ class Creature {
         this.isAlive = true;
         this.age = 0;
         
-        // Sistema de energía
-        this.energy = CONSTANTS.ENERGY ? CONSTANTS.ENERGY.INITIAL : 100;
-        this.maxEnergy = this.energy;
-        
-        // Configuración de movimiento browniano
-        this.directionTimer = 1 + Math.random() * 2; // 1-3 segundos
-        this.directionChangeRate = 0.5; // Intensidad del cambio
-        
         // Propiedades visuales básicas
         this.radius = CONSTANTS.CREATURES.BASE_RADIUS * (0.8 + Math.random() * 0.4);
         this.color = this.getRandomColor();
         
-        console.log(`Creature: Criatura ${this.id} creada en (${Math.round(x)}, ${Math.round(y)}) con ${this.energy} energía`);
+        // Sistemas modulares
+        this.energySystem = new CreatureEnergy(this);
+        this.behavior = new CreatureBehavior(this);
         
-        // Registrar en sistema de energía
-        if (window.gameEnergy) {
-            gameEnergy.registerCreature(this);
-        }
+        console.log(`Creature: Criatura ${this.id} creada en (${Math.round(x)}, ${Math.round(y)}) con ${this.energySystem.getCurrent()} energía`);
         
         if (window.eventBus) {
             eventBus.emit('creature:created', { 
@@ -46,7 +37,7 @@ class Creature {
                 x: this.x, 
                 y: this.y,
                 color: this.color,
-                energy: this.energy
+                energy: this.energySystem.getCurrent()
             });
         }
     }
@@ -59,91 +50,8 @@ class Creature {
         
         this.age += deltaTime;
         
-        // Actualizar movimiento browniano
-        this.updateMovement(deltaTime);
-        
-        // Mover criatura
-        this.move(deltaTime);
-        
-        // Verificar límites del mundo
-        this.checkWorldBounds();
-    }
-
-    /**
-     * Actualiza el movimiento browniano
-     */
-    updateMovement(deltaTime) {
-        // Reducir timer de cambio de dirección
-        this.directionTimer -= deltaTime;
-        
-        // Cambiar dirección aleatoriamente
-        if (this.directionTimer <= 0) {
-            const directionChange = (Math.random() - 0.5) * Math.PI * this.directionChangeRate;
-            this.direction += directionChange;
-            this.directionTimer = 1 + Math.random() * 2; // Nuevo timer aleatorio
-        }
-        
-        // Pequeñas variaciones constantes para movimiento más orgánico
-        this.direction += (Math.random() - 0.5) * 0.1 * deltaTime;
-    }
-
-    /**
-     * Mueve la criatura según su dirección y velocidad
-     */
-    move(deltaTime) {
-        const oldX = this.x;
-        const oldY = this.y;
-        
-        this.x += Math.cos(this.direction) * this.speed * deltaTime;
-        this.y += Math.sin(this.direction) * this.speed * deltaTime;
-        
-        // Emitir evento si se movió significativamente
-        const distance = Math.sqrt((this.x - oldX) ** 2 + (this.y - oldY) ** 2);
-        if (distance > 1 && window.eventBus) {
-            eventBus.emit('creature:moved', {
-                id: this.id,
-                x: this.x,
-                y: this.y,
-                direction: this.direction
-            });
-        }
-    }
-
-    /**
-     * Verifica y maneja los límites del mundo
-     */
-    checkWorldBounds() {
-        const margin = CONSTANTS.CREATURES.WORLD_MARGIN;
-        const worldWidth = window.innerWidth;
-        const worldHeight = window.innerHeight;
-        
-        let bounced = false;
-        
-        // Rebote en bordes horizontales
-        if (this.x - this.radius < margin) {
-            this.x = margin + this.radius;
-            this.direction = Math.PI - this.direction;
-            bounced = true;
-        } else if (this.x + this.radius > worldWidth - margin) {
-            this.x = worldWidth - margin - this.radius;
-            this.direction = Math.PI - this.direction;
-            bounced = true;
-        }
-        
-        // Rebote en bordes verticales
-        if (this.y - this.radius < margin) {
-            this.y = margin + this.radius;
-            this.direction = -this.direction;
-            bounced = true;
-        } else if (this.y + this.radius > worldHeight - margin) {
-            this.y = worldHeight - margin - this.radius;
-            this.direction = -this.direction;
-            bounced = true;
-        }
-        
-        if (bounced && window.eventBus) {
-            eventBus.emit('creature:bounced', { id: this.id });
-        }
+        // Actualizar sistemas modulares
+        this.behavior.update(deltaTime);
     }
 
     /**
@@ -181,31 +89,42 @@ class Creature {
      * Consume energía de la criatura
      */
     consumeEnergy(amount) {
-        if (!this.isAlive) return;
-        
-        this.energy = Math.max(0, this.energy - amount);
-        
-        if (window.eventBus) {
-            eventBus.emit('creature:energy_consumed', {
-                id: this.id,
-                amount: amount,
-                currentEnergy: this.energy
-            });
-        }
+        return this.energySystem.consume(amount);
+    }
+    
+    /**
+     * Restaura energía de la criatura
+     */
+    restoreEnergy(amount) {
+        return this.energySystem.restore(amount);
     }
     
     /**
      * Verifica si la criatura está muriendo
      */
     isDying() {
-        return this.energy <= 5;
+        return this.energySystem.isDying();
     }
     
     /**
      * Obtiene el porcentaje de energía
      */
     getEnergyPercentage() {
-        return this.energy / this.maxEnergy;
+        return this.energySystem.getPercentage();
+    }
+    
+    /**
+     * Obtiene la energía actual
+     */
+    get energy() {
+        return this.energySystem.getCurrent();
+    }
+    
+    /**
+     * Obtiene la energía máxima
+     */
+    get maxEnergy() {
+        return this.energySystem.getMax();
     }
     
     /**
@@ -215,12 +134,7 @@ class Creature {
         if (!this.isAlive) return;
         
         this.isAlive = false;
-        this.energy = 0;
-        
-        // Desregistrar del sistema de energía
-        if (window.gameEnergy) {
-            gameEnergy.unregisterCreature(this);
-        }
+        this.energySystem.set(0);
         
         console.log(`Creature: Criatura ${this.id} murió por ${cause}`);
         
@@ -238,6 +152,14 @@ class Creature {
      */
     destroy() {
         this.die('destroyed');
+        
+        // Limpiar sistemas modulares
+        if (this.energySystem) {
+            this.energySystem.destroy();
+        }
+        if (this.behavior) {
+            this.behavior.destroy();
+        }
         
         if (window.eventBus) {
             eventBus.emit('creature:destroyed', { id: this.id });

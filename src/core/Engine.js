@@ -50,6 +50,7 @@ class Engine {
                    window.CreatureManager &&
                    window.Energy &&
                    window.gameEnergy &&
+                   window.Resources &&
                    typeof PIXI !== 'undefined';
         };
         
@@ -85,6 +86,13 @@ class Engine {
             
             // Hacer cámara disponible globalmente
             window.gameCamera = this.camera;
+            
+            // Inicializar sistema de recursos
+            this.gameResources = new Resources();
+            this.gameResources.init(this.worldContainer, this.camera);
+            
+            // Hacer recursos disponible globalmente
+            window.gameResources = this.gameResources;
             
             // Inicializar sistema de criaturas
             this.creatureManager = new CreatureManager();
@@ -183,6 +191,11 @@ class Engine {
                     this.camera.update(deltaTime);
                 }
                 
+                // Actualizar recursos
+                if (this.gameResources) {
+                    this.gameResources.update(deltaTime);
+                }
+                
                 // Actualizar criaturas
                 if (this.creatureManager) {
                     this.creatureManager.update(deltaTime);
@@ -221,6 +234,10 @@ class Engine {
         
         if (this.creatureManager) {
             this.creatureManager.destroy();
+        }
+        
+        if (this.gameResources) {
+            this.gameResources.destroy();
         }
         
         if (this.renderer) {

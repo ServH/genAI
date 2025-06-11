@@ -1,8 +1,8 @@
 /**
  * GenAI - Manager de Criaturas
- * CAJA 2 - Fase 2.0: Criatura Mínima
+ * CAJA 2 - Fase 2.2: Comida Básica (Refactorizado)
  * 
- * Gestión del pool de criaturas y sprites
+ * Gestión del pool de criaturas y sprites con sistemas modulares
  */
 
 class CreatureManager {
@@ -20,11 +20,14 @@ class CreatureManager {
         this.camera = null;
         this.factory = null;
         
+        // Sistemas modulares
+        this.lifecycle = new CreatureLifecycle(this);
+        this.stats = new CreatureStats(this);
+        
         // Estado
         this.isInitialized = false;
-        this.updateCounter = 0;
         
-        console.log('CreatureManager: Manager inicializado');
+        console.log('CreatureManager: Manager inicializado con sistemas modulares');
     }
 
     /**
@@ -36,9 +39,10 @@ class CreatureManager {
         
         // Crear factory
         this.factory = new CreatureFactory();
+        this.lifecycle.setFactory(this.factory);
         
         // Spawn inicial de criaturas
-        await this.spawnInitialCreatures();
+        await this.lifecycle.spawnInitialCreatures(this.initialCount);
         
         this.isInitialized = true;
         
@@ -52,31 +56,7 @@ class CreatureManager {
         }
     }
 
-    /**
-     * Spawn inicial de criaturas
-     */
-    async spawnInitialCreatures() {
-        console.log(`CreatureManager: Spawning ${this.initialCount} criaturas iniciales...`);
-        
-        for (let i = 0; i < this.initialCount; i++) {
-            const creature = this.factory.createCreature();
-            this.addCreature(creature);
-            
-            // Pequeña pausa para evitar bloqueo
-            if (i % 3 === 0) {
-                await new Promise(resolve => setTimeout(resolve, 1));
-            }
-        }
-        
-        console.log(`CreatureManager: ${this.creatures.size} criaturas spawneadas`);
-        
-        if (window.eventBus) {
-            eventBus.emit('creatures:spawned', {
-                count: this.creatures.size,
-                initial: true
-            });
-        }
-    }
+
 
     /**
      * Agrega una criatura al manager
@@ -146,7 +126,9 @@ class CreatureManager {
     update(deltaTime) {
         if (!this.isInitialized) return;
         
-        this.updateCounter++;
+        const startTime = performance.now();
+        
+        this.stats.incrementUpdateCounter();
         
         // Actualizar sistema de energía
         if (window.gameEnergy) {
@@ -166,18 +148,22 @@ class CreatureManager {
         }
         
         // Limpiar criaturas muertas cada 2 segundos
-        if (this.updateCounter % 120 === 0) {
-            this.cleanup();
-            this.checkRespawn();
+        if (this.stats.updateCounter % 120 === 0) {
+            this.lifecycle.cleanup();
+            this.lifecycle.checkRespawn();
         }
         
+        // Actualizar métricas de performance
+        const updateTime = performance.now() - startTime;
+        this.stats.updatePerformanceMetrics(updateTime);
+        
         // Emitir evento de actualización cada 60 frames
-        if (this.updateCounter % 60 === 0 && window.eventBus) {
+        if (this.stats.updateCounter % 60 === 0 && window.eventBus) {
             eventBus.emit('creatures:updated', {
                 count: this.creatures.size,
-                aliveCount: this.getAliveCount(),
+                aliveCount: this.stats.getAliveCount(),
                 deltaTime: deltaTime,
-                frame: this.updateCounter
+                frame: this.stats.updateCounter
             });
         }
     }
@@ -207,76 +193,17 @@ class CreatureManager {
      * Obtiene el número de criaturas vivas
      */
     getAliveCount() {
-        return Array.from(this.creatures.values())
-            .filter(c => c.isAlive).length;
+        return this.stats.getAliveCount();
     }
 
     /**
      * Obtiene estadísticas del manager
      */
     getStats() {
-        const aliveCount = this.getAliveCount();
-        
-        return {
-            totalCreatures: this.creatures.size,
-            aliveCreatures: aliveCount,
-            sprites: this.sprites.size,
-            maxCreatures: this.maxCreatures,
-            updateCounter: this.updateCounter,
-            factoryStats: this.factory ? this.factory.getStats() : null,
-            energyStats: window.gameEnergy ? gameEnergy.getStats() : null
-        };
+        return this.stats.getCompleteStats();
     }
 
-    /**
-     * Verifica si necesita respawn automático
-     */
-    checkRespawn() {
-        const aliveCount = this.getAliveCount();
-        const targetCount = CONSTANTS.CREATURES.INITIAL_COUNT;
-        
-        if (aliveCount < targetCount) {
-            const toSpawn = targetCount - aliveCount;
-            console.log(`CreatureManager: Respawning ${toSpawn} criaturas (${aliveCount}/${targetCount})`);
-            
-            for (let i = 0; i < toSpawn; i++) {
-                const creature = this.factory.createCreature();
-                if (creature) {
-                    this.addCreature(creature);
-                }
-            }
-            
-            if (window.eventBus) {
-                eventBus.emit('creatures:respawned', {
-                    spawned: toSpawn,
-                    aliveCount: this.getAliveCount()
-                });
-            }
-        }
-    }
 
-    /**
-     * Limpia criaturas muertas
-     */
-    cleanup() {
-        const deadCreatures = [];
-        
-        for (const [id, creature] of this.creatures) {
-            if (!creature.isAlive) {
-                deadCreatures.push(id);
-            }
-        }
-        
-        for (const id of deadCreatures) {
-            this.removeCreature(id);
-        }
-        
-        if (deadCreatures.length > 0) {
-            console.log(`CreatureManager: ${deadCreatures.length} criaturas muertas limpiadas`);
-        }
-        
-        return deadCreatures.length;
-    }
 
     /**
      * Destruye el manager y limpia recursos
@@ -293,6 +220,14 @@ class CreatureManager {
         
         this.creatures.clear();
         this.sprites.clear();
+        
+        // Limpiar sistemas modulares
+        if (this.lifecycle) {
+            this.lifecycle.destroy();
+        }
+        if (this.stats) {
+            this.stats.destroy();
+        }
         
         this.stage = null;
         this.camera = null;

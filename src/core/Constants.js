@@ -89,9 +89,20 @@ const CONSTANTS = {
         RESPAWN_DELAY: 2000 // ms para respawn automático
     },
 
+    // Configuración de Recursos
+    RESOURCES: {
+        MAX_FOOD: 20,
+        SPAWN_INTERVAL: 2000, // ms - cada 2 segundos
+        ENERGY_VALUE: 30, // energía que restaura cada comida
+        DETECTION_RADIUS: 50, // px - radio de detección
+        FOOD_RADIUS_MIN: 8,
+        FOOD_RADIUS_MAX: 12,
+        INITIAL_FOOD_RATIO: 0.3 // 30% del máximo al inicio
+    },
+
     // Versión del proyecto
-    VERSION: "2.0.0-alpha",
-    CURRENT_PHASE: "CAJA 2 - Fase 2.1: Energía y Muerte"
+    VERSION: "2.2.0-alpha",
+    CURRENT_PHASE: "CAJA 2 - Fase 2.2: Comida Básica"
 };
 
 // Hacer disponible globalmente
