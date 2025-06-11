@@ -1,0 +1,28 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>GenAI - Simulador de Vida Emergente</title>
+    <link rel="stylesheet" href="style.css">
+</head>
+<body>
+    <div id="game-container">
+        <canvas id="game-canvas"></canvas>
+        <div id="debug-overlay" class="debug-overlay hidden">
+            <div class="debug-panel">
+                <h3>Debug Info</h3>
+                <div id="debug-content"></div>
+            </div>
+        </div>
+    </div>
+    
+    <!-- PixiJS 8.x CDN -->
+    <script src="https://pixijs.download/release/pixi.min.js"></script>
+    
+    <!-- Módulos del juego -->
+    <script src="src/core/Constants.js"></script>
+    <script src="src/core/Engine.js"></script>
+    <script src="main.js"></script>
+</body>
+</html> 

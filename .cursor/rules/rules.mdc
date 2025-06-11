@@ -1,0 +1,62 @@
+---
+description: 
+globs: 
+alwaysApply: true
+---
+/**
+ * REGLAS PARA CURSOR - PROYECTO GENAI
+ * 
+ * 1. ARQUITECTURA SAGRADA
+ *    - NUNCA modificar la estructura de carpetas sin consultar
+ *    - Cada archivo tiene UN propósito claro
+ *    - Si crece > 200 líneas, considera dividirlo
+ * 
+ * 2. FASES ESTRICTAS
+ *    - SOLO implementar la fase actual
+ *    - Marcar como "TODO: Fase X.Y" lo que no toca
+ *    - No adelantarse a fases futuras
+ * 
+ * 3. ESTILO DE CÓDIGO
+ *    - Nombres descriptivos: `findNearestFood()` no `find()`
+ *    - Comentarios en cabeceras de clases/módulos
+ *    - JSDoc para funciones públicas
+ *    - Constantes en UPPER_CASE
+ * 
+ * 4. MODULARIDAD
+ *    - Importar solo lo necesario
+ *    - Evitar dependencias circulares
+ *    - Preferir composición sobre herencia
+ *    - Funciones puras cuando sea posible
+ * 
+ * 5. PERFORMANCE
+ *    - Object pooling para todo lo que se crea/destruye
+ *    - Cachear cálculos costosos
+ *    - Usar spatial grid para búsquedas
+ *    - Máximo 500 entidades activas
+ * 
+ * 6. PIXIJS ESPECÍFICO
+ *    - Reusar Graphics cuando sea posible
+ *    - Containers para agrupar sprites relacionados
+ *    - cacheAsBitmap para elementos estáticos
+ *    - Evitar filters costosos en muchas entidades
+ * 
+ * 7. TESTING VISUAL
+ *    - Después de cada fase, verificar visualmente
+ *    - Debug overlay debe mostrar info relevante
+ *    - FPS debe mantenerse > 50
+ * 
+ * 8. COMMITS
+ *    - Un commit por sub-fase completada
+ *    - Mensajes: "CAJA X - Fase Y.Z: [descripción]"
+ *    - No commitear código comentado
+ * 
+ * 9. EMERGENCIA
+ *    - El comportamiento complejo emerge de reglas simples
+ *    - No hardcodear comportamientos específicos
+ *    - Dejar que el sistema sorprenda
+ * 
+ * 10. COLABORACIÓN
+ *     - Código legible para otros agentes IA
+ *     - Documentar decisiones no obvias
+ *     - Mantener README.md actualizado
+ */
