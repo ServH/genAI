@@ -30,12 +30,12 @@ const CONSTANTS = {
 
     // Colores del Proyecto
     COLORS: {
-        BACKGROUND: 0x0a0e27,
-        CREATURE_CYAN: 0x00fff0,
-        CREATURE_PINK: 0xff00ff,
-        CREATURE_YELLOW: 0xffff00,
-        FOOD_GOLD: 0xffd700,
-        DEBUG_TEXT: 0x00fff0
+        BACKGROUND: '#0a0e27',
+        CREATURE_CYAN: '#00fff0',
+        CREATURE_PINK: '#ff00ff',
+        CREATURE_YELLOW: '#ffff00',
+        FOOD_GOLD: '#ffd700',
+        DEBUG_TEXT: '#00fff0'
     },
 
     // Configuración de Física
@@ -55,8 +55,8 @@ const CONSTANTS = {
     },
 
     // Versión del proyecto
-    VERSION: "1.1.0-alpha",
-    CURRENT_PHASE: "CAJA 1 - Fase 1.1"
+    VERSION: "1.1.1-alpha",
+    CURRENT_PHASE: "CAJA 1 - Fase 1.1 (Refactorizada)"
 };
 
 // Hacer disponible globalmente

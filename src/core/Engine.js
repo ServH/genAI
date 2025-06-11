@@ -1,225 +1,155 @@
 /**
- * GenAI - Motor Principal del Juego
- * CAJA 1 - Fase 1.0: Setup Inicial
+ * GenAI - Motor Principal
+ * CAJA 1 - Fase 1.1: Sistema Core
  * 
- * Maneja el gameloop principal y la inicialización de PixiJS
+ * Gameloop principal del juego
  */
 
 class Engine {
     constructor() {
-        this.app = null;
-        this.lastTime = 0;
-        this.deltaTime = 0;
         this.isRunning = false;
-        this.frameCount = 0;
+        this.animationFrameId = null;
+        this.canvas = null;
+        this.controls = null;
         
-        // Debug info
-        this.fps = 0;
-        this.lastFpsUpdate = 0;
-        
-        this.init();
-    }
-
-    /**
-     * Inicializa PixiJS y configura el canvas
-     */
-    async init() {
-        try {
-            // Crear aplicación PixiJS
-            this.app = new PIXI.Application();
-            
-            // Inicializar con configuración
-            await this.app.init({
-                width: window.innerWidth,
-                height: window.innerHeight,
-                backgroundColor: CONSTANTS.CANVAS.BACKGROUND_COLOR,
-                antialias: CONSTANTS.CANVAS.ANTIALIAS,
-                resolution: CONSTANTS.CANVAS.RESOLUTION,
-                autoDensity: true
-            });
-
-            // Agregar canvas al DOM
-            const gameContainer = document.getElementById('game-container');
-            const existingCanvas = document.getElementById('game-canvas');
-            if (existingCanvas) {
-                existingCanvas.remove();
-            }
-            
-            this.app.canvas.id = 'game-canvas';
-            gameContainer.appendChild(this.app.canvas);
-
-            // Configurar responsive
-            this.setupResize();
-            
-            // Inicializar debug
-            this.setupDebug();
-            
-            console.log('Engine inicializado correctamente');
-            console.log(`Fase actual: ${CONSTANTS.CURRENT_PHASE}`);
-            
-            // Iniciar gameloop
-            this.start();
-            
-        } catch (error) {
-            console.error('Error inicializando Engine:', error);
-        }
-    }
-
-    /**
-     * Configura el redimensionamiento responsivo
-     */
-    setupResize() {
-        const resize = () => {
-            this.app.renderer.resize(window.innerWidth, window.innerHeight);
-        };
-        
-        window.addEventListener('resize', resize);
-        resize(); // Aplicar inmediatamente
-    }
-
-    /**
-     * Configura el sistema de debug y controles
-     */
-    setupDebug() {
-        // Controles de teclado
-        document.addEventListener('keydown', (event) => {
-            switch(event.key.toLowerCase()) {
-                case 'd':
-                    this.toggleDebug();
-                    break;
-                case ' ':
-                    event.preventDefault();
-                    this.togglePause();
-                    break;
-            }
+        // Esperar a que todos los módulos estén cargados
+        this.waitForModules().then(() => {
+            this.init();
         });
     }
 
     /**
-     * Alterna entre pausa y reproducción del juego
+     * Espera a que todos los módulos necesarios estén disponibles
      */
-    togglePause() {
-        if (window.gameTime) {
-            gameTime.togglePause();
-        }
-    }
-
-    /**
-     * Alterna la visualización del debug overlay
-     */
-    toggleDebug() {
-        if (window.debugOverlay) {
-            debugOverlay.toggle();
-        } else {
-            // Fallback para compatibilidad
-            const debugOverlayElement = document.getElementById('debug-overlay');
-            if (debugOverlayElement) {
-                debugOverlayElement.classList.toggle('hidden');
-            }
-        }
-    }
-
-    /**
-     * Actualiza la información de debug
-     */
-    updateDebug() {
-        const now = performance.now();
+    async waitForModules() {
+        const checkModules = () => {
+            return window.gameTime && 
+                   window.timeStats && 
+                   window.eventBus && 
+                   window.debugOverlay &&
+                   window.EngineControls &&
+                   window.EngineCanvas;
+        };
         
-        // Actualizar FPS cada 100ms
-        if (now - this.lastFpsUpdate > CONSTANTS.DEBUG.UPDATE_INTERVAL) {
-            this.fps = Math.round(1000 / this.deltaTime);
-            this.lastFpsUpdate = now;
-            
-            // Actualizar DOM
-            const debugContent = document.getElementById('debug-content');
-            if (debugContent) {
-                debugContent.innerHTML = `
-                    <div>FPS: ${this.fps}</div>
-                    <div>Delta: ${this.deltaTime.toFixed(2)}ms</div>
-                    <div>Frame: ${this.frameCount}</div>
-                    <div>Fase: ${CONSTANTS.CURRENT_PHASE}</div>
-                `;
-            }
+        while (!checkModules()) {
+            await new Promise(resolve => setTimeout(resolve, 10));
         }
     }
 
     /**
-     * Inicia el gameloop principal
+     * Inicializa el motor
+     */
+    init() {
+        console.log('Engine: Inicializando motor principal...');
+        
+        // Configurar canvas
+        this.canvas = new EngineCanvas();
+        
+        // Configurar controles
+        this.controls = new EngineControls(this);
+        
+        // Emitir evento de inicialización
+        if (window.eventBus) {
+            eventBus.emit('engine:initialized');
+        }
+        
+        console.log('Engine: Motor inicializado correctamente');
+        
+        // Iniciar automáticamente
+        this.start();
+    }
+
+    /**
+     * Inicia el motor
      */
     start() {
-        if (this.isRunning) return;
-        
-        this.isRunning = true;
-        this.lastTime = performance.now();
-        
-        console.log('Gameloop iniciado');
-        
-        // Usar el ticker de PixiJS para el gameloop
-        this.app.ticker.add(this.gameLoop.bind(this));
+        if (!this.isRunning) {
+            this.isRunning = true;
+            this.gameLoop();
+            
+            console.log('Engine: Motor iniciado');
+            
+            if (window.eventBus) {
+                eventBus.emit('engine:started');
+            }
+        }
     }
 
     /**
-     * Detiene el gameloop
+     * Detiene el motor
      */
     stop() {
-        this.isRunning = false;
-        this.app.ticker.remove(this.gameLoop.bind(this));
-        console.log('Gameloop detenido');
+        if (this.isRunning) {
+            this.isRunning = false;
+            
+            if (this.animationFrameId) {
+                cancelAnimationFrame(this.animationFrameId);
+                this.animationFrameId = null;
+            }
+            
+            console.log('Engine: Motor detenido');
+            
+            if (window.eventBus) {
+                eventBus.emit('engine:stopped');
+            }
+        }
     }
 
     /**
-     * Loop principal del juego
+     * Gameloop principal
      */
     gameLoop() {
         if (!this.isRunning) return;
         
-        const currentTime = performance.now();
-        this.deltaTime = currentTime - this.lastTime;
-        this.lastTime = currentTime;
-        this.frameCount++;
+        // Actualizar sistemas
+        this.updateSystems();
         
-        // Log deltaTime para validación de la fase (solo cada 5 segundos para no saturar)
-        if (this.frameCount % 300 === 0) { // Cada 5 segundos aprox
-            console.log(`DeltaTime: ${this.deltaTime.toFixed(2)}ms | FPS: ${Math.round(1000/this.deltaTime)}`);
+        // Renderizar frame
+        if (this.canvas) {
+            this.canvas.render();
         }
         
-        // Actualizar sistemas (TODO: Fases futuras)
-        this.update();
-        
-        // Actualizar debug
-        this.updateDebug();
+        // Programar siguiente frame
+        this.animationFrameId = requestAnimationFrame(() => this.gameLoop());
     }
 
     /**
-     * Actualiza todos los sistemas del juego
+     * Actualiza todos los sistemas
      */
-    update() {
-        // Actualizar sistema de tiempo
+    updateSystems() {
+        // Actualizar tiempo
         if (window.gameTime) {
             gameTime.update();
+        }
+        
+        // Actualizar estadísticas
+        if (window.timeStats) {
+            timeStats.update();
         }
         
         // Actualizar debug overlay
         if (window.debugOverlay) {
             debugOverlay.update();
         }
-        
-        // TODO: Fase 2.0 - Actualizar criaturas
-        // TODO: Fase 3.0 - Actualizar genética
-        // TODO: Fase 4.0 - Actualizar mundo
     }
 
     /**
-     * Limpia recursos al destruir el engine
+     * Limpia recursos
      */
     destroy() {
-        if (this.app) {
-            this.stop();
-            this.app.destroy(true);
-            console.log('Engine destruido');
+        this.stop();
+        
+        if (this.controls) {
+            this.controls.destroy();
         }
+        
+        console.log('Engine: Destruido');
     }
 }
 
+// Crear instancia global
+const gameEngine = new Engine();
+
 // Hacer disponible globalmente
-window.Engine = Engine; 
+window.Engine = Engine;
+window.gameEngine = gameEngine; 

@@ -8,7 +8,7 @@
 </head>
 <body>
     <div id="game-container">
-        <canvas id="game-canvas"></canvas>
+        <canvas id="gameCanvas"></canvas>
         <div id="debug-overlay" class="debug-overlay hidden">
             <div class="debug-panel">
                 <h3>Debug Info</h3>
@@ -17,16 +17,26 @@
         </div>
     </div>
     
-    <!-- PixiJS 8.x CDN -->
-    <script src="https://pixijs.download/release/pixi.min.js"></script>
-    
-    <!-- Módulos del juego -->
+    <!-- Core Systems -->
     <script src="src/core/Constants.js"></script>
     <script src="src/core/EventBus.js"></script>
+    <script src="src/core/EventBusUtils.js"></script>
     <script src="src/core/Time.js"></script>
-    <script src="src/utils/Random.js"></script>
-    <script src="src/debug/DebugOverlay.js"></script>
+    <script src="src/core/TimeStats.js"></script>
+    <script src="src/core/TimeUtils.js"></script>
+    <script src="src/core/EngineControls.js"></script>
+    <script src="src/core/EngineCanvas.js"></script>
     <script src="src/core/Engine.js"></script>
+    
+    <!-- Utils -->
+    <script src="src/utils/Random.js"></script>
+    <script src="src/utils/RandomUtils.js"></script>
+    <script src="src/utils/RandomColors.js"></script>
+    
+    <!-- Debug -->
+    <script src="src/debug/DebugOverlay.js"></script>
+    
+    <!-- Main -->
     <script src="main.js"></script>
 </body>
 </html> 
