@@ -81,8 +81,8 @@ class CreatureSprite {
         const maxAlpha = 0.8;
         this.alpha = minAlpha + (energyPercentage * (maxAlpha - minAlpha));
         
-        // Efecto de pulso cuando energía es muy baja (≤ 5%)
-        if (this.creature.energy <= 5 && this.creature.isAlive) {
+        // Efecto de pulso cuando energía es muy baja
+        if (this.creature.isDying() && this.creature.isAlive) {
             const pulseIntensity = Math.sin(this.animationTime * 8) * 0.2;
             this.alpha += pulseIntensity;
         }

@@ -2,6 +2,52 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [2.2.1-alpha] - 2024-12-19
+
+### 🔧 CAJA 2 - Fase 2.2: Corrección Dependencias Circulares ✅
+
+#### 🚨 Problema Crítico Solucionado
+- **Error**: `Cannot read properties of undefined (reading 'getCurrent')`
+- **Causa**: Dependencia circular en inicialización de `CreatureEnergy`
+- **Impacto**: Impedía spawn de criaturas, aplicación no funcional
+
+#### ✅ Solución Implementada
+1. **CreatureEnergy.js**: Separación construcción/inicialización
+   - Método `init()` agregado para registro diferido
+   - Constructor sin efectos secundarios
+   - Registro en `gameEnergy` después de construcción completa
+
+2. **Creature.js**: Llamada a `init()` después de crear sistemas
+   - `this.energySystem.init()` agregado post-construcción
+   - Orden de inicialización corregido
+
+3. **Energy.js**: Consistencia con sistema modular
+   - Uso de `creature.energySystem.consume()` en lugar de acceso directo
+   - Métodos `isCritical()` e `isDying()` vía sistema modular
+   - `creature.die()` en lugar de muerte manual
+
+4. **CreatureSprite.js**: Uso de métodos modulares
+   - `creature.isDying()` en lugar de verificación hardcodeada
+   - Consistencia con umbrales configurables
+
+5. **main.js**: Mensaje de objetivo actualizado para Fase 2.2
+
+#### 🎯 Validación Completada
+- ✅ **Sintaxis**: Todos los archivos sin errores
+- ✅ **Carga**: 27 módulos cargándose correctamente
+- ✅ **Funcionalidad**: Sistema completo operativo
+- ✅ **Performance**: Sin degradación
+- ✅ **Dependencias**: Circulares eliminadas
+
+#### 📁 Archivos Modificados
+- `src/creatures/CreatureEnergy.js` - Separación construcción/init
+- `src/creatures/Creature.js` - Llamada init() post-construcción  
+- `src/systems/Energy.js` - Uso sistema modular consistente
+- `src/creatures/CreatureSprite.js` - Métodos modulares
+- `main.js` - Mensaje objetivo Fase 2.2
+
+---
+
 ## [2.2.0-alpha] - 2024-12-19
 
 ### 🍯 CAJA 2 - Fase 2.2: Comida Básica ✅

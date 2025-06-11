@@ -11,9 +11,16 @@ class CreatureEnergy {
         this.energy = CONSTANTS.ENERGY ? CONSTANTS.ENERGY.INITIAL : 100;
         this.maxEnergy = this.energy;
         
+        // Nota: El registro en gameEnergy se hace después de la construcción completa
+    }
+    
+    /**
+     * Inicializa el sistema de energía (llamar después del constructor)
+     */
+    init() {
         // Registrar en sistema global de energía
         if (window.gameEnergy) {
-            gameEnergy.registerCreature(creature);
+            gameEnergy.registerCreature(this.creature);
         }
     }
     
@@ -59,14 +66,16 @@ class CreatureEnergy {
      * Verifica si la criatura está muriendo
      */
     isDying() {
-        return this.energy <= 5;
+        const threshold = CONSTANTS.ENERGY ? CONSTANTS.ENERGY.PULSE_THRESHOLD : 5;
+        return this.energy <= threshold;
     }
     
     /**
      * Verifica si la criatura está en estado crítico
      */
     isCritical() {
-        return this.energy <= 15;
+        const threshold = CONSTANTS.ENERGY ? CONSTANTS.ENERGY.CRITICAL_THRESHOLD : 15;
+        return this.energy <= threshold;
     }
     
     /**

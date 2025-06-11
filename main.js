@@ -75,11 +75,11 @@ console.log(`
 GenAI - Simulador de Vida Emergente
 ===================================
 Fase: ${CONSTANTS.CURRENT_PHASE}
-Objetivo: Sistema de energía y muerte por inanición
-- Energía inicial: 100 puntos
-- Pérdida: 1 energía/segundo
-- Visual: opacidad = energía/100
-- Respawn automático
+Objetivo: Sistema de comida básica
+- Spawn automático: Cada 2 segundos hasta máximo 20 items
+- Detección: Radio 50px, comida más cercana prioritaria
+- Restauración: +30 energía por consumo
+- Efectos visuales: Pulso dorado, rotación, glow brillante
 Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
 ===================================
 `); 

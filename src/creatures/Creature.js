@@ -29,6 +29,9 @@ class Creature {
         this.energySystem = new CreatureEnergy(this);
         this.behavior = new CreatureBehavior(this);
         
+        // Inicializar sistemas después de construcción completa
+        this.energySystem.init();
+        
         console.log(`Creature: Criatura ${this.id} creada en (${Math.round(x)}, ${Math.round(y)}) con ${this.energySystem.getCurrent()} energía`);
         
         if (window.eventBus) {

@@ -43,10 +43,10 @@ class Energy {
     registerCreature(creature) {
         if (!creature) return;
         
-        // Inicializar energía si no existe
-        if (typeof creature.energy === 'undefined') {
-            creature.energy = this.config.initial;
-            creature.maxEnergy = this.config.initial;
+        // Verificar que la criatura tenga sistema de energía
+        if (!creature.energySystem) {
+            console.warn('Energy: Criatura sin sistema de energía, ignorando registro');
+            return;
         }
         
         this.creatures.add(creature);
@@ -83,21 +83,22 @@ class Energy {
         
         // Procesar cada criatura
         for (const creature of this.creatures) {
-            if (!creature.isAlive) continue;
+            if (!creature.isAlive || !creature.energySystem) continue;
             
-            // Drenar energía
+            // Drenar energía usando el sistema modular
             const previousEnergy = creature.energy;
-            creature.energy = Math.max(0, creature.energy - energyDrain);
+            creature.energySystem.consume(energyDrain);
+            const currentEnergy = creature.energy;
             
             // Actualizar estadísticas
-            this.totalEnergyLost += (previousEnergy - creature.energy);
-            totalEnergy += creature.energy;
+            this.totalEnergyLost += (previousEnergy - currentEnergy);
+            totalEnergy += currentEnergy;
             
             // Verificar estados críticos
             this.checkEnergyStates(creature, previousEnergy);
             
             // Marcar para muerte si energía = 0
-            if (creature.energy <= this.config.deathThreshold && creature.isAlive) {
+            if (currentEnergy <= this.config.deathThreshold && creature.isAlive) {
                 dyingCreatures.push(creature);
             }
         }
@@ -155,9 +156,8 @@ class Energy {
     killCreature(creature) {
         if (!creature.isAlive) return;
         
-        // Marcar como muerta
-        creature.isAlive = false;
-        creature.energy = 0;
+        // Usar el método die de la criatura
+        creature.die('starvation');
         
         // Actualizar estadísticas
         this.totalDeaths++;
@@ -168,12 +168,6 @@ class Energy {
                 creature,
                 cause: 'starvation',
                 totalDeaths: this.totalDeaths
-            });
-            
-            // También emitir el evento general de muerte
-            eventBus.emit('creature:died', { 
-                creature,
-                cause: 'starvation'
             });
         }
         
@@ -209,22 +203,24 @@ class Energy {
      * Obtiene la energía de una criatura como porcentaje
      */
     getEnergyPercentage(creature) {
-        if (!creature || typeof creature.energy === 'undefined') return 1.0;
-        return Math.max(0, Math.min(1, creature.energy / creature.maxEnergy));
+        if (!creature || !creature.energySystem) return 1.0;
+        return creature.getEnergyPercentage();
     }
     
     /**
      * Verifica si una criatura está en estado crítico
      */
     isCritical(creature) {
-        return creature && creature.energy <= this.config.criticalThreshold;
+        if (!creature || !creature.energySystem) return false;
+        return creature.energySystem.isCritical();
     }
     
     /**
      * Verifica si una criatura está muriendo
      */
     isDying(creature) {
-        return creature && creature.energy <= this.config.pulseThreshold;
+        if (!creature || !creature.energySystem) return false;
+        return creature.energySystem.isDying();
     }
     
     /**
