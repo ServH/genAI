@@ -107,11 +107,12 @@ const CONSTANTS = {
         DEBUG_SHOW: false // mostrar cono en debug
     },
 
-    // Configuración de Estados
+    // Configuración de Estados - Fase 2.3 + 3.1
     STATES: {
         IDLE_DURATION: 2000, // ms mínimo en idle
         SEEKING_TIMEOUT: 5000, // ms máximo buscando
         EATING_DURATION: 500, // ms consumiendo
+        MATING_DURATION: 2000, // ms apareándose
         STATE_CHANGE_COOLDOWN: 200 // ms entre cambios de estado
     },
 
@@ -122,7 +123,7 @@ const CONSTANTS = {
         DIRECTION_VARIANCE: 0.3 // variación en movimiento browniano
     },
 
-    // Configuración Genética - Fase 3.0
+    // Configuración Genética - Fase 3.0 + 3.1
     GENETICS: {
         GENES: {
             SPEED: { min: 0.5, max: 2.0, default: 1.0 },
@@ -134,9 +135,20 @@ const CONSTANTS = {
         }
     },
 
+    // Configuración de Reproducción - Fase 3.1
+    REPRODUCTION: {
+        ENERGY_THRESHOLD: 80,        // % energía mínima para reproducirse
+        SEARCH_RADIUS: 150,          // pixels para buscar pareja
+        GENETIC_COMPATIBILITY: 0.7,  // máxima distancia genética permitida
+        ENERGY_COST: 40,            // energía que cuesta a cada padre
+        COOLDOWN: 10000,            // ms antes de poder reproducirse de nuevo
+        OFFSPRING_ENERGY: 100,      // energía inicial de la cría
+        MATING_DISTANCE: 30         // pixels para aparearse
+    },
+
     // Versión del proyecto
-    VERSION: "3.0.0-alpha",
-    CURRENT_PHASE: "CAJA 3 - Fase 3.0: Sistema de ADN"
+    VERSION: "3.1.0-alpha",
+    CURRENT_PHASE: "CAJA 3 - Fase 3.1: Reproducción Básica"
 };
 
 // Hacer disponible globalmente

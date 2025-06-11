@@ -98,6 +98,9 @@ class Engine {
             this.creatureManager = new CreatureManager();
             await this.creatureManager.init(this.worldContainer, this.camera);
             
+            // Hacer creatureManager disponible globalmente para reproducción
+            window.gameEngine = this;
+            
             // Configurar canvas legacy (para compatibilidad)
             this.canvas = new EngineCanvas();
             
@@ -199,6 +202,15 @@ class Engine {
                 // Actualizar criaturas
                 if (this.creatureManager) {
                     this.creatureManager.update(deltaTime);
+                }
+                
+                // Actualizar sistema de reproducción - Fase 3.1
+                if (window.gameReproduction) {
+                    // Limpiar cooldowns de criaturas muertas
+                    const aliveCreatureIds = this.creatureManager.getAllCreatures()
+                        .filter(c => c.isAlive)
+                        .map(c => c.id);
+                    gameReproduction.cleanupCooldowns(aliveCreatureIds);
                 }
             }
         }

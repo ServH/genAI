@@ -2,6 +2,70 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [3.1.0-alpha] - 2024-12-19
+
+### 🧬 CAJA 3 - Fase 3.1: Reproducción Básica ✅
+
+#### ✨ Sistema de Reproducción Sexual Implementado
+- **Reproduction.js**: Sistema completo de apareamiento (185 líneas)
+- **Compatibility.js**: Compatibilidad genética avanzada (195 líneas)
+- **Búsqueda pareja**: Energía >80%, radio 150px, prioridad sobre comida
+- **Compatibilidad**: Distancia genética <70%, pesos por tipo de gen
+- **Mezcla genética**: 50/50 probabilidad de cada gen de cada padre
+
+#### 🎮 Comportamiento Reproductivo Avanzado
+- **Estado MATING**: Nuevo estado con transiciones IDLE→MATING→IDLE
+- **Proceso apareamiento**: 2s duración, 30px distancia mínima
+- **Costo energético**: 40 energía por padre, cooldown 10s
+- **Spawn crías**: Punto medio entre padres, 100 energía inicial
+- **Herencia visible**: Características mezcladas observables
+
+#### 🔧 Integración Completa del Sistema
+- **CreatureBehavior.js**: Búsqueda pareja + proceso apareamiento
+- **CreatureStates.js**: Estado MATING + transiciones válidas
+- **CreatureManager.js**: Método spawnCreatureWithDNA()
+- **CreatureFactory.js**: Método createCreatureWithDNA()
+- **Engine.js**: Limpieza automática cooldowns reproductivos
+
+#### 📊 Debug y Estadísticas Reproductivas
+- **Panel reproducción**: Apareamientos, compatibilidad, estados
+- **Métricas tiempo real**: Total, exitosos, cooldowns activos
+- **Distancia genética**: Promedio de apareamientos exitosos
+- **Tasa compatibilidad**: Porcentaje parejas compatibles
+- **Estados MATING**: Criaturas apareándose y listas (>80E)
+
+#### 🏗️ Arquitectura Genética Escalable
+- **Compatibilidad ponderada**: Genes SPEED/SIZE/VISION (1.0), COLOR (0.5)
+- **Rango válido**: 0.1-0.7 evita clones y incompatibilidad extrema
+- **Predicción descendencia**: Min/Max/Promedio características
+- **Búsqueda mejores parejas**: Algoritmo de matching optimizado
+
+#### 🎯 Validación Reproductiva Completada
+- ✅ **Búsqueda activa**: Criaturas >80% energía buscan pareja
+- ✅ **Selección natural**: Solo parejas compatibles se reproducen
+- ✅ **Herencia 50/50**: Características mezcladas visibles
+- ✅ **Balance poblacional**: Nacimientos vs muertes estable
+- ✅ **Performance**: Sin degradación con sistema reproductivo
+- ✅ **Emergencia**: Comportamientos reproductivos naturales
+
+#### 📁 Archivos Implementados
+- `src/genetics/Reproduction.js` (185 líneas) - Sistema apareamiento
+- `src/genetics/Compatibility.js` (195 líneas) - Compatibilidad genética
+
+#### 🔧 Archivos Modificados
+- `src/core/Constants.js` - Configuración REPRODUCTION + MATING_DURATION
+- `src/creatures/CreatureStates.js` - Estado MATING + transiciones
+- `src/creatures/CreatureStatesUtils.js` - Lógica transiciones MATING
+- `src/creatures/CreatureBehavior.js` - Búsqueda pareja + apareamiento
+- `src/creatures/CreatureManager.js` - Spawn con DNA específico
+- `src/creatures/CreatureFactory.js` - Creación con DNA heredado
+- `src/core/Engine.js` - Integración sistema reproductivo
+- `src/debug/DebugOverlay.js` - Panel estadísticas reproducción
+- `index.html` - Carga módulos Compatibility + Reproduction
+- `main.js` - Mensaje objetivo Fase 3.1
+
+---
+
 ## [3.0.0-alpha] - 2024-12-19
 
 ### 🧬 CAJA 3 - Fase 3.0: Sistema de ADN ✅

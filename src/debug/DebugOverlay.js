@@ -63,6 +63,10 @@ class DebugOverlay {
                     <div id="debug-genetics">Cargando...</div>
                 </div>
                 <div class="debug-section">
+                    <h4>Reproducción</h4>
+                    <div id="debug-reproduction">Cargando...</div>
+                </div>
+                <div class="debug-section">
                     <h4>Controles</h4>
                     <div id="debug-controls">
                         <div class="debug-info">D: Toggle Debug</div>
@@ -170,6 +174,7 @@ class DebugOverlay {
         this.updateCamera();
         this.updateCreatures();
         this.updateGenetics();
+        this.updateReproduction();
         this.lastUpdate = now;
     }
 
@@ -329,6 +334,56 @@ class DebugOverlay {
         }
         
         geneticsDiv.innerHTML = content;
+    }
+
+    /**
+     * Actualiza la sección de reproducción - Fase 3.1
+     */
+    updateReproduction() {
+        const reproductionDiv = document.getElementById('debug-reproduction');
+        if (!reproductionDiv) return;
+        
+        let content = '<div class="debug-info">Cargando reproducción...</div>';
+        
+        if (window.gameReproduction && window.gameCompatibility) {
+            const reproStats = window.gameReproduction.getStats();
+            const compatStats = window.gameCompatibility.getStats();
+            
+            // Estadísticas de reproducción
+            content = `
+                <div class="debug-info">--- Apareamientos ---</div>
+                <div class="debug-info">Total: ${reproStats.totalReproductions}</div>
+                <div class="debug-info">Exitosos: ${reproStats.successfulMatings}</div>
+                <div class="debug-info">Cooldowns: ${reproStats.activeCooldowns}</div>
+                <div class="debug-info">Dist. Gen. Prom: ${(reproStats.averageGeneticDistance * 100).toFixed(1)}%</div>
+                <div class="debug-info">--- Compatibilidad ---</div>
+                <div class="debug-info">Checks: ${compatStats.totalChecks}</div>
+                <div class="debug-info">Compatibles: ${compatStats.compatiblePairs}</div>
+                <div class="debug-info">Incompatibles: ${compatStats.incompatiblePairs}</div>
+                <div class="debug-info">Tasa Compat: ${(compatStats.compatibilityRate * 100).toFixed(1)}%</div>
+            `;
+            
+            // Estadísticas de estados MATING
+            if (window.gameEngine && window.gameEngine.creatureManager) {
+                const manager = window.gameEngine.creatureManager;
+                const creatures = manager.getAllCreatures().filter(c => c.isAlive);
+                const matingCount = creatures.filter(c => 
+                    c.behavior && c.behavior.states && 
+                    c.behavior.states.isInState && 
+                    c.behavior.states.isInState(CREATURE_STATES.MATING)
+                ).length;
+                
+                const readyToMate = creatures.filter(c => c.energy >= 80).length;
+                
+                content += `
+                    <div class="debug-info">--- Estados ---</div>
+                    <div class="debug-info">Apareándose: ${matingCount}</div>
+                    <div class="debug-info">Listas (>80E): ${readyToMate}</div>
+                `;
+            }
+        }
+        
+        reproductionDiv.innerHTML = content;
     }
 
     /**

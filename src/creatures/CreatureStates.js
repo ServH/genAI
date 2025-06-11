@@ -8,7 +8,8 @@
 const CREATURE_STATES = {
     IDLE: 'idle',
     SEEKING: 'seeking',
-    EATING: 'eating'
+    EATING: 'eating',
+    MATING: 'mating'
 };
 
 class CreatureStates {

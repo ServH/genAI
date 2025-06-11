@@ -44,9 +44,14 @@ class CreatureBehavior {
         // 1. Actualizar sistema de estados
         this.states.update(deltaTime);
         
-        // 2. Buscar comida con visión si está en IDLE
+        // 2. Buscar comida o pareja con visión si está en IDLE
         if (this.states.isInState(CREATURE_STATES.IDLE)) {
-            this.searchForFood();
+            // Priorizar reproducción si tiene suficiente energía
+            if (this.creature.energy >= 80 && window.gameReproduction) {
+                this.searchForMate();
+            } else {
+                this.searchForFood();
+            }
         }
         
         // 3. Verificar si llegó al objetivo
@@ -54,12 +59,42 @@ class CreatureBehavior {
             this.checkTargetReached();
         }
         
-        // 4. Actualizar movimiento según estado
+        // 4. Verificar reproducción si está en MATING
+        if (this.states.isInState(CREATURE_STATES.MATING)) {
+            this.checkMatingProcess();
+        }
+        
+        // 5. Actualizar movimiento según estado
         const currentState = this.states.getCurrentState();
         const target = this.states.getTarget();
         this.movement.update(deltaTime, currentState, target);
     }
     
+    /**
+     * Busca pareja para reproducción - Fase 3.1
+     */
+    searchForMate() {
+        if (!window.gameEngine || !window.gameEngine.creatureManager || !window.gameReproduction) {
+            return;
+        }
+        
+        const allCreatures = gameEngine.creatureManager.getAllCreatures();
+        const mate = gameReproduction.findMate(this.creature, allCreatures);
+        
+        if (mate) {
+            // Cambiar a estado MATING con objetivo
+            this.states.setState(CREATURE_STATES.MATING, mate);
+            
+            if (window.eventBus) {
+                eventBus.emit('creature:mate_found', {
+                    id: this.creature.id,
+                    mateId: mate.id,
+                    distance: this.distanceTo(mate.x, mate.y)
+                });
+            }
+        }
+    }
+
     /**
      * Busca comida usando el sistema de visión
      */
@@ -87,6 +122,47 @@ class CreatureBehavior {
         }
     }
     
+    /**
+     * Verifica el proceso de apareamiento - Fase 3.1
+     */
+    checkMatingProcess() {
+        const mate = this.states.getTarget();
+        if (!mate || !mate.isAlive) {
+            this.states.setState(CREATURE_STATES.IDLE);
+            return;
+        }
+        
+        // Verificar si ambos están cerca
+        const distance = this.distanceTo(mate.x, mate.y);
+        const matingDistance = 30; // pixels
+        
+        if (distance <= matingDistance && window.gameReproduction) {
+            // Intentar reproducción
+            const offspringDNA = gameReproduction.reproduce(this.creature, mate);
+            
+            if (offspringDNA && window.gameEngine && window.gameEngine.creatureManager) {
+                // Calcular posición de la cría
+                const position = gameReproduction.calculateOffspringPosition(this.creature, mate);
+                
+                // Crear nueva criatura con DNA mezclado
+                const offspring = gameEngine.creatureManager.spawnCreatureWithDNA(position.x, position.y, offspringDNA);
+                
+                if (offspring && window.eventBus) {
+                    eventBus.emit('creature:offspring_born', {
+                        parent1: this.creature.id,
+                        parent2: mate.id,
+                        offspring: offspring.id,
+                        position: position,
+                        dna: offspringDNA
+                    });
+                }
+            }
+            
+            // Volver a IDLE después del apareamiento
+            this.states.setState(CREATURE_STATES.IDLE);
+        }
+    }
+
     /**
      * Verifica si llegó al objetivo
      */

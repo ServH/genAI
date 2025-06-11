@@ -75,11 +75,13 @@ console.log(`
 GenAI - Simulador de Vida Emergente
 ===================================
 Fase: ${CONSTANTS.CURRENT_PHASE}
-Objetivo: Sistema de ADN básico
-- Genes: speed (0.5-2.0), size (0.7-1.3), vision (100-300px)
-- Colores: RGB genéticos mapeados a paleta bioluminiscente
-- Diversidad: Cada criatura única en características
-- Debug: Panel genético con estadísticas de población
+Objetivo: Reproducción sexual básica con genética
+- Búsqueda de pareja: Energía >80%, radio 150px
+- Compatibilidad: Distancia genética <70%
+- Mezcla genética: 50/50 de genes parentales
+- Cooldown: 10s entre reproducciones
+- Cría: Spawn en punto medio entre padres
+- Debug: Panel reproducción con estadísticas
 Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
 ===================================
 `); 

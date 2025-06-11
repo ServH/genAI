@@ -117,6 +117,47 @@ class CreatureFactory {
     }
 
     /**
+     * Crea una criatura con DNA específico - Fase 3.1
+     * @param {number} x - Posición X
+     * @param {number} y - Posición Y
+     * @param {DNA} dna - DNA específico para la criatura
+     * @returns {Creature} - Nueva criatura con DNA heredado
+     */
+    createCreatureWithDNA(x, y, dna) {
+        // Validar posición
+        if (!this.isValidPosition(x, y)) {
+            console.warn('CreatureFactory: Posición inválida para criatura con DNA, ajustando');
+            const pos = this.getRandomSpawnPosition();
+            x = pos.x;
+            y = pos.y;
+        }
+        
+        // Crear criatura con DNA específico
+        const creature = new Creature(x, y, dna);
+        
+        // Aplicar efectos genéticos del DNA heredado
+        Genes.applyToCreature(creature, dna);
+        
+        // Actualizar estadísticas
+        this.creaturesCreated++;
+        this.lastSpawnTime = performance.now();
+        
+        console.log(`CreatureFactory: Criatura ${creature.id} creada con DNA heredado en (${Math.round(x)}, ${Math.round(y)})`);
+        
+        if (window.eventBus) {
+            eventBus.emit('factory:creatureWithDNASpawned', {
+                id: creature.id,
+                x: x,
+                y: y,
+                dna: dna,
+                total: this.creaturesCreated
+            });
+        }
+        
+        return creature;
+    }
+
+    /**
      * Crea múltiples criaturas de una vez
      */
     createMultipleCreatures(count) {

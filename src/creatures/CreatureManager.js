@@ -203,6 +203,44 @@ class CreatureManager {
         return this.stats.getCompleteStats();
     }
 
+    /**
+     * Crea una nueva criatura con DNA específico - Fase 3.1
+     * @param {number} x - Posición X
+     * @param {number} y - Posición Y  
+     * @param {DNA} dna - DNA para la nueva criatura
+     * @returns {Creature|null} - Nueva criatura o null si falla
+     */
+    spawnCreatureWithDNA(x, y, dna) {
+        if (this.creatures.size >= this.maxCreatures) {
+            console.warn('CreatureManager: No se puede crear criatura, máximo alcanzado');
+            return null;
+        }
+
+        try {
+            // Crear criatura con DNA específico
+            const creature = this.factory.createCreatureWithDNA(x, y, dna);
+            
+            if (creature && this.addCreature(creature)) {
+                console.log(`CreatureManager: Criatura ${creature.id} creada con DNA heredado en (${x}, ${y})`);
+                
+                if (window.eventBus) {
+                    eventBus.emit('creature:spawned_with_dna', {
+                        id: creature.id,
+                        position: { x, y },
+                        dna: dna,
+                        parentCount: this.creatures.size
+                    });
+                }
+                
+                return creature;
+            }
+        } catch (error) {
+            console.error('CreatureManager: Error creando criatura con DNA:', error);
+        }
+        
+        return null;
+    }
+
 
 
     /**

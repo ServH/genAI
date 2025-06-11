@@ -11,9 +11,10 @@ class CreatureStatesUtils {
      */
     static isValidTransition(fromState, toState) {
         const validTransitions = {
-            [CREATURE_STATES.IDLE]: [CREATURE_STATES.SEEKING],
+            [CREATURE_STATES.IDLE]: [CREATURE_STATES.SEEKING, CREATURE_STATES.MATING],
             [CREATURE_STATES.SEEKING]: [CREATURE_STATES.IDLE, CREATURE_STATES.EATING],
-            [CREATURE_STATES.EATING]: [CREATURE_STATES.IDLE]
+            [CREATURE_STATES.EATING]: [CREATURE_STATES.IDLE],
+            [CREATURE_STATES.MATING]: [CREATURE_STATES.IDLE]
         };
         
         return validTransitions[fromState]?.includes(toState) || false;
@@ -27,6 +28,7 @@ class CreatureStatesUtils {
             idleDuration: CONSTANTS.STATES ? CONSTANTS.STATES.IDLE_DURATION : 2000,
             seekingTimeout: CONSTANTS.STATES ? CONSTANTS.STATES.SEEKING_TIMEOUT : 5000,
             eatingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.EATING_DURATION : 500,
+            matingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.MATING_DURATION : 2000,
             changeCooldown: CONSTANTS.STATES ? CONSTANTS.STATES.STATE_CHANGE_COOLDOWN : 200
         };
     }
@@ -41,6 +43,9 @@ class CreatureStatesUtils {
                 
             case CREATURE_STATES.SEEKING:
                 return stateTimer >= config.seekingTimeout ? CREATURE_STATES.IDLE : null;
+                
+            case CREATURE_STATES.MATING:
+                return stateTimer >= config.matingDuration ? CREATURE_STATES.IDLE : null;
                 
             default:
                 return null;
