@@ -17,7 +17,8 @@ class Energy {
         this.config = {
             initial: 100,
             drainRate: 1.0,
-            criticalThreshold: 20,
+            criticalThreshold: 15,
+            pulseThreshold: 5,
             deathThreshold: 0
         };
         
@@ -127,10 +128,11 @@ class Energy {
             }
         }
         
-        // Energía muy baja (< 10)
-        if (previousEnergy > 10 && currentEnergy <= 10) {
+        // Energía muy baja (pulso visual)
+        if (previousEnergy > this.config.pulseThreshold && 
+            currentEnergy <= this.config.pulseThreshold) {
             if (window.eventBus) {
-                eventBus.emit('energy:very_low', { 
+                eventBus.emit('energy:pulse_threshold', { 
                     creature, 
                     energy: currentEnergy 
                 });
@@ -222,7 +224,7 @@ class Energy {
      * Verifica si una criatura está muriendo
      */
     isDying(creature) {
-        return creature && creature.energy <= 10;
+        return creature && creature.energy <= this.config.pulseThreshold;
     }
     
     /**

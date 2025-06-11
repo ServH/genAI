@@ -83,7 +83,8 @@ const CONSTANTS = {
     ENERGY: {
         INITIAL: 100,
         DRAIN_RATE: 1.0, // energía por segundo
-        CRITICAL_THRESHOLD: 20,
+        CRITICAL_THRESHOLD: 15, // desvanecimiento de color
+        PULSE_THRESHOLD: 5, // pulso visual
         DEATH_THRESHOLD: 0,
         RESPAWN_DELAY: 2000 // ms para respawn automático
     },

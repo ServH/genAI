@@ -198,7 +198,7 @@ class Creature {
      * Verifica si la criatura está muriendo
      */
     isDying() {
-        return this.energy <= 10;
+        return this.energy <= 5;
     }
     
     /**
