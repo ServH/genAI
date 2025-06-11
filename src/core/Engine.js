@@ -12,6 +12,13 @@ class Engine {
         this.canvas = null;
         this.controls = null;
         
+        // Sistemas de rendering
+        this.renderer = null;
+        this.camera = null;
+        this.background = null;
+        this.grid = null;
+        this.worldContainer = null;
+        
         // Esperar a que todos los módulos estén cargados
         this.waitForModules().then(() => {
             this.init();
@@ -28,7 +35,12 @@ class Engine {
                    window.eventBus && 
                    window.debugOverlay &&
                    window.EngineControls &&
-                   window.EngineCanvas;
+                   window.EngineCanvas &&
+                   window.Renderer &&
+                   window.Camera &&
+                   window.Background &&
+                   window.Grid &&
+                   typeof PIXI !== 'undefined';
         };
         
         while (!checkModules()) {
@@ -39,24 +51,51 @@ class Engine {
     /**
      * Inicializa el motor
      */
-    init() {
+    async init() {
         console.log('Engine: Inicializando motor principal...');
         
-        // Configurar canvas
-        this.canvas = new EngineCanvas();
-        
-        // Configurar controles
-        this.controls = new EngineControls(this);
-        
-        // Emitir evento de inicialización
-        if (window.eventBus) {
-            eventBus.emit('engine:initialized');
+        try {
+            // Inicializar renderer PixiJS
+            this.renderer = new Renderer();
+            await this.renderer.init();
+            
+            // Crear contenedor del mundo
+            this.worldContainer = new PIXI.Container();
+            this.renderer.getStage().addChild(this.worldContainer);
+            
+            // Inicializar sistemas de rendering
+            this.background = new Background();
+            this.background.init(this.renderer.getStage());
+            
+            this.grid = new Grid();
+            this.grid.init(this.worldContainer);
+            
+            this.camera = new Camera();
+            this.camera.setContainer(this.worldContainer);
+            
+            // Hacer cámara disponible globalmente
+            window.gameCamera = this.camera;
+            
+            // Configurar canvas legacy (para compatibilidad)
+            this.canvas = new EngineCanvas();
+            
+            // Configurar controles
+            this.controls = new EngineControls(this);
+            
+            console.log('Engine: Motor inicializado correctamente');
+            
+            // Emitir evento de inicialización
+            if (window.eventBus) {
+                eventBus.emit('engine:initialized');
+            }
+            
+            // Iniciar automáticamente
+            this.start();
+            
+        } catch (error) {
+            console.error('Engine: Error inicializando:', error);
+            throw error;
         }
-        
-        console.log('Engine: Motor inicializado correctamente');
-        
-        // Iniciar automáticamente
-        this.start();
     }
 
     /**
@@ -120,6 +159,12 @@ class Engine {
         // Actualizar tiempo
         if (window.gameTime) {
             gameTime.update();
+            const deltaTime = gameTime.getDeltaTime();
+            
+            // Actualizar cámara
+            if (this.camera) {
+                this.camera.update(deltaTime);
+            }
         }
         
         // Actualizar estadísticas
@@ -141,6 +186,18 @@ class Engine {
         
         if (this.controls) {
             this.controls.destroy();
+        }
+        
+        if (this.background) {
+            this.background.destroy();
+        }
+        
+        if (this.grid) {
+            this.grid.destroy();
+        }
+        
+        if (this.renderer) {
+            this.renderer.destroy();
         }
         
         console.log('Engine: Destruido');

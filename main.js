@@ -5,8 +5,7 @@
  * Punto de entrada del juego
  */
 
-// Variable global del engine
-let gameEngine = null;
+// El engine se crea automáticamente en Engine.js
 
 /**
  * Inicializa el juego cuando el DOM está listo
@@ -16,23 +15,8 @@ document.addEventListener('DOMContentLoaded', () => {
     console.log(`Versión: ${CONSTANTS.VERSION}`);
     console.log(`Fase: ${CONSTANTS.CURRENT_PHASE}`);
     
-    // Verificar que PixiJS esté disponible
-    if (typeof PIXI === 'undefined') {
-        console.error('PixiJS no está disponible');
-        showError('Error: PixiJS no se pudo cargar');
-        return;
-    }
-    
-    console.log(`PixiJS ${PIXI.VERSION} cargado correctamente`);
-    
-    // Inicializar el engine
-    try {
-        gameEngine = new Engine();
-        console.log('GenAI iniciado exitosamente');
-    } catch (error) {
-        console.error('Error iniciando el juego:', error);
-        showError(`Error iniciando el juego: ${error.message}`);
-    }
+    // El engine se inicializa automáticamente
+    console.log('GenAI iniciado exitosamente');
 });
 
 /**
@@ -66,8 +50,8 @@ function showError(message) {
  * Limpia recursos al cerrar la página
  */
 window.addEventListener('beforeunload', () => {
-    if (gameEngine) {
-        gameEngine.destroy();
+    if (window.gameEngine) {
+        window.gameEngine.destroy();
         console.log('Recursos limpiados');
     }
 });

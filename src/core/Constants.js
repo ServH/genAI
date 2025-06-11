@@ -31,11 +31,27 @@ const CONSTANTS = {
     // Colores del Proyecto
     COLORS: {
         BACKGROUND: '#0a0e27',
+        BACKGROUND_INNER: '#1a1e37',
         CREATURE_CYAN: '#00fff0',
         CREATURE_PINK: '#ff00ff',
         CREATURE_YELLOW: '#ffff00',
         FOOD_GOLD: '#ffd700',
         DEBUG_TEXT: '#00fff0'
+    },
+
+    // Configuración de Cámara
+    CAMERA: {
+        MIN_ZOOM: 0.1,
+        MAX_ZOOM: 5.0,
+        ZOOM_SPEED: 5.0,
+        PAN_SPEED: 1.0
+    },
+
+    // Configuración de Grid
+    GRID: {
+        SIZE: 100,
+        COLOR: '#ffffff',
+        ALPHA: 0.1
     },
 
     // Configuración de Física
@@ -55,8 +71,8 @@ const CONSTANTS = {
     },
 
     // Versión del proyecto
-    VERSION: "1.1.1-alpha",
-    CURRENT_PHASE: "CAJA 1 - Fase 1.1 (Refactorizada)"
+    VERSION: "1.2.0-alpha",
+    CURRENT_PHASE: "CAJA 1 - Fase 1.2: Rendering Base"
 };
 
 // Hacer disponible globalmente

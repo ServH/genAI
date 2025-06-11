@@ -50,6 +50,20 @@ class DebugOverlay {
                     <h4>Performance</h4>
                     <div id="debug-performance">Cargando...</div>
                 </div>
+                <div class="debug-section">
+                    <h4>Cámara</h4>
+                    <div id="debug-camera">Cargando...</div>
+                </div>
+                <div class="debug-section">
+                    <h4>Controles</h4>
+                    <div id="debug-controls">
+                        <div class="debug-info">D: Toggle Debug</div>
+                        <div class="debug-info">G: Toggle Grid</div>
+                        <div class="debug-info">Espacio: Pausa</div>
+                        <div class="debug-info">Mouse: Pan cámara</div>
+                        <div class="debug-info">Rueda: Zoom</div>
+                    </div>
+                </div>
             </div>
         `;
         
@@ -145,6 +159,7 @@ class DebugOverlay {
         if (now - this.lastUpdate < this.updateInterval) return;
         
         this.updatePerformance();
+        this.updateCamera();
         this.lastUpdate = now;
     }
 
@@ -170,6 +185,29 @@ class DebugOverlay {
         }
         
         performanceDiv.innerHTML = content;
+    }
+
+    /**
+     * Actualiza la sección de cámara
+     */
+    updateCamera() {
+        const cameraDiv = document.getElementById('debug-camera');
+        if (!cameraDiv) return;
+        
+        let content = '<div class="debug-info">Sin datos</div>';
+        
+        if (window.gameCamera) {
+            const camera = window.gameCamera;
+            content = `
+                <div class="debug-info">X: ${Math.round(camera.x)}</div>
+                <div class="debug-info">Y: ${Math.round(camera.y)}</div>
+                <div class="debug-info">Zoom: ${camera.zoom.toFixed(2)}x</div>
+                <div class="debug-info">Target Zoom: ${camera.targetZoom.toFixed(2)}x</div>
+                <div class="debug-info">Arrastrando: ${camera.isDragging ? 'Sí' : 'No'}</div>
+            `;
+        }
+        
+        cameraDiv.innerHTML = content;
     }
 
     /**
