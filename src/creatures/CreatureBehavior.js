@@ -93,6 +93,13 @@ class CreatureBehavior {
             return;
         }
         
+        // Verificar si el objetivo (comida) aún existe
+        if (!window.gameResources || !gameResources.food.has(target.id)) {
+            console.log(`CreatureBehavior: ${this.creature.id} - Objetivo ${target.id} ya no existe, volviendo a IDLE`);
+            this.states.setState(CREATURE_STATES.IDLE);
+            return;
+        }
+        
         const distance = this.vision.getDistance(target.x, target.y);
         const minDistance = CONSTANTS.MOVEMENT.MIN_TARGET_DISTANCE;
         
