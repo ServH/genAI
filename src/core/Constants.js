@@ -118,7 +118,7 @@ const CONSTANTS = {
     // Configuración de Movimiento
     MOVEMENT: {
         SMOOTHING_FACTOR: 0.1, // suavidad interpolación (0-1)
-        MIN_TARGET_DISTANCE: 10, // pixels para "llegar" al objetivo
+        MIN_TARGET_DISTANCE: 25, // pixels para "llegar" al objetivo (aumentado para debug)
         DIRECTION_VARIANCE: 0.3 // variación en movimiento browniano
     },
 

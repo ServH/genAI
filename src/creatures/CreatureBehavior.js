@@ -96,8 +96,14 @@ class CreatureBehavior {
         const distance = this.vision.getDistance(target.x, target.y);
         const minDistance = CONSTANTS.MOVEMENT.MIN_TARGET_DISTANCE;
         
+        // Debug: Log de distancia al objetivo
+        if (Math.random() < 0.01) { // Solo 1% de las veces para no saturar
+            console.log(`CreatureBehavior: ${this.creature.id} - Distancia al objetivo: ${distance.toFixed(1)}px (min: ${minDistance}px)`);
+        }
+        
         if (distance <= minDistance) {
             // Cambiar a estado EATING
+            console.log(`CreatureBehavior: ${this.creature.id} llegó al objetivo, cambiando a EATING`);
             this.states.setState(CREATURE_STATES.EATING, target);
         }
     }
@@ -165,8 +171,10 @@ class CreatureBehavior {
         
         // Solo consumir si está en estado EATING
         if (this.states.isInState(CREATURE_STATES.EATING)) {
+            console.log(`CreatureBehavior: ${this.creature.id} está en estado EATING, verificando consumo...`);
             const result = gameResources.checkFoodConsumption(this.creature);
             if (result) {
+                console.log(`CreatureBehavior: ${this.creature.id} consumió comida exitosamente (+${result.energyGained} energía)`);
                 // Volver a IDLE después de comer
                 this.states.setState(CREATURE_STATES.IDLE);
                 
@@ -179,6 +187,8 @@ class CreatureBehavior {
                         newEnergy: this.creature.energy
                     });
                 }
+            } else {
+                console.log(`CreatureBehavior: ${this.creature.id} no pudo consumir comida (no hay comida cercana o no puede comer)`);
             }
         }
     }
