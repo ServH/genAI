@@ -8,8 +8,9 @@
 class CreatureEnergy {
     constructor(creature) {
         this.creature = creature;
-        this.energy = CONSTANTS.ENERGY ? CONSTANTS.ENERGY.INITIAL : 100;
-        this.maxEnergy = this.energy;
+        this.maxEnergy = CONSTANTS.ENERGY ? CONSTANTS.ENERGY.INITIAL : 100;
+        // Empezar con 80% de energía para que tengan hambre inicial
+        this.energy = this.maxEnergy * 0.8;
         
         // Nota: El registro en gameEnergy se hace después de la construcción completa
     }

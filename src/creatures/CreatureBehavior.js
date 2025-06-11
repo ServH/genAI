@@ -178,10 +178,9 @@ class CreatureBehavior {
         
         // Solo consumir si está en estado EATING
         if (this.states.isInState(CREATURE_STATES.EATING)) {
-            console.log(`CreatureBehavior: ${this.creature.id} está en estado EATING, verificando consumo...`);
             const result = gameResources.checkFoodConsumption(this.creature);
             if (result) {
-                console.log(`CreatureBehavior: ${this.creature.id} consumió comida exitosamente (+${result.energyGained} energía)`);
+                console.log(`CreatureBehavior: ${this.creature.id} consumió comida (+${result.energyGained} energía)`);
                 // Volver a IDLE después de comer
                 this.states.setState(CREATURE_STATES.IDLE);
                 
@@ -194,8 +193,6 @@ class CreatureBehavior {
                         newEnergy: this.creature.energy
                     });
                 }
-            } else {
-                console.log(`CreatureBehavior: ${this.creature.id} no pudo consumir comida (no hay comida cercana o no puede comer)`);
             }
         }
     }

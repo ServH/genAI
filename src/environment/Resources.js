@@ -184,26 +184,14 @@ class Resources {
      * Verifica si una criatura puede comer comida cercana
      */
     checkFoodConsumption(creature) {
-        if (!creature.isAlive) {
-            console.log(`Resources: Criatura ${creature.id} no está viva`);
-            return null;
-        }
-        
-        if (!creature.energySystem.canEat()) {
-            console.log(`Resources: Criatura ${creature.id} no puede comer (energía llena: ${creature.energy}/${creature.maxEnergy})`);
-            return null;
-        }
+        if (!creature.isAlive || !creature.energySystem.canEat()) return null;
         
         let nearestFood = null;
         let nearestDistance = Infinity;
         
-        console.log(`Resources: Verificando consumo para ${creature.id} en (${creature.x.toFixed(1)}, ${creature.y.toFixed(1)})`);
-        console.log(`Resources: Comida disponible: ${this.food.size} items`);
-        
         // Buscar comida más cercana en rango
         for (const foodItem of this.food.values()) {
             const distance = this.calculateDistance(creature.x, creature.y, foodItem.x, foodItem.y);
-            console.log(`Resources: Distancia a ${foodItem.id}: ${distance.toFixed(1)}px (límite: ${this.detectionRadius}px)`);
             
             if (distance <= this.detectionRadius && distance < nearestDistance) {
                 nearestDistance = distance;
@@ -213,10 +201,7 @@ class Resources {
         
         // Consumir si encontró comida
         if (nearestFood) {
-            console.log(`Resources: Comida más cercana encontrada: ${nearestFood.id} a ${nearestDistance.toFixed(1)}px`);
             return this.consumeFood(nearestFood.id, creature);
-        } else {
-            console.log(`Resources: No hay comida en rango para ${creature.id}`);
         }
         
         return null;
