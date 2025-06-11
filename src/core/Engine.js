@@ -54,14 +54,14 @@ class Engine {
             // Inicializar debug
             this.setupDebug();
             
-            console.log('✅ Engine inicializado correctamente');
-            console.log(`📊 Fase actual: ${CONSTANTS.CURRENT_PHASE}`);
+            console.log('Engine inicializado correctamente');
+            console.log(`Fase actual: ${CONSTANTS.CURRENT_PHASE}`);
             
             // Iniciar gameloop
             this.start();
             
         } catch (error) {
-            console.error('❌ Error inicializando Engine:', error);
+            console.error('Error inicializando Engine:', error);
         }
     }
 
@@ -78,23 +78,45 @@ class Engine {
     }
 
     /**
-     * Configura el sistema de debug
+     * Configura el sistema de debug y controles
      */
     setupDebug() {
-        // Toggle debug con tecla D
+        // Controles de teclado
         document.addEventListener('keydown', (event) => {
-            if (event.key.toLowerCase() === 'd') {
-                this.toggleDebug();
+            switch(event.key.toLowerCase()) {
+                case 'd':
+                    this.toggleDebug();
+                    break;
+                case ' ':
+                    event.preventDefault();
+                    this.togglePause();
+                    break;
             }
         });
+    }
+
+    /**
+     * Alterna entre pausa y reproducción del juego
+     */
+    togglePause() {
+        if (window.gameTime) {
+            gameTime.togglePause();
+        }
     }
 
     /**
      * Alterna la visualización del debug overlay
      */
     toggleDebug() {
-        const debugOverlay = document.getElementById('debug-overlay');
-        debugOverlay.classList.toggle('hidden');
+        if (window.debugOverlay) {
+            debugOverlay.toggle();
+        } else {
+            // Fallback para compatibilidad
+            const debugOverlayElement = document.getElementById('debug-overlay');
+            if (debugOverlayElement) {
+                debugOverlayElement.classList.toggle('hidden');
+            }
+        }
     }
 
     /**
@@ -130,7 +152,7 @@ class Engine {
         this.isRunning = true;
         this.lastTime = performance.now();
         
-        console.log('🚀 Gameloop iniciado');
+        console.log('Gameloop iniciado');
         
         // Usar el ticker de PixiJS para el gameloop
         this.app.ticker.add(this.gameLoop.bind(this));
@@ -142,7 +164,7 @@ class Engine {
     stop() {
         this.isRunning = false;
         this.app.ticker.remove(this.gameLoop.bind(this));
-        console.log('⏹️ Gameloop detenido');
+        console.log('Gameloop detenido');
     }
 
     /**
@@ -156,9 +178,9 @@ class Engine {
         this.lastTime = currentTime;
         this.frameCount++;
         
-        // Log deltaTime para validación de la fase
-        if (this.frameCount % 60 === 0) { // Cada segundo aprox
-            console.log(`⏱️ DeltaTime: ${this.deltaTime.toFixed(2)}ms | FPS: ${Math.round(1000/this.deltaTime)}`);
+        // Log deltaTime para validación de la fase (solo cada 5 segundos para no saturar)
+        if (this.frameCount % 300 === 0) { // Cada 5 segundos aprox
+            console.log(`DeltaTime: ${this.deltaTime.toFixed(2)}ms | FPS: ${Math.round(1000/this.deltaTime)}`);
         }
         
         // Actualizar sistemas (TODO: Fases futuras)
@@ -170,9 +192,18 @@ class Engine {
 
     /**
      * Actualiza todos los sistemas del juego
-     * TODO: Expandir en fases futuras
      */
     update() {
+        // Actualizar sistema de tiempo
+        if (window.gameTime) {
+            gameTime.update();
+        }
+        
+        // Actualizar debug overlay
+        if (window.debugOverlay) {
+            debugOverlay.update();
+        }
+        
         // TODO: Fase 2.0 - Actualizar criaturas
         // TODO: Fase 3.0 - Actualizar genética
         // TODO: Fase 4.0 - Actualizar mundo
@@ -185,7 +216,7 @@ class Engine {
         if (this.app) {
             this.stop();
             this.app.destroy(true);
-            console.log('🗑️ Engine destruido');
+            console.log('Engine destruido');
         }
     }
 }

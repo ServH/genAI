@@ -4,13 +4,16 @@ Un simulador de vida emergente donde criaturas geométricas evolucionan, se repr
 
 ## 🎯 Estado Actual
 
-**CAJA 1 - Fase 1.0: Setup Inicial** ✅
+**CAJA 1 - Fase 1.1: Sistema Core** ✅
 
 - ✅ Estructura de carpetas completa
 - ✅ Canvas responsivo con PixiJS 8.x
 - ✅ Motor del juego con gameloop básico
-- ✅ Sistema de debug (tecla D)
-- ✅ Configuración centralizada
+- ✅ Sistema de eventos global (EventBus)
+- ✅ Gestión de tiempo con deltaTime suavizado
+- ✅ Generador aleatorio determinista
+- ✅ Debug overlay profesional con tabs
+- ✅ Control de pausa (tecla Espacio)
 
 ## 🚀 Inicio Rápido
 
@@ -33,6 +36,8 @@ Un simulador de vida emergente donde criaturas geométricas evolucionan, se repr
 ## ⌨️ Controles
 
 - **D**: Toggle debug overlay
+- **Espacio**: Pausa/reanuda el juego
+- **Tabs en Debug**: Navegación entre paneles (Performance, Systems, Events, Random)
 - **ESC**: Salir/deseleccionar (futuro)
 
 ## 🏗️ Arquitectura
@@ -66,7 +71,7 @@ Un simulador de vida emergente donde criaturas geométricas evolucionan, se repr
 
 ### 🏗️ CAJA 1: FOUNDATION
 - [x] **Fase 1.0**: Setup inicial ✅
-- [ ] **Fase 1.1**: Sistema core (EventBus, Time, Random)
+- [x] **Fase 1.1**: Sistema core (EventBus, Time, Random) ✅
 - [ ] **Fase 1.2**: Rendering base (Camera, efectos)
 
 ### 🦠 CAJA 2: VIDA BÁSICA
@@ -120,6 +125,6 @@ MIT License - Ver archivo LICENSE para detalles.
 
 ---
 
-**Versión**: 1.0.0-alpha  
-**Fase Actual**: CAJA 1 - Fase 1.0  
-**Última Actualización**: $(date) 
+**Versión**: 1.1.0-alpha  
+**Fase Actual**: CAJA 1 - Fase 1.1  
+**Última Actualización**: 2024-12-19 

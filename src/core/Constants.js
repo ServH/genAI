@@ -55,8 +55,8 @@ const CONSTANTS = {
     },
 
     // Versión del proyecto
-    VERSION: "1.0.0-alpha",
-    CURRENT_PHASE: "CAJA 1 - Fase 1.0"
+    VERSION: "1.1.0-alpha",
+    CURRENT_PHASE: "CAJA 1 - Fase 1.1"
 };
 
 // Hacer disponible globalmente

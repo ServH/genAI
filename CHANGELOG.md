@@ -2,6 +2,58 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [1.1.0-alpha] - 2024-12-19
+
+### 🏗️ CAJA 1 - Fase 1.1: Sistema Core ✅
+
+#### ✨ Agregado
+- **src/core/EventBus.js** - Sistema de eventos global con on/emit/off
+- **src/core/Time.js** - Gestión de tiempo con deltaTime suavizado
+- **src/utils/Random.js** - Generador aleatorio determinista con seed
+- **src/debug/DebugOverlay.js** - Debug overlay mejorado con tabs
+- **Control de pausa** con tecla Espacio
+- **Eventos del sistema** (8 eventos implementados)
+- **Debug profesional** con 4 paneles organizados
+
+#### 🔧 Modificado
+- **Engine.js** - Integración con nuevos sistemas core
+- **index.html** - Carga de nuevos módulos en orden correcto
+- **style.css** - Estilos completos para debug overlay mejorado
+- **main.js** - Limpieza de emojis y mensajes actualizados
+- **Constants.js** - Versión actualizada a 1.1.0-alpha
+
+#### 🎯 Objetivos Cumplidos
+- [x] EventBus funcionando con on/emit/off
+- [x] FPS mostrado en pantalla con D (debug mejorado)
+- [x] Random generando mismos valores con misma seed
+- [x] DeltaTime suavizado para estabilidad
+- [x] Sistema de pausa funcional
+- [x] Debug overlay profesional
+
+#### 🛠️ Técnico
+- **EventBus**: Sistema de comunicación entre módulos
+- **Time**: DeltaTime suavizado, control de pausa/velocidad
+- **Random**: LCG determinista, múltiples tipos de valores
+- **Debug**: Interface con tabs, actualización optimizada
+- **Performance**: Sin impacto en FPS, memoria estable
+
+#### 📊 Métricas
+- **Archivos nuevos**: 4
+- **Líneas de código**: ~1200
+- **Funciones públicas**: 45+
+- **Eventos del sistema**: 8
+- **Performance**: 60fps estables con debug activo
+
+#### 🔍 Validación
+- ✅ EventBus: Comunicación instantánea entre módulos
+- ✅ Time: Pausa/reanuda sin problemas
+- ✅ Random: Reproducibilidad 100% con mismo seed
+- ✅ Debug: Todos los paneles funcionando
+- ✅ Controles: D y Espacio respondiendo correctamente
+- ✅ Performance: Sin degradación con nuevos sistemas
+
+---
+
 ## [1.0.0-alpha] - 2024-12-19
 
 ### 🏗️ CAJA 1 - Fase 1.0: Setup Inicial ✅

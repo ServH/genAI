@@ -12,25 +12,25 @@ let gameEngine = null;
  * Inicializa el juego cuando el DOM está listo
  */
 document.addEventListener('DOMContentLoaded', () => {
-    console.log('🎮 Iniciando GenAI...');
-    console.log(`📦 Versión: ${CONSTANTS.VERSION}`);
-    console.log(`🔧 Fase: ${CONSTANTS.CURRENT_PHASE}`);
+    console.log('Iniciando GenAI...');
+    console.log(`Versión: ${CONSTANTS.VERSION}`);
+    console.log(`Fase: ${CONSTANTS.CURRENT_PHASE}`);
     
     // Verificar que PixiJS esté disponible
     if (typeof PIXI === 'undefined') {
-        console.error('❌ PixiJS no está disponible');
+        console.error('PixiJS no está disponible');
         showError('Error: PixiJS no se pudo cargar');
         return;
     }
     
-    console.log(`✅ PixiJS ${PIXI.VERSION} cargado correctamente`);
+    console.log(`PixiJS ${PIXI.VERSION} cargado correctamente`);
     
     // Inicializar el engine
     try {
         gameEngine = new Engine();
-        console.log('🚀 GenAI iniciado exitosamente');
+        console.log('GenAI iniciado exitosamente');
     } catch (error) {
-        console.error('❌ Error iniciando el juego:', error);
+        console.error('Error iniciando el juego:', error);
         showError(`Error iniciando el juego: ${error.message}`);
     }
 });
@@ -52,7 +52,7 @@ function showError(message) {
             background: #0a0e27;
         ">
             <div>
-                <h2>⚠️ Error</h2>
+                <h2>Error</h2>
                 <p>${message}</p>
                 <p style="margin-top: 20px; font-size: 12px; opacity: 0.7;">
                     Revisa la consola para más detalles
@@ -68,7 +68,7 @@ function showError(message) {
 window.addEventListener('beforeunload', () => {
     if (gameEngine) {
         gameEngine.destroy();
-        console.log('🧹 Recursos limpiados');
+        console.log('Recursos limpiados');
     }
 });
 
@@ -76,22 +76,22 @@ window.addEventListener('beforeunload', () => {
  * Maneja errores no capturados
  */
 window.addEventListener('error', (event) => {
-    console.error('❌ Error no capturado:', event.error);
+    console.error('Error no capturado:', event.error);
 });
 
 /**
  * Maneja promesas rechazadas
  */
 window.addEventListener('unhandledrejection', (event) => {
-    console.error('❌ Promesa rechazada:', event.reason);
+    console.error('Promesa rechazada:', event.reason);
 });
 
 // Información de debug en consola
 console.log(`
-🧬 GenAI - Simulador de Vida Emergente
-═══════════════════════════════════════
-📊 Fase: ${CONSTANTS.CURRENT_PHASE}
-🎯 Objetivo: Setup inicial con PixiJS
-⌨️  Controles: D = Debug overlay
-═══════════════════════════════════════
+GenAI - Simulador de Vida Emergente
+===================================
+Fase: ${CONSTANTS.CURRENT_PHASE}
+Objetivo: Sistema Core con EventBus, Time y Random
+Controles: D = Debug overlay, Espacio = Pausa
+===================================
 `); 
