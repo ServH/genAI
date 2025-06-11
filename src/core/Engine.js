@@ -32,6 +32,7 @@ class Engine {
         const checkModules = () => {
             return window.gameTime && 
                    window.timeStats && 
+                   window.timeUtils &&
                    window.eventBus && 
                    window.debugOverlay &&
                    window.EngineControls &&
@@ -159,11 +160,15 @@ class Engine {
         // Actualizar tiempo
         if (window.gameTime) {
             gameTime.update();
-            const deltaTime = gameTime.getDeltaTime();
             
-            // Actualizar cámara
-            if (this.camera) {
-                this.camera.update(deltaTime);
+            // Obtener deltaTime desde timeUtils
+            if (window.timeUtils) {
+                const deltaTime = timeUtils.getDeltaTimeSeconds();
+                
+                // Actualizar cámara
+                if (this.camera) {
+                    this.camera.update(deltaTime);
+                }
             }
         }
         
