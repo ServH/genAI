@@ -27,6 +27,11 @@ class CreatureBehavior {
     update(deltaTime) {
         if (!this.creature.isAlive) return;
         
+        // Debug: Verificar que se está llamando
+        if (Math.random() < 0.001) { // Muy ocasional
+            console.log(`CreatureBehavior: ${this.creature.id} update() llamado`);
+        }
+        
         // Actualizar sistemas modulares
         this.updateBehaviorSystems(deltaTime);
         
@@ -75,7 +80,10 @@ class CreatureBehavior {
         }
         
         const foods = gameResources.getAllFood();
-        console.log(`CreatureBehavior: ${this.creature.id} buscando comida - ${foods.size} items disponibles`);
+        // Solo log ocasional para no saturar
+        if (Math.random() < 0.01) {
+            console.log(`CreatureBehavior: ${this.creature.id} buscando comida - ${foods.size} items disponibles`);
+        }
         
         const nearestFood = this.vision.getNearestVisibleFood(foods);
         
@@ -90,11 +98,6 @@ class CreatureBehavior {
                     foodId: nearestFood.id,
                     distance: this.vision.getDistance(nearestFood.x, nearestFood.y)
                 });
-            }
-        } else {
-            // Solo log ocasional para no saturar
-            if (Math.random() < 0.01) {
-                console.log(`CreatureBehavior: ${this.creature.id} no ve comida en su cono de visión`);
             }
         }
     }

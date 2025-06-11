@@ -102,7 +102,7 @@ const CONSTANTS = {
 
     // Configuración de Visión
     VISION: {
-        ANGLE: 120, // grados del cono de visión
+        ANGLE: 360, // grados del cono de visión (360° = visión completa para debug)
         RANGE: 200, // pixels de alcance
         DEBUG_SHOW: false // mostrar cono en debug
     },
