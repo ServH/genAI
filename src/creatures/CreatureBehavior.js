@@ -47,6 +47,11 @@ class CreatureBehavior {
         // 2. Buscar comida con visión si está en IDLE
         if (this.states.isInState(CREATURE_STATES.IDLE)) {
             this.searchForFood();
+        } else {
+            // Debug: ¿Por qué no está en IDLE?
+            if (Math.random() < 0.01) {
+                console.log(`CreatureBehavior: ${this.creature.id} no está en IDLE, estado actual: ${this.states.getCurrentState()}`);
+            }
         }
         
         // 3. Verificar si llegó al objetivo
@@ -64,12 +69,18 @@ class CreatureBehavior {
      * Busca comida usando el sistema de visión
      */
     searchForFood() {
-        if (!window.gameResources) return;
+        if (!window.gameResources) {
+            console.log(`CreatureBehavior: ${this.creature.id} - gameResources no disponible`);
+            return;
+        }
         
         const foods = gameResources.getAllFood();
+        console.log(`CreatureBehavior: ${this.creature.id} buscando comida - ${foods.size} items disponibles`);
+        
         const nearestFood = this.vision.getNearestVisibleFood(foods);
         
         if (nearestFood) {
+            console.log(`CreatureBehavior: ${this.creature.id} detectó comida ${nearestFood.id}, cambiando a SEEKING`);
             // Cambiar a estado SEEKING con objetivo
             this.states.setState(CREATURE_STATES.SEEKING, nearestFood);
             
@@ -79,6 +90,11 @@ class CreatureBehavior {
                     foodId: nearestFood.id,
                     distance: this.vision.getDistance(nearestFood.x, nearestFood.y)
                 });
+            }
+        } else {
+            // Solo log ocasional para no saturar
+            if (Math.random() < 0.01) {
+                console.log(`CreatureBehavior: ${this.creature.id} no ve comida en su cono de visión`);
             }
         }
     }
