@@ -2,6 +2,39 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [3.1.6-alpha] - 2024-12-19
+
+### 🌱 CAJA 3 - Fase 3.1: Evolución Natural Habilitada ✅
+
+#### 🚨 **PROBLEMA CRÍTICO SOLUCIONADO**
+- **Respawn automático deshabilitado**: Sistema mantenía población fija en 10 criaturas
+- **Crecimiento poblacional bloqueado**: Reproducción no podía aumentar población
+- **Evolución imposible**: Sin variación poblacional no hay presión selectiva
+
+#### 🔧 **CreatureLifecycle.js Corregido**
+- **checkRespawn() modificado**: Solo respawn en extinción total (0 criaturas)
+- **Respawn de emergencia**: 2 criaturas mínimas para recuperación
+- **Población natural**: Crece/decrece por reproducción/muerte hasta 50 máximo
+- **Log poblacional**: Tracking de población natural sin intervención
+
+#### 🌱 **Evolución Natural Implementada**
+- **Crecimiento orgánico**: 10 criaturas iniciales → hasta 50 por reproducción
+- **Presión selectiva**: Recursos limitados crean competencia natural
+- **Diversidad genética**: Población variable permite especialización
+- **Extinción posible**: Solo respawn si población llega a 0
+
+#### 🎯 **Reproducción Ahora Observable**
+- ✅ **Población crece**: Bebés se suman a población existente
+- ✅ **Capacidad máxima**: 50 criaturas permiten familias grandes
+- ✅ **Competencia natural**: Recursos limitados vs población creciente
+- ✅ **Evolución real**: Variación poblacional + selección = evolución
+
+#### 📁 **Archivos Modificados**
+- `src/creatures/CreatureLifecycle.js` - Respawn automático deshabilitado
+- `main.js` - Mensaje actualizado con evolución natural
+
+---
+
 ## [3.1.5-alpha] - 2024-12-19
 
 ### 🧬 CAJA 3 - Fase 3.1: Sistema de Género Sexual Completo ✅
