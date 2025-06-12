@@ -76,13 +76,14 @@ GenAI - Simulador de Vida Emergente
 ===================================
 Fase: ${CONSTANTS.CURRENT_PHASE} - OPTIMIZADO PARA OBSERVACIÓN
 Objetivo: Sistemas Fundamentales para Evolución
-- Población inicial: 50 criaturas (vs 10 anterior)
+- Población inicial: 10 criaturas aleatorias con genes únicos
+- Capacidad máxima: 50 criaturas (espacio para reproducción)
 - Reproducción acelerada: Umbral 60% energía, cooldown 3s
 - Crecimiento rápido: Bebé→Juvenil 10s, Juvenil→Adulto 20s
 - Energía balanceada: Drenaje 0.3/s, vida ~333s promedio
-- Símbolos familiares: Visualización completa de linajes
+- Símbolos familiares: Cada familia desarrolla su propio símbolo
 - Debug completo: Paneles población + linajes en tiempo real
-¡Ahora podrás ver bebés, crecimiento y símbolos familiares!
+¡Observa cómo 10 criaturas crean familias y llenan el mundo!
 Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
 ===================================
 `); 

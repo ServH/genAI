@@ -18,7 +18,7 @@ const CONSTANTS = {
     WORLD: {
         CHUNK_SIZE: 500,
         MAX_ENTITIES: 500,
-        INITIAL_CREATURES: 50, // Aumentado para ver reproducción
+        INITIAL_CREATURES: 10, // 10 criaturas iniciales aleatorias
         WIDTH: 1200,  // Mundo fijo más grande
         HEIGHT: 800, // Mundo fijo más grande
         BORDER_TYPE: 'wall', // 'wall', 'wrap', o 'infinite'
@@ -67,8 +67,8 @@ const CONSTANTS = {
 
     // Configuración de Criaturas
     CREATURES: {
-        INITIAL_COUNT: 50, // Consistente con WORLD.INITIAL_CREATURES
-        MAX_COUNT: 200, // Aumentado para permitir más reproducción
+        INITIAL_COUNT: 10, // 10 criaturas iniciales aleatorias
+        MAX_COUNT: 50, // Capacidad máxima para reproducción
         BASE_RADIUS: 20,
         MIN_SPEED: 20, // px/s
         MAX_SPEED: 80, // px/s
