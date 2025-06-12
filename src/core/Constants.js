@@ -109,12 +109,14 @@ const CONSTANTS = {
         DEBUG_SHOW: false // mostrar cono en debug
     },
 
-    // Configuración de Estados - Fase 2.3 + 3.1
+    // Configuración de Estados - Fase 2.3 + 3.1 + fixfeatures
     STATES: {
         IDLE_DURATION: 2000, // ms mínimo en idle
         SEEKING_TIMEOUT: 5000, // ms máximo buscando
         EATING_DURATION: 500, // ms consumiendo
-        MATING_DURATION: 2000, // ms apareándose
+        COURTING_DURATION: 3000, // ms de cortejo circular
+        MATING_DURATION: 5000, // ms apareándose (aumentado)
+        NURSING_DURATION: 30000, // ms cuidando bebé
         STATE_CHANGE_COOLDOWN: 200 // ms entre cambios de estado
     },
 
@@ -137,7 +139,7 @@ const CONSTANTS = {
         }
     },
 
-    // Configuración de Reproducción - Fase 3.1
+    // Configuración de Reproducción - Fase 3.1 + fixfeatures
     REPRODUCTION: {
         ENERGY_THRESHOLD: 80,        // % energía mínima para reproducirse
         SEARCH_RADIUS: 500,          // pixels de radio de búsqueda de pareja (muy grande)
@@ -146,6 +148,8 @@ const CONSTANTS = {
         COOLDOWN: 5000,             // ms de cooldown entre reproducciones (reducido)
         OFFSPRING_ENERGY: 100,      // energía inicial de la cría
         MATING_DISTANCE: 50,        // pixels mínimos para aparearse (aumentado)
+        COURTING_RADIUS: 80,        // pixels para movimiento circular
+        ENERGY_TRANSFER_RATE: 0.5,  // energía/segundo de madre a bebé
         
         // Modo debug para forzar apareamiento
         DEBUG_MODE: {
@@ -175,17 +179,10 @@ const CONSTANTS = {
             PULSE_SIZE: 5
         },
 
-        // Efectos de nacimiento
+        // Efectos de nacimiento (simplificados)
         BIRTH: {
             COLOR: 0xffd700,
-            GLOW_COLOR: 0xffff00,
-            PARTICLE_COUNT: 8,
-            PARTICLE_SPEED: 50,
-            PARTICLE_DECAY: 0.02,
-            PARTICLE_SIZE: 3,
-            FRICTION: 0.98,
-            ALPHA: 0.8,
-            DURATION: 3000 // 3 segundos
+            DURATION: 1500 // 1.5 segundos
         }
     },
 

@@ -123,7 +123,13 @@ class MatingEffects {
         graphics.lineStyle(2, CONSTANTS.EFFECTS.SEEKING_PULSE.COLOR, alpha);
         graphics.drawCircle(x, y, radius);
         
-        renderer.app.stage.addChild(graphics);
+        // Usar worldContainer en lugar de stage para que se mueva con la cámara
+        const worldContainer = this.getWorldContainer(renderer);
+        if (worldContainer) {
+            worldContainer.addChild(graphics);
+        } else {
+            renderer.app.stage.addChild(graphics); // Fallback
+        }
         this.scheduleGraphicRemoval(graphics);
     }
 
@@ -148,8 +154,24 @@ class MatingEffects {
         graphics.drawCircle(centerX, centerY, pulseSize);
         graphics.endFill();
         
-        renderer.app.stage.addChild(graphics);
+        // Usar worldContainer en lugar de stage para que se mueva con la cámara
+        const worldContainer = this.getWorldContainer(renderer);
+        if (worldContainer) {
+            worldContainer.addChild(graphics);
+        } else {
+            renderer.app.stage.addChild(graphics); // Fallback
+        }
         this.scheduleGraphicRemoval(graphics);
+    }
+
+    /**
+     * Obtiene el worldContainer del engine
+     */
+    getWorldContainer(renderer) {
+        if (window.gameEngine && window.gameEngine.worldContainer) {
+            return window.gameEngine.worldContainer;
+        }
+        return null;
     }
 
     /**

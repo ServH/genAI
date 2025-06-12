@@ -10,7 +10,7 @@ class BirthEffects {
     }
 
     /**
-     * Crea efecto de nacimiento en posición específica
+     * Crea efecto de nacimiento simple en posición específica
      */
     createBirthEffect(x, y) {
         const config = CONSTANTS.EFFECTS.BIRTH;
@@ -18,9 +18,10 @@ class BirthEffects {
         this.effects.push({
             x: x,
             y: y,
-            particles: this.createParticles(x, y, config.PARTICLE_COUNT),
             startTime: Date.now(),
-            duration: config.DURATION
+            duration: config.DURATION,
+            scale: 0,
+            alpha: 1
         });
 
         // Emitir evento de nacimiento
@@ -29,30 +30,7 @@ class BirthEffects {
         }
     }
 
-    /**
-     * Crea partículas para el efecto
-     */
-    createParticles(x, y, count) {
-        const particles = [];
-        const config = CONSTANTS.EFFECTS.BIRTH;
-        
-        for (let i = 0; i < count; i++) {
-            const angle = (Math.PI * 2 * i) / count;
-            const speed = config.PARTICLE_SPEED;
-            
-            particles.push({
-                x: x,
-                y: y,
-                vx: Math.cos(angle) * speed,
-                vy: Math.sin(angle) * speed,
-                life: 1.0,
-                decay: config.PARTICLE_DECAY,
-                size: config.PARTICLE_SIZE
-            });
-        }
-        
-        return particles;
-    }
+
 
     /**
      * Actualiza todos los efectos de nacimiento
@@ -62,37 +40,23 @@ class BirthEffects {
         
         this.effects = this.effects.filter(effect => {
             const elapsed = now - effect.startTime;
+            const progress = elapsed / effect.duration;
             
-            // Actualizar partículas del efecto
-            this.updateParticles(effect.particles, deltaTime);
+            // Animación simple: scale 0→1.5→1 y alpha 1→0.5
+            if (progress < 0.5) {
+                effect.scale = progress * 3; // 0 a 1.5
+                effect.alpha = 1;
+            } else {
+                effect.scale = 1.5 - (progress - 0.5) * 1; // 1.5 a 1
+                effect.alpha = 1 - (progress - 0.5) * 1; // 1 a 0.5
+            }
             
             // Mantener efecto si no ha expirado
             return elapsed < effect.duration;
         });
     }
 
-    /**
-     * Actualiza partículas individuales
-     */
-    updateParticles(particles, deltaTime) {
-        const friction = CONSTANTS.EFFECTS.BIRTH.FRICTION;
-        
-        particles.forEach(particle => {
-            // Actualizar posición
-            particle.x += particle.vx * deltaTime;
-            particle.y += particle.vy * deltaTime;
-            
-            // Reducir vida
-            particle.life -= particle.decay;
-            
-            // Aplicar fricción
-            particle.vx *= friction;
-            particle.vy *= friction;
-            
-            // Reducir tamaño gradualmente
-            particle.size *= 0.99;
-        });
-    }
+
 
     /**
      * Renderiza todos los efectos de nacimiento
@@ -101,44 +65,40 @@ class BirthEffects {
         if (!renderer?.app) return;
         
         for (const effect of this.effects) {
-            this.renderEffect(renderer, effect);
+            this.renderSimpleEffect(renderer, effect);
         }
     }
 
     /**
-     * Renderiza un efecto específico
+     * Renderiza un efecto simple de nacimiento
      */
-    renderEffect(renderer, effect) {
-        const config = CONSTANTS.EFFECTS.BIRTH;
-        
-        for (const particle of effect.particles) {
-            if (particle.life <= 0) continue;
-            
-            const alpha = particle.life * config.ALPHA;
-            const size = particle.size * particle.life;
-            
-            this.createParticleGraphic(renderer, particle, alpha, size);
-        }
-    }
-
-    /**
-     * Crea gráfico de partícula temporal
-     */
-    createParticleGraphic(renderer, particle, alpha, size) {
+    renderSimpleEffect(renderer, effect) {
         const graphics = new PIXI.Graphics();
         const config = CONSTANTS.EFFECTS.BIRTH;
         
-        // Partícula brillante
-        graphics.beginFill(config.COLOR, alpha);
-        graphics.drawCircle(particle.x, particle.y, size);
+        // Círculo simple con fade y scale
+        graphics.beginFill(config.COLOR, effect.alpha * 0.8);
+        graphics.drawCircle(effect.x, effect.y, 5 * effect.scale);
         graphics.endFill();
         
-        // Glow exterior
-        graphics.lineStyle(1, config.GLOW_COLOR, alpha * 0.5);
-        graphics.drawCircle(particle.x, particle.y, size * 1.5);
-        
-        renderer.app.stage.addChild(graphics);
+        // Usar worldContainer en lugar de stage para que se mueva con la cámara
+        const worldContainer = this.getWorldContainer(renderer);
+        if (worldContainer) {
+            worldContainer.addChild(graphics);
+        } else {
+            renderer.app.stage.addChild(graphics); // Fallback
+        }
         this.scheduleGraphicRemoval(graphics);
+    }
+
+    /**
+     * Obtiene el worldContainer del engine
+     */
+    getWorldContainer(renderer) {
+        if (window.gameEngine && window.gameEngine.worldContainer) {
+            return window.gameEngine.worldContainer;
+        }
+        return null;
     }
 
     /**
@@ -156,14 +116,10 @@ class BirthEffects {
      * Obtiene estadísticas de efectos activos
      */
     getStats() {
-        const totalParticles = this.effects.reduce((sum, effect) => 
-            sum + effect.particles.length, 0);
-        
         return {
             activeEffects: this.effects.length,
-            totalParticles: totalParticles,
-            averageParticlesPerEffect: this.effects.length > 0 ? 
-                Math.round(totalParticles / this.effects.length) : 0
+            totalParticles: this.effects.length, // Ahora cada efecto es un círculo simple
+            averageParticlesPerEffect: 1 // Siempre 1 por efecto
         };
     }
 

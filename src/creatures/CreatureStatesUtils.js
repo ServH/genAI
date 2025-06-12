@@ -11,10 +11,12 @@ class CreatureStatesUtils {
      */
     static isValidTransition(fromState, toState) {
         const validTransitions = {
-            [CREATURE_STATES.IDLE]: [CREATURE_STATES.SEEKING, CREATURE_STATES.MATING],
-            [CREATURE_STATES.SEEKING]: [CREATURE_STATES.IDLE, CREATURE_STATES.EATING],
+            [CREATURE_STATES.IDLE]: [CREATURE_STATES.SEEKING, CREATURE_STATES.COURTING],
+            [CREATURE_STATES.SEEKING]: [CREATURE_STATES.IDLE, CREATURE_STATES.EATING, CREATURE_STATES.COURTING],
             [CREATURE_STATES.EATING]: [CREATURE_STATES.IDLE],
-            [CREATURE_STATES.MATING]: [CREATURE_STATES.IDLE]
+            [CREATURE_STATES.COURTING]: [CREATURE_STATES.MATING, CREATURE_STATES.IDLE],
+            [CREATURE_STATES.MATING]: [CREATURE_STATES.NURSING, CREATURE_STATES.IDLE],
+            [CREATURE_STATES.NURSING]: [CREATURE_STATES.IDLE]
         };
         
         return validTransitions[fromState]?.includes(toState) || false;
@@ -28,7 +30,9 @@ class CreatureStatesUtils {
             idleDuration: CONSTANTS.STATES ? CONSTANTS.STATES.IDLE_DURATION : 2000,
             seekingTimeout: CONSTANTS.STATES ? CONSTANTS.STATES.SEEKING_TIMEOUT : 5000,
             eatingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.EATING_DURATION : 500,
-            matingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.MATING_DURATION : 2000,
+            courtingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.COURTING_DURATION : 3000,
+            matingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.MATING_DURATION : 5000,
+            nursingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.NURSING_DURATION : 30000,
             changeCooldown: CONSTANTS.STATES ? CONSTANTS.STATES.STATE_CHANGE_COOLDOWN : 200
         };
     }
@@ -44,8 +48,14 @@ class CreatureStatesUtils {
             case CREATURE_STATES.SEEKING:
                 return stateTimer >= config.seekingTimeout ? CREATURE_STATES.IDLE : null;
                 
+            case CREATURE_STATES.COURTING:
+                return stateTimer >= config.courtingDuration ? CREATURE_STATES.MATING : null;
+                
             case CREATURE_STATES.MATING:
                 return stateTimer >= config.matingDuration ? CREATURE_STATES.IDLE : null;
+                
+            case CREATURE_STATES.NURSING:
+                return stateTimer >= config.nursingDuration ? CREATURE_STATES.IDLE : null;
                 
             default:
                 return null;
