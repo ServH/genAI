@@ -7,12 +7,12 @@ Registro detallado de cambios por fase del proyecto GenAI.
 ### 🔍 CAJA 3 - Fase 3.1: Optimización para Observación de Reproducción ✅
 
 #### 🎯 Problema Solucionado
-- **Población insuficiente**: Solo 10 criaturas impedían observar reproducción
+- **Capacidad insuficiente**: Sistema limitado impedía crecimiento poblacional
 - **Parámetros lentos**: Configuración original dificultaba ver bebés y linajes
 - **Visualización faltante**: Símbolos familiares no se mostraban en pantalla
 
 #### ⚡ Optimizaciones Implementadas
-- **Población aumentada**: 10 → 50 criaturas iniciales para observar reproducción
+- **Capacidad expandida**: 10 criaturas iniciales aleatorias, capacidad máxima 50
 - **Reproducción acelerada**: Umbral 60% energía (vs 80%), cooldown 3s (vs 5s)
 - **Crecimiento rápido**: Bebé→Juvenil 10s, Juvenil→Adulto 20s (vs 20s/40s)
 - **Energía balanceada**: Drenaje 0.3/s (vs 0.5/s), vida ~333s promedio
