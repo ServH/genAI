@@ -116,6 +116,11 @@ class CreatureBehavior {
             return;
         }
         
+        // 🔄 VERIFICACIÓN ADICIONAL: No buscar pareja si está en cooldown
+        if (!window.gameReproduction.canReproduce(this.creature)) {
+            return; // Silenciosamente no buscar si está en cooldown
+        }
+        
         const allCreatures = window.gameEngine.creatureManager.getAllCreatures();
         const female = window.gameReproduction.findMate(this.creature, allCreatures);
         

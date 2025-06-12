@@ -251,8 +251,8 @@ class Reproduction {
         // Limpiar selección femenina
         this.clearFemaleSelection(female);
         
-        // 🔄 LIMPIAR REFERENCIAS BIDIRECCIONALES
-        this.clearMatingReferences(male, female);
+        // 🔄 LIMPIAR REFERENCIAS BIDIRECCIONALES (después de reproducción exitosa)
+        this.clearMatingReferences(male, female, true);
         
         // Actualizar estadísticas
         this.stats.totalReproductions++;
@@ -329,24 +329,29 @@ class Reproduction {
      * 🔄 NUEVO: Limpia referencias de apareamiento inconsistentes
      * @param {Creature} creature1 - Primera criatura
      * @param {Creature} creature2 - Segunda criatura
+     * @param {boolean} isSuccessfulReproduction - Si es después de reproducción exitosa
      */
-    clearMatingReferences(creature1, creature2) {
-        // Aplicar cooldown temporal para evitar bucles infinitos
-        const cooldownTime = 2000; // 2 segundos
-        const now = Date.now();
-        
-        this.reproductionCooldowns.set(creature1.id, now);
-        this.reproductionCooldowns.set(creature2.id, now);
+    clearMatingReferences(creature1, creature2, isSuccessfulReproduction = false) {
+        // Solo aplicar cooldown si NO es después de reproducción exitosa
+        // (porque performReproduction ya estableció el cooldown correcto)
+        if (!isSuccessfulReproduction) {
+            const cooldownTime = 2000; // 2 segundos para fallos
+            const now = Date.now();
+            
+            this.reproductionCooldowns.set(creature1.id, now);
+            this.reproductionCooldowns.set(creature2.id, now);
+            console.log(`🔄 RESET: Cooldown temporal aplicado por referencias inconsistentes (2s)`);
+        }
         
         // Resetear ambas criaturas a IDLE si están en MATING
         if (creature1.behavior?.states?.isInState(CREATURE_STATES.MATING)) {
             creature1.behavior.states.setState(CREATURE_STATES.IDLE);
-            console.log(`🔄 RESET: ${creature1.id} reseteado a IDLE por referencias inconsistentes (cooldown 2s)`);
+            console.log(`🔄 RESET: ${creature1.id} reseteado a IDLE ${isSuccessfulReproduction ? 'después de reproducción exitosa' : 'por referencias inconsistentes'}`);
         }
         
         if (creature2.behavior?.states?.isInState(CREATURE_STATES.MATING)) {
             creature2.behavior.states.setState(CREATURE_STATES.IDLE);
-            console.log(`🔄 RESET: ${creature2.id} reseteado a IDLE por referencias inconsistentes (cooldown 2s)`);
+            console.log(`🔄 RESET: ${creature2.id} reseteado a IDLE ${isSuccessfulReproduction ? 'después de reproducción exitosa' : 'por referencias inconsistentes'}`);
         }
     }
 
