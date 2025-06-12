@@ -125,7 +125,6 @@ class CreatureBehavior {
         const female = window.gameReproduction.findMate(this.creature, allCreatures);
         
         if (female) {
-            console.log(`💕 COURTING: Macho ${this.creature.id} cambió a estado COURTING con hembra ${female.id}`);
             // Cambiar a estado COURTING con objetivo
             this.states.setState(CREATURE_STATES.COURTING, female);
             
@@ -181,13 +180,7 @@ class CreatureBehavior {
         const distance = this.distanceTo(partner.x, partner.y);
         const matingDistance = CONSTANTS.REPRODUCTION.MATING_DISTANCE;
         
-        // 🔍 DIAGNÓSTICO: Log inteligente cada 3 segundos por pareja
-        if (!this.lastMatingDiagnostic || Date.now() - this.lastMatingDiagnostic > 3000) {
-            const partnerGender = partner.dna ? (partner.dna.isMale() ? 'M' : 'F') : '?';
-            const myGender = this.creature.dna ? (this.creature.dna.isMale() ? 'M' : 'F') : '?';
-            console.log(`🔍 MATING CHECK: ${myGender}${this.creature.id.slice(-3)} + ${partnerGender}${partner.id.slice(-3)} | Distancia: ${distance.toFixed(1)}px (necesita ≤${matingDistance}px) | Estados: ${this.states.getCurrentState()} + ${partner.behavior?.states?.getCurrentState() || '?'}`);
-            this.lastMatingDiagnostic = Date.now();
-        }
+        // Diagnóstico silencioso - información disponible en debug overlay
         
         if (distance <= matingDistance && window.gameReproduction) {
             // 🔄 VERIFICAR SINCRONIZACIÓN: Asegurar que ambas criaturas estén en MATING
@@ -247,16 +240,13 @@ class CreatureBehavior {
                     }
                     
                     this.states.setState(CREATURE_STATES.NURSING, offspring);
-                    console.log(`👶 NURSING: Hembra ${this.creature.id} cambió a estado NURSING para cuidar a ${offspring.id}`);
                 } else {
                     // El macho vuelve a IDLE después de reproducirse
                     this.states.setState(CREATURE_STATES.IDLE);
-                    console.log(`♂️ IDLE: Macho ${this.creature.id} vuelve a IDLE después de reproducirse`);
                 }
             } else {
                 // Si no se pudo reproducir, volver a IDLE
                 this.states.setState(CREATURE_STATES.IDLE);
-                console.log(`❌ IDLE: ${this.creature.id} no pudo reproducirse, vuelve a IDLE`);
             }
         }
     }
@@ -390,19 +380,12 @@ class CreatureBehavior {
         // Verificar distancia actual
         const distance = this.distanceTo(mate.x, mate.y);
         
-        // 🔍 DIAGNÓSTICO: Log inteligente cada 3 segundos por pareja
-        if (!this.lastCourtingDiagnostic || Date.now() - this.lastCourtingDiagnostic > 3000) {
-            const partnerGender = mate.dna ? (mate.dna.isMale() ? 'M' : 'F') : '?';
-            const myGender = this.creature.dna ? (this.creature.dna.isMale() ? 'M' : 'F') : '?';
-            console.log(`💕 COURTING: ${myGender}${this.creature.id.slice(-3)} cortejando ${partnerGender}${mate.id.slice(-3)} | Distancia: ${distance.toFixed(1)}px | Radio objetivo: ${targetRadius.toFixed(1)}px | Tiempo: ${timeInCourting.toFixed(1)}s`);
-            this.lastCourtingDiagnostic = Date.now();
-        }
+        // Diagnóstico silencioso - información disponible en debug overlay
         
         // Si están lo suficientemente cerca para aparearse, transición a MATING
         if (distance <= CONSTANTS.REPRODUCTION.MATING_DISTANCE) {
             // 🔄 SINCRONIZACIÓN BIDIRECCIONAL: Ambas criaturas deben cambiar a MATING
             this.synchronizeMatingTransition(mate);
-            console.log(`💖 MATING: ${this.creature.id} cambió a MATING (distancia: ${distance.toFixed(1)}px ≤ ${CONSTANTS.REPRODUCTION.MATING_DISTANCE}px)`);
             return;
         }
         
@@ -423,7 +406,6 @@ class CreatureBehavior {
     checkCommittedProcess() {
         const selectedMale = this.states.getTarget();
         if (!selectedMale || !selectedMale.isAlive) {
-            console.log(`💔 COMMITTED: Macho seleccionado ${selectedMale?.id || 'ninguno'} no disponible, volviendo a IDLE`);
             this.states.setState(CREATURE_STATES.IDLE);
             return;
         }
@@ -433,7 +415,6 @@ class CreatureBehavior {
         const maleTarget = selectedMale.behavior?.states?.getTarget();
         
         if (maleState !== CREATURE_STATES.COURTING || !maleTarget || maleTarget.id !== this.creature.id) {
-            console.log(`💔 COMMITTED: Macho ${selectedMale.id} no está cortejando (estado: ${maleState}, target: ${maleTarget?.id}), abortando compromiso`);
             this.states.setState(CREATURE_STATES.IDLE);
             
             // Limpiar selección femenina
@@ -446,11 +427,7 @@ class CreatureBehavior {
         // Verificar distancia - si el macho está lo suficientemente cerca, esperar transición
         const distance = this.distanceTo(selectedMale.x, selectedMale.y);
         
-        // 🔍 DIAGNÓSTICO: Log inteligente cada 3 segundos
-        if (!this.lastCommittedDiagnostic || Date.now() - this.lastCommittedDiagnostic > 3000) {
-            console.log(`💍 COMMITTED: Hembra ${this.creature.id.slice(-3)} esperando a macho ${selectedMale.id.slice(-3)} | Distancia: ${distance.toFixed(1)}px | Macho estado: ${maleState}`);
-            this.lastCommittedDiagnostic = Date.now();
-        }
+        // Diagnóstico silencioso - información disponible en debug overlay
         
         // La hembra simplemente espera - el macho iniciará la transición a MATING cuando esté listo
         // No hacer nada más, solo mantener el estado COMMITTED
@@ -477,7 +454,6 @@ class CreatureBehavior {
         if (mother) {
             // Cambiar a estado SEEKING para seguir a la madre
             this.states.setState(CREATURE_STATES.SEEKING, mother);
-            console.log(`👶 FOLLOWING: ${this.creature.id} siguiendo a madre ${mother.id}`);
             return true;
         }
         
@@ -520,24 +496,17 @@ class CreatureBehavior {
     synchronizeMatingTransition(mate) {
         // Solo el macho puede iniciar la transición sincronizada
         if (!this.creature.dna || !this.creature.dna.isMale()) {
-            console.log(`❌ SYNC: Solo machos pueden iniciar transición MATING (${this.creature.id})`);
             return;
         }
         
         // Verificar que la hembra esté en estado COMMITTED
         if (!mate.behavior?.states?.isInState(CREATURE_STATES.COMMITTED)) {
-            console.log(`❌ SYNC: Hembra ${mate.id} no está en estado COMMITTED (estado: ${mate.behavior?.states?.getCurrentState()})`);
             return;
         }
         
         // Usar el sistema de reproducción para sincronizar la transición
         if (window.gameReproduction) {
-            const success = window.gameReproduction.synchronizeMatingTransition(this.creature, mate);
-            if (!success) {
-                console.log(`❌ SYNC: Falló sincronización MATING entre ${this.creature.id} y ${mate.id}`);
-            }
-        } else {
-            console.log(`❌ SYNC: gameReproduction no disponible para sincronización`);
+            window.gameReproduction.synchronizeMatingTransition(this.creature, mate);
         }
     }
 

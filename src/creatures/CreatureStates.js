@@ -26,7 +26,7 @@ class CreatureStates {
         // Configuración desde utilidades
         this.config = CreatureStatesUtils.getConfig();
         
-        console.log(`CreatureStates: Sistema inicializado para ${creature.id} - Estado inicial: ${this.currentState}`);
+        // Sistema inicializado silenciosamente
     }
 
     /**
@@ -68,19 +68,7 @@ class CreatureStates {
         this.stateTimer = 0;
         this.lastStateChange = now;
         
-        // Log solo cambios importantes
-        if (newState === CREATURE_STATES.SEEKING || newState === CREATURE_STATES.EATING) {
-            console.log(`ESTADO: ${this.creature.id} cambió de ${previousState} a ${newState}${target ? ` (objetivo: ${target.id})` : ''}`);
-        }
-        
-        // Log especial para estados reproductivos
-        if (newState === CREATURE_STATES.COMMITTED) {
-            console.log(`💍 COMMITTED: Hembra ${this.creature.id} comprometida con macho ${target ? target.id : 'sin pareja'}`);
-        }
-        
-        if (newState === CREATURE_STATES.MATING) {
-            console.log(`💕 MATING: ${this.creature.id} cambió a estado MATING con pareja ${target ? target.id : 'sin pareja'}`);
-        }
+        // Estados cambiados silenciosamente - información disponible en debug overlay
         
         // Emitir evento de cambio de estado
         CreatureStatesUtils.emitStateChangeEvent(

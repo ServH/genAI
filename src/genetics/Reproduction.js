@@ -116,7 +116,6 @@ class Reproduction {
         const newSelectedMale = this.getSelectedMale(closestFemale);
         if (newSelectedMale && newSelectedMale.id === creature.id) {
             // Fue seleccionado, puede empezar cortejo
-            console.log(`✅ SELECTED: Macho ${creature.id} fue seleccionado por hembra ${closestFemale.id}`);
             return closestFemale;
         }
 
@@ -177,13 +176,11 @@ class Reproduction {
     attemptReproduction(male, female) {
         // Verificar géneros correctos
         if (!male.dna || !female.dna || !male.dna.isMale() || !female.dna.isFemale()) {
-            console.log(`❌ REPRODUCTION: Géneros incorrectos - ${male.id}:${male.dna?.getGender()}, ${female.id}:${female.dna?.getGender()}`);
             return null;
         }
 
         // Verificar que ambos pueden reproducirse
         if (!this.canReproduce(male) || !this.canReproduce(female)) {
-            console.log(`❌ REPRODUCTION: No pueden reproducirse - M:${this.canReproduce(male)}, F:${this.canReproduce(female)}`);
             return null;
         }
 
@@ -193,13 +190,11 @@ class Reproduction {
         
         // Verificar referencias bidireccionales
         if (!maleTarget || maleTarget.id !== female.id) {
-            console.log(`❌ SYNC: Macho ${male.id} no tiene como target a hembra ${female.id} (target: ${maleTarget?.id || 'ninguno'})`);
             this.clearMatingReferences(male, female);
             return null;
         }
         
         if (!femaleTarget || femaleTarget.id !== male.id) {
-            console.log(`❌ SYNC: Hembra ${female.id} no tiene como target a macho ${male.id} (target: ${femaleTarget?.id || 'ninguno'})`);
             this.clearMatingReferences(male, female);
             return null;
         }
@@ -209,7 +204,6 @@ class Reproduction {
         const femaleState = female.behavior?.states?.getCurrentState();
         
         if (maleState !== CREATURE_STATES.MATING || femaleState !== CREATURE_STATES.MATING) {
-            console.log(`❌ SYNC: Estados incorrectos para reproducción - M:${maleState}, F:${femaleState}`);
             this.clearMatingReferences(male, female);
             return null;
         }
@@ -217,12 +211,10 @@ class Reproduction {
         // 🔄 VERIFICAR DISTANCIA MÍNIMA
         const distance = this.calculateDistance(male, female);
         if (distance > CONSTANTS.REPRODUCTION.MATING_DISTANCE) {
-            console.log(`❌ DISTANCE: Demasiado lejos para aparearse - ${distance.toFixed(1)}px > ${CONSTANTS.REPRODUCTION.MATING_DISTANCE}px`);
             return null;
         }
 
         // ✅ TODAS LAS VERIFICACIONES PASADAS - PROCEDER CON REPRODUCCIÓN
-        console.log(`✅ REPRODUCTION: Iniciando reproducción sincronizada entre ${male.id} y ${female.id}`);
         return this.performReproduction(male, female);
     }
 
@@ -276,8 +268,6 @@ class Reproduction {
             });
         }
 
-        console.log(`🧬 REPRODUCTION: Macho ${male.id} + Hembra ${female.id} = offspring en (${offspringX.toFixed(1)}, ${offspringY.toFixed(1)})`);
-        
         return {
             dna: offspringDNA,
             x: offspringX,
@@ -299,14 +289,12 @@ class Reproduction {
         const femaleTarget = female.behavior?.states?.getTarget();
         
         if (femaleState !== CREATURE_STATES.COMMITTED || !femaleTarget || femaleTarget.id !== male.id) {
-            console.log(`❌ SYNC: Hembra ${female.id} no está COMMITTED con macho ${male.id} (estado: ${femaleState}, target: ${femaleTarget?.id})`);
             return false;
         }
         
         // Verificar distancia para transición
         const distance = this.calculateDistance(male, female);
         if (distance > CONSTANTS.REPRODUCTION.MATING_DISTANCE) {
-            console.log(`❌ SYNC: Demasiado lejos para transición MATING - ${distance.toFixed(1)}px > ${CONSTANTS.REPRODUCTION.MATING_DISTANCE}px`);
             return false;
         }
         
@@ -315,10 +303,8 @@ class Reproduction {
         const femaleSuccess = female.behavior.states.setState(CREATURE_STATES.MATING, male);
         
         if (maleSuccess && femaleSuccess) {
-            console.log(`💕 SYNC: Transición sincronizada a MATING - ${male.id} ↔ ${female.id}`);
             return true;
         } else {
-            console.log(`❌ SYNC: Falló transición sincronizada - M:${maleSuccess}, F:${femaleSuccess}`);
             // Limpiar estados inconsistentes
             this.clearMatingReferences(male, female);
             return false;
@@ -340,18 +326,15 @@ class Reproduction {
             
             this.reproductionCooldowns.set(creature1.id, now);
             this.reproductionCooldowns.set(creature2.id, now);
-            console.log(`🔄 RESET: Cooldown temporal aplicado por referencias inconsistentes (2s)`);
         }
         
         // Resetear ambas criaturas a IDLE si están en MATING
         if (creature1.behavior?.states?.isInState(CREATURE_STATES.MATING)) {
             creature1.behavior.states.setState(CREATURE_STATES.IDLE);
-            console.log(`🔄 RESET: ${creature1.id} reseteado a IDLE ${isSuccessfulReproduction ? 'después de reproducción exitosa' : 'por referencias inconsistentes'}`);
         }
         
         if (creature2.behavior?.states?.isInState(CREATURE_STATES.MATING)) {
             creature2.behavior.states.setState(CREATURE_STATES.IDLE);
-            console.log(`🔄 RESET: ${creature2.id} reseteado a IDLE ${isSuccessfulReproduction ? 'después de reproducción exitosa' : 'por referencias inconsistentes'}`);
         }
     }
 
@@ -421,10 +404,7 @@ class Reproduction {
                 ).length;
             }
             
-            console.log(`📊 REPRODUCTION SUMMARY (${(this.diagnostics.summaryInterval/1000)}s):
-                Cortejando: ${courtingPairs} | Apareándose: ${matingPairs} | Nacimientos: ${this.stats.successfulMatings}
-                Fallos distancia: ${this.diagnostics.distanceFailures} | Rechazos: ${this.stats.maleRejections}
-                Selecciones activas: ${this.femaleSelections.size} | Cooldowns: ${this.reproductionCooldowns.size}`);
+            // Diagnóstico silencioso - información disponible en debug overlay
             
             this.diagnostics.lastSummary = now;
             // Reset contadores para próximo período
@@ -467,7 +447,6 @@ class Reproduction {
         // Agregar macho si no está ya en la lista
         if (!selection.suitors.find(s => s.id === male.id)) {
             selection.suitors.push(male);
-            console.log(`💕 SUITOR: Macho ${male.id} corteja a hembra ${female.id} (${selection.suitors.length}/${CONSTANTS.REPRODUCTION.GENDER.MAX_SUITORS})`);
         }
 
         // Si es el primer pretendiente o han pasado 2 segundos, hacer selección
@@ -525,9 +504,7 @@ class Reproduction {
         
         if (commitSuccess) {
             this.stats.femaleSelections++;
-            console.log(`💍 COMMITTED: Hembra ${female.id} comprometida con macho ${bestSuitor.male.id} (score: ${bestSuitor.score.toFixed(2)})`);
         } else {
-            console.log(`❌ COMMIT: Falló compromiso de hembra ${female.id} con macho ${bestSuitor.male.id}`);
             // Limpiar selección si falló el compromiso
             this.clearFemaleSelection(female);
         }
@@ -540,7 +517,6 @@ class Reproduction {
     rejectMale(male) {
         this.rejectionCooldowns.set(male.id, Date.now());
         this.stats.maleRejections++;
-        console.log(`💔 REJECTED: Macho ${male.id} rechazado, cooldown ${CONSTANTS.REPRODUCTION.GENDER.REJECTION_COOLDOWN}ms`);
     }
 
     /**
