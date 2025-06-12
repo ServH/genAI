@@ -15,6 +15,17 @@ class CreatureStats {
             totalUpdates: 0,
             lastUpdateTime: 0
         };
+        
+        // Métricas de población - fixfeatures
+        this.populationMetrics = {
+            births: 0,
+            deaths: 0,
+            totalLifespan: 0,
+            startTime: Date.now(),
+            generationSum: 0,
+            uniqueGenes: new Set(),
+            totalGenes: 0
+        };
     }
     
     /**
@@ -260,11 +271,63 @@ class CreatureStats {
     }
     
     /**
+     * Registra un nacimiento - fixfeatures
+     */
+    recordBirth(creature) {
+        this.populationMetrics.births++;
+        if (creature.generation !== undefined) {
+            this.populationMetrics.generationSum += creature.generation;
+        }
+        if (creature.dna) {
+            this.populationMetrics.totalGenes++;
+            // Crear hash simple del DNA para diversidad
+            const geneHash = JSON.stringify(creature.dna.genes);
+            this.populationMetrics.uniqueGenes.add(geneHash);
+        }
+    }
+
+    /**
+     * Registra una muerte - fixfeatures
+     */
+    recordDeath(creature) {
+        this.populationMetrics.deaths++;
+        if (creature.age !== undefined) {
+            this.populationMetrics.totalLifespan += creature.age;
+        }
+    }
+
+    /**
+     * Obtiene métricas de población - fixfeatures
+     */
+    getPopulationMetrics() {
+        const timeElapsed = (Date.now() - this.populationMetrics.startTime) / 1000; // segundos
+        const aliveCount = this.getAliveCount();
+        
+        return {
+            birthRate: timeElapsed > 0 ? this.populationMetrics.births / timeElapsed : 0,
+            deathRate: timeElapsed > 0 ? this.populationMetrics.deaths / timeElapsed : 0,
+            avgLifespan: this.populationMetrics.deaths > 0 ? 
+                this.populationMetrics.totalLifespan / this.populationMetrics.deaths : 0,
+            avgGeneration: this.populationMetrics.births > 0 ? 
+                this.populationMetrics.generationSum / this.populationMetrics.births : 0,
+            geneticDiversity: this.populationMetrics.totalGenes > 0 ? 
+                this.populationMetrics.uniqueGenes.size / this.populationMetrics.totalGenes : 0,
+            sustainabilityIndex: this.populationMetrics.deathRate > 0 ? 
+                (this.populationMetrics.births / timeElapsed) / (this.populationMetrics.deaths / timeElapsed) : 1,
+            totalBirths: this.populationMetrics.births,
+            totalDeaths: this.populationMetrics.deaths,
+            currentPopulation: aliveCount,
+            timeElapsed: Math.round(timeElapsed)
+        };
+    }
+
+    /**
      * Limpia el sistema de estadísticas
      */
     destroy() {
         this.manager = null;
         this.updateCounter = 0;
+        this.populationMetrics = null;
         this.resetPerformanceMetrics();
     }
 }

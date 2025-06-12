@@ -14,13 +14,15 @@ const CONSTANTS = {
         RESOLUTION: window.devicePixelRatio || 1
     },
 
-    // Configuración del Mundo
+    // Configuración del Mundo - fixfeatures mejorada
     WORLD: {
         CHUNK_SIZE: 500,
         MAX_ENTITIES: 500,
         INITIAL_CREATURES: 10,
-        WIDTH: 1200,  // Ancho del canvas limitado
-        HEIGHT: 800   // Alto del canvas limitado
+        WIDTH: 3000,  // Mundo fijo más grande
+        HEIGHT: 2000, // Mundo fijo más grande
+        BORDER_TYPE: 'wall', // 'wall', 'wrap', o 'infinite'
+        BORDER_MARGIN: 50 // Margen para rebote suave
     },
 
     // Configuración de Debug
@@ -81,14 +83,21 @@ const CONSTANTS = {
         REPRODUCTION_THRESHOLD: 80
     },
 
-    // Configuración de Energía
+    // Configuración de Energía - fixfeatures mejorada
     ENERGY: {
         INITIAL: 100,
-        DRAIN_RATE: 0.1, // energía por segundo (6 por minuto)
+        DRAIN_RATE: 0.5, // energía por segundo (más realista)
+        MOVEMENT_COST: 0.1, // coste adicional por movimiento
         CRITICAL_THRESHOLD: 15, // desvanecimiento de color
         PULSE_THRESHOLD: 5, // pulso visual
         DEATH_THRESHOLD: 0,
-        RESPAWN_DELAY: 2000 // ms para respawn automático
+        RESPAWN_DELAY: 2000, // ms para respawn automático
+        REPRODUCTION_RECOVERY: 20000, // 20s sin poder reproducirse tras nacer
+        GROWTH_STAGES: [
+            { age: 0, scale: 0.5, name: 'baby' },    // Bebé
+            { age: 20, scale: 0.8, name: 'juvenile' },   // Juvenil  
+            { age: 40, scale: 1.0, name: 'adult' }    // Adulto
+        ]
     },
 
     // Configuración de Recursos

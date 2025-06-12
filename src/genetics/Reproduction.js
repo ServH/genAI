@@ -51,6 +51,11 @@ class Reproduction {
             const distance = this.calculateDistance(creature, other);
             if (distance > this.config.searchRadius) return false;
             
+            // Verificar parentesco (prevenir incesto) - fixfeatures
+            if (window.gameLineage && !window.gameLineage.canMate(creature, other)) {
+                return false;
+            }
+            
             // Para test: todas las parejas son compatibles
             return true;
         });
@@ -80,6 +85,11 @@ class Reproduction {
         
         // Verificar DNA
         if (!creature.dna) {
+            return false;
+        }
+        
+        // Verificar madurez (solo adultos) - fixfeatures
+        if (creature.growth && !creature.growth.canReproduce()) {
             return false;
         }
         
@@ -135,7 +145,8 @@ class Reproduction {
                 parent1: parent1.id,
                 parent2: parent2.id,
                 geneticDistance,
-                offspringDNA
+                offspringDNA,
+                parentageData: { parent1, parent2 } // Para establecer parentesco después
             });
         }
         

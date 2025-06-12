@@ -91,6 +91,13 @@ class Engine {
             this.effects = new Effects();
             window.gameEffects = this.effects;
             
+            // Inicializar sistemas nuevos - fixfeatures
+            this.lineage = new Lineage();
+            window.gameLineage = this.lineage;
+            
+            this.visualId = new CreatureVisualId();
+            window.gameVisualId = this.visualId;
+            
             // Inicializar sistema de recursos
             this.gameResources = new Resources();
             this.gameResources.init(this.worldContainer, this.camera);

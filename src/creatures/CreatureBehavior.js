@@ -193,6 +193,11 @@ class CreatureBehavior {
                 
                 // La madre pasa a estado NURSING para cuidar al bebé
                 if (offspring) {
+                    // Establecer parentesco - fixfeatures
+                    if (window.gameLineage) {
+                        window.gameLineage.setParentage(offspring, this.creature, mate);
+                    }
+                    
                     this.states.setState(CREATURE_STATES.NURSING, offspring);
                     console.log(`👶 NURSING: ${this.creature.id} cambió a estado NURSING para cuidar a ${offspring.id}`);
                 } else {

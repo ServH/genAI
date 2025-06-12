@@ -30,9 +30,17 @@ class Creature {
         this.geneticColor = null;
         this.baseSpeed = this.speed; // Guardar velocidad base para aplicar genes
         
+        // Sistema de parentesco - fixfeatures
+        this.parents = { mother: null, father: null };
+        this.children = [];
+        this.generation = 0;
+        this.lineageId = null; // Para tracking de familias
+        this.birthTime = Date.now();
+        
         // Sistemas modulares
         this.energySystem = new CreatureEnergy(this);
         this.behavior = new CreatureBehavior(this);
+        this.growth = new CreatureGrowth(this); // fixfeatures
         
         // Inicializar sistemas después de construcción completa
         this.energySystem.init();
@@ -60,6 +68,7 @@ class Creature {
         
         // Actualizar sistemas modulares
         this.behavior.update(deltaTime);
+        this.growth.update(deltaTime); // fixfeatures
     }
 
     /**
@@ -167,6 +176,9 @@ class Creature {
         }
         if (this.behavior) {
             this.behavior.destroy();
+        }
+        if (this.growth) {
+            this.growth.destroy();
         }
         
         if (window.eventBus) {
