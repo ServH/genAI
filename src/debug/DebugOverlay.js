@@ -38,54 +38,79 @@ class DebugOverlay {
         overlay.className = 'debug-overlay hidden';
         
         overlay.innerHTML = `
-            <div class="debug-header">
-                <span class="debug-title">GenAI Debug</span>
-                <div class="debug-controls">
-                    <button class="debug-btn" id="debug-minimize">-</button>
-                    <button class="debug-btn" id="debug-close">×</button>
+            <div class="debug-panel-container">
+                <div class="debug-header">
+                    <h3>GenAI Debug</h3>
+                    <div class="debug-controls">
+                        <button class="debug-btn" id="debug-minimize">-</button>
+                        <button class="debug-btn" id="debug-close">×</button>
+                    </div>
                 </div>
-            </div>
-            <div class="debug-content" id="debug-content">
-                <div class="debug-section">
-                    <h4>Performance</h4>
-                    <div id="debug-performance">Cargando...</div>
-                </div>
-                <div class="debug-section">
-                    <h4>Cámara</h4>
-                    <div id="debug-camera">Cargando...</div>
-                </div>
-                <div class="debug-section">
-                    <h4>Criaturas</h4>
-                    <div id="debug-creatures">Cargando...</div>
-                </div>
-                <div class="debug-section">
-                    <h4>Genética</h4>
-                    <div id="debug-genetics">Cargando...</div>
-                </div>
-                <div class="debug-section">
-                    <h4>Reproducción</h4>
-                    <div id="debug-reproduction">Cargando...</div>
-                </div>
-                <div class="debug-section">
-                    <h4>Efectos</h4>
-                    <div id="debug-effects">Cargando...</div>
-                </div>
-                <div class="debug-section">
-                    <h4>Población</h4>
-                    <div id="debug-population">Cargando...</div>
-                </div>
-                <div class="debug-section">
-                    <h4>Linajes</h4>
-                    <div id="debug-lineage">Cargando...</div>
-                </div>
-                <div class="debug-section">
-                    <h4>Controles</h4>
-                    <div id="debug-controls">
-                        <div class="debug-info">D: Toggle Debug</div>
-                        <div class="debug-info">G: Toggle Grid</div>
-                        <div class="debug-info">Espacio: Pausa</div>
-                        <div class="debug-info">Mouse: Pan cámara</div>
-                        <div class="debug-info">Rueda: Zoom</div>
+                <div class="debug-content" id="debug-content">
+                    <div class="debug-tabs">
+                        <button class="debug-tab active" data-tab="sistema">Sistema</button>
+                        <button class="debug-tab" data-tab="criaturas">Criaturas</button>
+                        <button class="debug-tab" data-tab="reproduccion">Reproducción</button>
+                        <button class="debug-tab" data-tab="linajes">Linajes</button>
+                    </div>
+                    <div class="debug-panels">
+                        <!-- Panel Sistema -->
+                        <div class="debug-panel active" id="panel-sistema">
+                            <div class="debug-section">
+                                <h4>Performance</h4>
+                                <div id="debug-performance">Cargando...</div>
+                            </div>
+                            <div class="debug-section">
+                                <h4>Cámara</h4>
+                                <div id="debug-camera">Cargando...</div>
+                            </div>
+                            <div class="debug-section">
+                                <h4>Efectos</h4>
+                                <div id="debug-effects">Cargando...</div>
+                            </div>
+                            <div class="debug-section">
+                                <h4>Controles</h4>
+                                <div id="debug-controls">
+                                    <div class="debug-info">D: Toggle Debug</div>
+                                    <div class="debug-info">G: Toggle Grid</div>
+                                    <div class="debug-info">Espacio: Pausa</div>
+                                    <div class="debug-info">Mouse: Pan cámara</div>
+                                    <div class="debug-info">Rueda: Zoom</div>
+                                </div>
+                            </div>
+                        </div>
+                        
+                        <!-- Panel Criaturas -->
+                        <div class="debug-panel" id="panel-criaturas">
+                            <div class="debug-section">
+                                <h4>Población</h4>
+                                <div id="debug-population">Cargando...</div>
+                            </div>
+                            <div class="debug-section">
+                                <h4>Criaturas</h4>
+                                <div id="debug-creatures">Cargando...</div>
+                            </div>
+                            <div class="debug-section">
+                                <h4>Genética</h4>
+                                <div id="debug-genetics">Cargando...</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Panel Reproducción -->
+                        <div class="debug-panel" id="panel-reproduccion">
+                            <div class="debug-section">
+                                <h4>Sistema Reproductivo</h4>
+                                <div id="debug-reproduction">Cargando...</div>
+                            </div>
+                        </div>
+                        
+                        <!-- Panel Linajes -->
+                        <div class="debug-panel" id="panel-linajes">
+                            <div class="debug-section">
+                                <h4>Familias y Linajes</h4>
+                                <div id="debug-lineage">Cargando...</div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
@@ -93,6 +118,7 @@ class DebugOverlay {
         
         document.body.appendChild(overlay);
         this.overlay = overlay;
+        this.currentTab = 'sistema';
     }
 
     /**
@@ -110,6 +136,42 @@ class DebugOverlay {
         if (closeBtn) {
             closeBtn.addEventListener('click', () => this.hide());
         }
+        
+        // Tabs
+        const tabs = document.querySelectorAll('.debug-tab');
+        tabs.forEach(tab => {
+            tab.addEventListener('click', () => {
+                const tabName = tab.getAttribute('data-tab');
+                this.switchTab(tabName);
+            });
+        });
+    }
+
+    /**
+     * Cambia de tab en el debug overlay
+     */
+    switchTab(tabName) {
+        // Actualizar tab activo
+        const tabs = document.querySelectorAll('.debug-tab');
+        tabs.forEach(tab => {
+            if (tab.getAttribute('data-tab') === tabName) {
+                tab.classList.add('active');
+            } else {
+                tab.classList.remove('active');
+            }
+        });
+        
+        // Actualizar panel activo
+        const panels = document.querySelectorAll('.debug-panel');
+        panels.forEach(panel => {
+            if (panel.id === `panel-${tabName}`) {
+                panel.classList.add('active');
+            } else {
+                panel.classList.remove('active');
+            }
+        });
+        
+        this.currentTab = tabName;
     }
 
     /**
@@ -205,12 +267,12 @@ class DebugOverlay {
         if (window.timeStats) {
             const stats = timeStats.getDebugInfo();
             content = `
-                <div class="debug-info">FPS: ${stats.fps}</div>
-                <div class="debug-info">Delta: ${stats.deltaTime}ms</div>
-                <div class="debug-info">Frames: ${stats.frameCount}</div>
-                <div class="debug-info">Tiempo: ${stats.totalTime}s</div>
-                <div class="debug-info">Escala: ${stats.timeScale}x</div>
-                <div class="debug-info">Pausado: ${stats.isPaused ? 'Sí' : 'No'}</div>
+                <div class="debug-info"><span class="debug-label">FPS:</span> <span class="debug-value">${stats.fps}</span></div>
+                <div class="debug-info"><span class="debug-label">Delta:</span> <span class="debug-value">${stats.deltaTime}ms</span></div>
+                <div class="debug-info"><span class="debug-label">Frames:</span> <span class="debug-value">${stats.frameCount}</span></div>
+                <div class="debug-info"><span class="debug-label">Tiempo:</span> <span class="debug-value">${stats.totalTime}s</span></div>
+                <div class="debug-info"><span class="debug-label">Escala:</span> <span class="debug-value">${stats.timeScale}x</span></div>
+                <div class="debug-info"><span class="debug-label">Pausado:</span> <span class="debug-value">${stats.isPaused ? 'Sí' : 'No'}</span></div>
             `;
         }
         
@@ -229,11 +291,11 @@ class DebugOverlay {
         if (window.gameCamera) {
             const camera = window.gameCamera;
             content = `
-                <div class="debug-info">X: ${Math.round(camera.x)}</div>
-                <div class="debug-info">Y: ${Math.round(camera.y)}</div>
-                <div class="debug-info">Zoom: ${camera.zoom.toFixed(2)}x</div>
-                <div class="debug-info">Target Zoom: ${camera.targetZoom.toFixed(2)}x</div>
-                <div class="debug-info">Arrastrando: ${camera.isDragging ? 'Sí' : 'No'}</div>
+                <div class="debug-info"><span class="debug-label">X:</span> <span class="debug-value">${Math.round(camera.x)}</span></div>
+                <div class="debug-info"><span class="debug-label">Y:</span> <span class="debug-value">${Math.round(camera.y)}</span></div>
+                <div class="debug-info"><span class="debug-label">Zoom:</span> <span class="debug-value">${camera.zoom.toFixed(2)}x</span></div>
+                <div class="debug-info"><span class="debug-label">Target Zoom:</span> <span class="debug-value">${camera.targetZoom.toFixed(2)}x</span></div>
+                <div class="debug-info"><span class="debug-label">Arrastrando:</span> <span class="debug-value">${camera.isDragging ? 'Sí' : 'No'}</span></div>
             `;
         }
         

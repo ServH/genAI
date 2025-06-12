@@ -36,9 +36,9 @@ body {
     left: 10px;
     z-index: 1000;
     pointer-events: auto;
-    max-width: 400px;
-    max-height: 80vh;
-    overflow: hidden;
+    max-width: 420px;
+    max-height: 85vh;
+    overflow: visible;
 }
 
 .debug-overlay.hidden {
@@ -132,8 +132,28 @@ body {
 }
 
 .debug-panels {
-    height: 300px;
+    max-height: calc(85vh - 120px);
     overflow-y: auto;
+    overflow-x: hidden;
+}
+
+/* Scrollbar personalizado para debug panels */
+.debug-panels::-webkit-scrollbar {
+    width: 8px;
+}
+
+.debug-panels::-webkit-scrollbar-track {
+    background: rgba(0, 0, 0, 0.3);
+    border-radius: 4px;
+}
+
+.debug-panels::-webkit-scrollbar-thumb {
+    background: rgba(0, 255, 240, 0.4);
+    border-radius: 4px;
+}
+
+.debug-panels::-webkit-scrollbar-thumb:hover {
+    background: rgba(0, 255, 240, 0.6);
 }
 
 .debug-panel {
@@ -210,6 +230,39 @@ body {
     padding: 1px 4px;
     border-radius: 2px;
     font-size: 8px;
+}
+
+.debug-info {
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 1px 0;
+    color: #ffffff;
+    font-size: 10px;
+    line-height: 1.2;
+}
+
+.debug-info:nth-child(odd) {
+    background: rgba(255, 255, 255, 0.02);
+}
+
+.debug-value {
+    color: #00fff0;
+    font-weight: bold;
+    font-family: monospace;
+}
+
+.debug-label {
+    color: #ccc;
+}
+
+.debug-separator {
+    border-top: 1px solid #333;
+    margin: 4px 0;
+    font-size: 9px;
+    color: #888;
+    text-align: center;
+    padding: 2px 0;
 }
 
 /* Responsive */
