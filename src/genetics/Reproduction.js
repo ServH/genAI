@@ -214,11 +214,11 @@ class Reproduction {
 
         // Verificar distancia física
         const distance = this.calculateDistance(male, female);
-        if (distance > CONSTANTS.CREATURE_STATES.MATING_DISTANCE) {
+        if (distance > CONSTANTS.REPRODUCTION.MATING_DISTANCE) {
             this.diagnostics.distanceFailures++;
             // Solo log detallado cada 10 fallos para evitar spam
             if (this.diagnostics.distanceFailures % 10 === 1) {
-                console.log(`❌ REPRODUCTION: Muy lejos - distancia ${distance.toFixed(1)} > ${CONSTANTS.CREATURE_STATES.MATING_DISTANCE} (fallo #${this.diagnostics.distanceFailures})`);
+                console.log(`❌ REPRODUCTION: Muy lejos - distancia ${distance.toFixed(1)} > ${CONSTANTS.REPRODUCTION.MATING_DISTANCE} (fallo #${this.diagnostics.distanceFailures})`);
             }
             return null;
         }

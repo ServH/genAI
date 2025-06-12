@@ -169,7 +169,7 @@ class CreatureBehavior {
         
         // Verificar si ambos están cerca
         const distance = this.distanceTo(partner.x, partner.y);
-        const matingDistance = CONSTANTS.CREATURE_STATES.MATING_DISTANCE;
+        const matingDistance = CONSTANTS.REPRODUCTION.MATING_DISTANCE;
         
         // 🔍 DIAGNÓSTICO: Log inteligente cada 3 segundos por pareja
         if (!this.lastMatingDiagnostic || Date.now() - this.lastMatingDiagnostic > 3000) {
