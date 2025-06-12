@@ -2,6 +2,72 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [3.1.3-alpha] - 2024-12-19
+
+### 🚀 CAJA 3 - Fase 3.1: Sistemas Fundamentales para Evolución ✅
+
+#### 👨‍👩‍👧‍👦 Sistema de Parentesco Implementado
+- **Lineage.js**: Tracking completo de relaciones familiares
+- **Prevención incesto**: Verificación padres/hijos/hermanos antes reproducción
+- **Generaciones**: Cálculo automático generación = max(padres) + 1
+- **Linajes familiares**: ID único por familia, fundadores identificados
+- **Limpieza automática**: Familias extintas eliminadas del sistema
+
+#### 🔋 Sistema de Energía Realista
+- **Drenaje acelerado**: 0.5 energía/segundo (más realista que 0.1)
+- **Coste movimiento**: 0.1 energía adicional por movimiento
+- **Etapas crecimiento**: Bebé (0.5x) → Juvenil (0.8x) → Adulto (1.0x)
+- **Madurez reproductiva**: Solo adultos pueden reproducirse
+- **Recuperación post-natal**: 20s cooldown tras nacer
+
+#### 🏷️ Identificación Visual Familiar
+- **Símbolos únicos**: 15 símbolos diferentes por familia (♦●▲■★)
+- **Colores generacionales**: Blanco→Amarillo→Naranja→Rojo→Magenta→Violeta
+- **Tamaño adaptativo**: Símbolos escalan con etapa de crecimiento
+- **Tracking visual**: Fácil identificación de linajes y generaciones
+
+#### 📊 Métricas de Población Avanzadas
+- **Tasa natalidad/mortalidad**: Nacimientos y muertes por segundo
+- **Esperanza de vida**: Promedio de vida de criaturas muertas
+- **Diversidad genética**: Ratio genes únicos / genes totales
+- **Índice sostenibilidad**: Ratio natalidad/mortalidad (>1 = crecimiento)
+- **Generación promedio**: Tracking evolución poblacional
+
+#### 🌍 Mundo Fijo Expandido
+- **Dimensiones**: 3000x2000px (vs 1200x800px anterior)
+- **Límites definidos**: Bordes tipo 'wall' con rebote suave
+- **Margen rebote**: 50px para transiciones naturales
+- **Exploración**: Mundo más grande para comportamientos complejos
+
+#### 🔧 Integraciones Arquitecturales
+- **Engine.js**: Inicialización automática de todos los sistemas
+- **Creature.js**: Sistema crecimiento integrado en constructor
+- **Reproduction.js**: Verificación parentesco y madurez
+- **CreatureStats.js**: Métricas población en tiempo real
+- **index.html**: Carga ordenada de 3 nuevos módulos
+
+#### 🎯 Preparación para Mutaciones
+- ✅ **Parentesco**: Base para evitar deriva genética
+- ✅ **Madurez**: Solo adultos evolucionan la especie
+- ✅ **Métricas**: Tracking de diversidad y sostenibilidad
+- ✅ **Identificación**: Visual tracking de linajes evolutivos
+- ✅ **Energía**: Sistema realista para presión selectiva
+
+#### 📁 Archivos Nuevos
+- `src/genetics/Lineage.js` (200 líneas) - Sistema parentesco
+- `src/creatures/CreatureGrowth.js` (120 líneas) - Etapas crecimiento
+- `src/creatures/CreatureVisualId.js` (130 líneas) - Identificación visual
+
+#### 🔧 Archivos Modificados
+- `src/core/Constants.js` - Configuración energía + mundo expandido
+- `src/creatures/Creature.js` - Integración parentesco + crecimiento
+- `src/genetics/Reproduction.js` - Verificación parentesco + madurez
+- `src/creatures/CreatureStats.js` - Métricas población avanzadas
+- `src/core/Engine.js` - Inicialización sistemas nuevos
+- `index.html` - Carga módulos adicionales
+
+---
+
 ## [3.1.2-alpha] - 2024-12-19
 
 ### 🧬 CAJA 3 - Fase 3.1: Comportamiento Reproductivo Completo ✅
