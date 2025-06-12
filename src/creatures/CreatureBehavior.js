@@ -82,17 +82,22 @@ class CreatureBehavior {
             this.checkCourtingProcess();
         }
         
-        // 5. Verificar reproducción si está en MATING
+        // 5. 🔄 NUEVO: Verificar compromiso si está en COMMITTED
+        if (this.states.isInState(CREATURE_STATES.COMMITTED)) {
+            this.checkCommittedProcess();
+        }
+        
+        // 6. Verificar reproducción si está en MATING
         if (this.states.isInState(CREATURE_STATES.MATING)) {
             this.checkMatingProcess();
         }
         
-        // 6. Verificar cuidado maternal si está en NURSING
+        // 7. Verificar cuidado maternal si está en NURSING
         if (this.states.isInState(CREATURE_STATES.NURSING)) {
             this.checkNursingProcess(deltaTime);
         }
         
-        // 7. Actualizar movimiento según estado
+        // 8. Actualizar movimiento según estado
         const currentState = this.states.getCurrentState();
         const target = this.states.getTarget();
         this.movement.update(deltaTime, currentState, target);
@@ -408,6 +413,45 @@ class CreatureBehavior {
     }
 
     /**
+     * 🔄 NUEVO: Verifica el proceso de compromiso (hembra esperando al macho)
+     */
+    checkCommittedProcess() {
+        const selectedMale = this.states.getTarget();
+        if (!selectedMale || !selectedMale.isAlive) {
+            console.log(`💔 COMMITTED: Macho seleccionado ${selectedMale?.id || 'ninguno'} no disponible, volviendo a IDLE`);
+            this.states.setState(CREATURE_STATES.IDLE);
+            return;
+        }
+        
+        // Verificar que el macho esté cortejando a esta hembra
+        const maleState = selectedMale.behavior?.states?.getCurrentState();
+        const maleTarget = selectedMale.behavior?.states?.getTarget();
+        
+        if (maleState !== CREATURE_STATES.COURTING || !maleTarget || maleTarget.id !== this.creature.id) {
+            console.log(`💔 COMMITTED: Macho ${selectedMale.id} no está cortejando (estado: ${maleState}, target: ${maleTarget?.id}), abortando compromiso`);
+            this.states.setState(CREATURE_STATES.IDLE);
+            
+            // Limpiar selección femenina
+            if (window.gameReproduction) {
+                window.gameReproduction.clearFemaleSelection(this.creature);
+            }
+            return;
+        }
+        
+        // Verificar distancia - si el macho está lo suficientemente cerca, esperar transición
+        const distance = this.distanceTo(selectedMale.x, selectedMale.y);
+        
+        // 🔍 DIAGNÓSTICO: Log inteligente cada 3 segundos
+        if (!this.lastCommittedDiagnostic || Date.now() - this.lastCommittedDiagnostic > 3000) {
+            console.log(`💍 COMMITTED: Hembra ${this.creature.id.slice(-3)} esperando a macho ${selectedMale.id.slice(-3)} | Distancia: ${distance.toFixed(1)}px | Macho estado: ${maleState}`);
+            this.lastCommittedDiagnostic = Date.now();
+        }
+        
+        // La hembra simplemente espera - el macho iniciará la transición a MATING cuando esté listo
+        // No hacer nada más, solo mantener el estado COMMITTED
+    }
+
+    /**
      * Verifica si esta criatura debe seguir a su madre - fixfeatures
      */
     checkIfShouldFollowMother() {
@@ -465,19 +509,30 @@ class CreatureBehavior {
     }
 
     /**
-     * 🔄 NUEVO: Sincroniza transición a MATING para ambas criaturas
+     * 🔄 NUEVO: Sincroniza transición a MATING usando sistema bidireccional
      * @param {Creature} mate - Pareja para apareamiento
      */
     synchronizeMatingTransition(mate) {
-        // Cambiar esta criatura a MATING con la pareja como target
-        this.states.setState(CREATURE_STATES.MATING, mate);
+        // Solo el macho puede iniciar la transición sincronizada
+        if (!this.creature.dna || !this.creature.dna.isMale()) {
+            console.log(`❌ SYNC: Solo machos pueden iniciar transición MATING (${this.creature.id})`);
+            return;
+        }
         
-        // Cambiar la pareja a MATING con esta criatura como target
-        if (mate.behavior && mate.behavior.states) {
-            mate.behavior.states.setState(CREATURE_STATES.MATING, this.creature);
-            console.log(`🔄 SYNC: Ambas criaturas ${this.creature.id} y ${mate.id} sincronizadas en estado MATING`);
+        // Verificar que la hembra esté en estado COMMITTED
+        if (!mate.behavior?.states?.isInState(CREATURE_STATES.COMMITTED)) {
+            console.log(`❌ SYNC: Hembra ${mate.id} no está en estado COMMITTED (estado: ${mate.behavior?.states?.getCurrentState()})`);
+            return;
+        }
+        
+        // Usar el sistema de reproducción para sincronizar la transición
+        if (window.gameReproduction) {
+            const success = window.gameReproduction.synchronizeMatingTransition(this.creature, mate);
+            if (!success) {
+                console.log(`❌ SYNC: Falló sincronización MATING entre ${this.creature.id} y ${mate.id}`);
+            }
         } else {
-            console.log(`⚠️ SYNC: No se pudo sincronizar pareja ${mate.id} - falta behavior/states`);
+            console.log(`❌ SYNC: gameReproduction no disponible para sincronización`);
         }
     }
 

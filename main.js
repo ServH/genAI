@@ -72,30 +72,31 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Información de debug en consola
 console.log(`
-🔄 GenAI - CAJA 3 Fase 3.1: Sincronización Bidireccional de Reproducción
+🔄 GenAI - CAJA 3 Fase 3.1: Sistema de Sincronización Bidireccional COMPLETO
 ================================================================
-🚨 PROBLEMA CRÍTICO SOLUCIONADO:
-- Referencias perdidas: Criaturas llegaban a MATING pero perdían pareja
-- Bucles infinitos: Estados MATING "sin pareja" causaban loops
-- Falta sincronización: Una criatura tenía target pero la otra no
+🎯 NUEVO FLUJO REPRODUCTIVO CON ESTADO COMMITTED:
+1. Macho busca hembra → COURTING
+2. Hembra selecciona macho → COMMITTED (nuevo estado)
+3. Macho se acerca → Sincronización bidireccional → MATING
+4. Verificación completa → Reproducción exitosa
 
 🔄 SINCRONIZACIÓN BIDIRECCIONAL IMPLEMENTADA:
-- Verificación completa antes de reproducción
-- Ambas criaturas deben reconocerse mutuamente
+- Estado COMMITTED agregado para hembras comprometidas
+- Verificación bidireccional antes de reproducción
 - Transición sincronizada a estado MATING
 - Limpieza automática de referencias inconsistentes
 
-🛠️ CORRECCIONES TÉCNICAS:
-- attemptReproduction(): Verificación bidireccional completa
-- synchronizeMatingTransition(): Cambio simultáneo a MATING
-- clearMatingReferences(): Reset automático de estados inconsistentes
-- Logs diagnósticos: Información clara de sincronización
+🛠️ ARQUITECTURA MEJORADA:
+- COMMITTED_TIMEOUT: 10s para evitar bloqueos
+- synchronizeMatingTransition(): Solo machos inician transición
+- checkCommittedProcess(): Hembras esperan al macho seleccionado
+- Debug overlay: Muestra "Comprometidas" en tiempo real
 
-🎯 REPRODUCCIÓN AHORA FUNCIONAL:
+🎯 REPRODUCCIÓN ROBUSTA Y FUNCIONAL:
+- Estados claros: COURTING → COMMITTED → MATING → NURSING
 - Referencias bidireccionales verificadas
 - Transiciones sincronizadas
-- Estados consistentes
-- ¡Nacimientos finalmente posibles!
+- ¡Sistema completamente funcional!
 
 Controles: D = Debug con estadísticas reproducción, G = Grid, Espacio = Pausa
 ================================================================

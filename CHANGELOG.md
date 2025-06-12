@@ -2,6 +2,52 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [3.1.8-alpha] - 2024-12-19
+
+### 🔄 CAJA 3 - Fase 3.1: Sistema de Sincronización Bidireccional COMPLETO ✅
+
+#### 🎯 **NUEVO FLUJO REPRODUCTIVO CON ESTADO COMMITTED**
+- **Estado COMMITTED agregado**: Hembras comprometidas con macho seleccionado
+- **Flujo claro**: COURTING → COMMITTED → MATING → NURSING
+- **Sincronización robusta**: Solo machos inician transición a MATING
+- **Verificación completa**: Ambas criaturas deben reconocerse mutuamente
+
+#### 🔄 **Arquitectura de Estados Mejorada**
+- **CREATURE_STATES.COMMITTED**: Nuevo estado para hembras comprometidas
+- **COMMITTED_TIMEOUT**: 10s máximo para evitar bloqueos permanentes
+- **Transiciones válidas**: COMMITTED puede ir a MATING o abortar a IDLE
+- **checkCommittedProcess()**: Hembras esperan al macho seleccionado
+
+#### 🛠️ **Implementación Técnica Completa**
+- **CreatureStates.js**: Estado COMMITTED agregado con logs específicos
+- **CreatureStatesUtils.js**: Transiciones y timeout para COMMITTED
+- **Constants.js**: COMMITTED_TIMEOUT configurado en 10 segundos
+- **Reproduction.js**: performFemaleSelection() pone hembra en COMMITTED
+- **Reproduction.js**: synchronizeMatingTransition() para transición bidireccional
+- **CreatureBehavior.js**: checkCommittedProcess() para hembras esperando
+- **CreatureBehavior.js**: synchronizeMatingTransition() solo para machos
+- **DebugOverlay.js**: Panel muestra "Comprometidas" en tiempo real
+
+#### 🎯 **Sistema Reproductivo Robusto**
+- ✅ **Estados claros**: Cada estado tiene propósito específico
+- ✅ **Flujo unidireccional**: Macho busca → Hembra selecciona → Compromiso → Apareamiento
+- ✅ **Sincronización bidireccional**: Ambas criaturas cambian a MATING simultáneamente
+- ✅ **Verificación completa**: Referencias, estados, distancia verificados
+- ✅ **Limpieza automática**: Estados inconsistentes se resetean
+- ✅ **Timeouts configurables**: Evita bloqueos permanentes
+- ✅ **Debug completo**: Estadísticas "Comprometidas" visibles
+
+#### 📁 **Archivos Modificados**
+- `src/creatures/CreatureStates.js` - Estado COMMITTED agregado
+- `src/creatures/CreatureStatesUtils.js` - Transiciones y timeout COMMITTED
+- `src/core/Constants.js` - COMMITTED_TIMEOUT configurado
+- `src/genetics/Reproduction.js` - Sistema selección → COMMITTED + sincronización
+- `src/creatures/CreatureBehavior.js` - checkCommittedProcess() + sincronización mejorada
+- `src/debug/DebugOverlay.js` - Panel "Comprometidas" agregado
+- `main.js` - Mensaje actualizado con nuevo flujo
+
+---
+
 ## [3.1.7-alpha] - 2024-12-19
 
 ### 🔄 CAJA 3 - Fase 3.1: Sincronización Bidireccional de Reproducción ✅

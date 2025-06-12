@@ -11,10 +11,11 @@ class CreatureStatesUtils {
      */
     static isValidTransition(fromState, toState) {
         const validTransitions = {
-            [CREATURE_STATES.IDLE]: [CREATURE_STATES.SEEKING, CREATURE_STATES.COURTING],
-            [CREATURE_STATES.SEEKING]: [CREATURE_STATES.IDLE, CREATURE_STATES.EATING, CREATURE_STATES.COURTING],
-            [CREATURE_STATES.EATING]: [CREATURE_STATES.IDLE],
+            [CREATURE_STATES.IDLE]: [CREATURE_STATES.SEEKING, CREATURE_STATES.COURTING, CREATURE_STATES.COMMITTED],
+            [CREATURE_STATES.SEEKING]: [CREATURE_STATES.IDLE, CREATURE_STATES.EATING, CREATURE_STATES.COURTING, CREATURE_STATES.COMMITTED],
+            [CREATURE_STATES.EATING]: [CREATURE_STATES.IDLE, CREATURE_STATES.COMMITTED],
             [CREATURE_STATES.COURTING]: [CREATURE_STATES.MATING, CREATURE_STATES.IDLE],
+            [CREATURE_STATES.COMMITTED]: [CREATURE_STATES.MATING, CREATURE_STATES.IDLE], // 🔄 NUEVO: Hembra comprometida puede ir a MATING o abortar
             [CREATURE_STATES.MATING]: [CREATURE_STATES.NURSING, CREATURE_STATES.IDLE],
             [CREATURE_STATES.NURSING]: [CREATURE_STATES.IDLE]
         };
@@ -31,6 +32,7 @@ class CreatureStatesUtils {
             seekingTimeout: CONSTANTS.STATES ? CONSTANTS.STATES.SEEKING_TIMEOUT : 5000,
             eatingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.EATING_DURATION : 500,
             courtingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.COURTING_DURATION : 3000,
+            committedTimeout: CONSTANTS.STATES ? CONSTANTS.STATES.COMMITTED_TIMEOUT : 10000, // 🔄 NUEVO: Timeout para estado COMMITTED
             matingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.MATING_DURATION : 5000,
             nursingDuration: CONSTANTS.STATES ? CONSTANTS.STATES.NURSING_DURATION : 30000,
             changeCooldown: CONSTANTS.STATES ? CONSTANTS.STATES.STATE_CHANGE_COOLDOWN : 200
@@ -52,6 +54,10 @@ class CreatureStatesUtils {
                 // COURTING ahora transiciona por distancia, no por tiempo
                 // La transición se maneja en checkCourtingProcess()
                 return null;
+                
+            case CREATURE_STATES.COMMITTED:
+                // 🔄 NUEVO: COMMITTED tiene timeout para evitar bloqueos
+                return stateTimer >= config.committedTimeout ? CREATURE_STATES.IDLE : null;
                 
             case CREATURE_STATES.MATING:
                 return stateTimer >= config.matingDuration ? CREATURE_STATES.IDLE : null;

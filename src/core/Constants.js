@@ -118,12 +118,13 @@ const CONSTANTS = {
         DEBUG_SHOW: false // mostrar cono en debug
     },
 
-    // Configuración de Estados - Fase 2.3 + 3.1 + fixfeatures
+    // Configuración de Estados - Fase 2.3 + 3.1 + fixfeatures + Sincronización
     STATES: {
         IDLE_DURATION: 2000, // ms mínimo en idle
         SEEKING_TIMEOUT: 5000, // ms máximo buscando
         EATING_DURATION: 500, // ms consumiendo
         COURTING_DURATION: 3000, // ms de cortejo circular
+        COMMITTED_TIMEOUT: 10000, // ms máximo en estado COMMITTED (evita bloqueos)
         MATING_DURATION: 5000, // ms apareándose (aumentado)
         NURSING_DURATION: 30000, // ms cuidando bebé
         STATE_CHANGE_COOLDOWN: 200 // ms entre cambios de estado

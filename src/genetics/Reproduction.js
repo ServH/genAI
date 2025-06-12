@@ -204,26 +204,25 @@ class Reproduction {
             return null;
         }
 
-        // Verificar que la hembra haya seleccionado a este macho
-        const selectedMale = this.getSelectedMale(female);
-        if (!selectedMale || selectedMale.id !== male.id) {
-            console.log(`❌ REPRODUCTION: Hembra ${female.id} no seleccionó a macho ${male.id} (seleccionó: ${selectedMale?.id || 'ninguno'})`);
+        // 🔄 VERIFICAR ESTADOS CORRECTOS: Ambos deben estar en MATING
+        const maleState = male.behavior?.states?.getCurrentState();
+        const femaleState = female.behavior?.states?.getCurrentState();
+        
+        if (maleState !== CREATURE_STATES.MATING || femaleState !== CREATURE_STATES.MATING) {
+            console.log(`❌ SYNC: Estados incorrectos para reproducción - M:${maleState}, F:${femaleState}`);
             this.clearMatingReferences(male, female);
             return null;
         }
 
-        // Verificar distancia física
+        // 🔄 VERIFICAR DISTANCIA MÍNIMA
         const distance = this.calculateDistance(male, female);
         if (distance > CONSTANTS.REPRODUCTION.MATING_DISTANCE) {
-            this.diagnostics.distanceFailures++;
-            // Solo log detallado cada 10 fallos para evitar spam
-            if (this.diagnostics.distanceFailures % 10 === 1) {
-                console.log(`❌ REPRODUCTION: Muy lejos - distancia ${distance.toFixed(1)} > ${CONSTANTS.REPRODUCTION.MATING_DISTANCE} (fallo #${this.diagnostics.distanceFailures})`);
-            }
+            console.log(`❌ DISTANCE: Demasiado lejos para aparearse - ${distance.toFixed(1)}px > ${CONSTANTS.REPRODUCTION.MATING_DISTANCE}px`);
             return null;
         }
 
         // ✅ TODAS LAS VERIFICACIONES PASADAS - PROCEDER CON REPRODUCCIÓN
+        console.log(`✅ REPRODUCTION: Iniciando reproducción sincronizada entre ${male.id} y ${female.id}`);
         return this.performReproduction(male, female);
     }
 
@@ -286,6 +285,44 @@ class Reproduction {
             energy: this.config.offspringEnergy,
             parents: [male, female]
         };
+    }
+
+    /**
+     * 🔄 NUEVO: Sincroniza transición bidireccional a estado MATING
+     * @param {Creature} male - Macho que inicia transición
+     * @param {Creature} female - Hembra comprometida
+     * @returns {boolean} - true si la transición fue exitosa
+     */
+    synchronizeMatingTransition(male, female) {
+        // Verificar que la hembra esté en estado COMMITTED con este macho
+        const femaleState = female.behavior?.states?.getCurrentState();
+        const femaleTarget = female.behavior?.states?.getTarget();
+        
+        if (femaleState !== CREATURE_STATES.COMMITTED || !femaleTarget || femaleTarget.id !== male.id) {
+            console.log(`❌ SYNC: Hembra ${female.id} no está COMMITTED con macho ${male.id} (estado: ${femaleState}, target: ${femaleTarget?.id})`);
+            return false;
+        }
+        
+        // Verificar distancia para transición
+        const distance = this.calculateDistance(male, female);
+        if (distance > CONSTANTS.REPRODUCTION.MATING_DISTANCE) {
+            console.log(`❌ SYNC: Demasiado lejos para transición MATING - ${distance.toFixed(1)}px > ${CONSTANTS.REPRODUCTION.MATING_DISTANCE}px`);
+            return false;
+        }
+        
+        // ✅ TRANSICIÓN SINCRONIZADA: Ambos a MATING simultáneamente
+        const maleSuccess = male.behavior.states.setState(CREATURE_STATES.MATING, female);
+        const femaleSuccess = female.behavior.states.setState(CREATURE_STATES.MATING, male);
+        
+        if (maleSuccess && femaleSuccess) {
+            console.log(`💕 SYNC: Transición sincronizada a MATING - ${male.id} ↔ ${female.id}`);
+            return true;
+        } else {
+            console.log(`❌ SYNC: Falló transición sincronizada - M:${maleSuccess}, F:${femaleSuccess}`);
+            // Limpiar estados inconsistentes
+            this.clearMatingReferences(male, female);
+            return false;
+        }
     }
 
     /**
@@ -478,8 +515,17 @@ class Reproduction {
         // Limpiar lista de pretendientes, mantener solo el elegido
         selection.suitors = [bestSuitor.male];
 
-        this.stats.femaleSelections++;
-        console.log(`👑 SELECTION: Hembra ${female.id} eligió a macho ${bestSuitor.male.id} (score: ${bestSuitor.score.toFixed(2)})`);
+        // 🔄 NUEVO: Poner hembra en estado COMMITTED con el macho seleccionado
+        const commitSuccess = female.behavior?.states?.setState(CREATURE_STATES.COMMITTED, bestSuitor.male);
+        
+        if (commitSuccess) {
+            this.stats.femaleSelections++;
+            console.log(`💍 COMMITTED: Hembra ${female.id} comprometida con macho ${bestSuitor.male.id} (score: ${bestSuitor.score.toFixed(2)})`);
+        } else {
+            console.log(`❌ COMMIT: Falló compromiso de hembra ${female.id} con macho ${bestSuitor.male.id}`);
+            // Limpiar selección si falló el compromiso
+            this.clearFemaleSelection(female);
+        }
     }
 
     /**

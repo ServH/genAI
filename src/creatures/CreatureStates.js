@@ -10,6 +10,7 @@ const CREATURE_STATES = {
     SEEKING: 'seeking',
     EATING: 'eating',
     COURTING: 'courting',
+    COMMITTED: 'committed',  // 🔄 NUEVO: Hembra comprometida con macho seleccionado
     MATING: 'mating',
     NURSING: 'nursing'
 };
@@ -72,7 +73,11 @@ class CreatureStates {
             console.log(`ESTADO: ${this.creature.id} cambió de ${previousState} a ${newState}${target ? ` (objetivo: ${target.id})` : ''}`);
         }
         
-        // Log especial para MATING
+        // Log especial para estados reproductivos
+        if (newState === CREATURE_STATES.COMMITTED) {
+            console.log(`💍 COMMITTED: Hembra ${this.creature.id} comprometida con macho ${target ? target.id : 'sin pareja'}`);
+        }
+        
         if (newState === CREATURE_STATES.MATING) {
             console.log(`💕 MATING: ${this.creature.id} cambió a estado MATING con pareja ${target ? target.id : 'sin pareja'}`);
         }

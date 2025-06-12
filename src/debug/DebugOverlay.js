@@ -392,6 +392,11 @@ class DebugOverlay {
                     c.behavior.states.isInState && 
                     c.behavior.states.isInState(CREATURE_STATES.COURTING)
                 );
+                const committedFemales = females.filter(c => 
+                    c.behavior && c.behavior.states && 
+                    c.behavior.states.isInState && 
+                    c.behavior.states.isInState(CREATURE_STATES.COMMITTED)
+                );
                 const matingCount = creatures.filter(c => 
                     c.behavior && c.behavior.states && 
                     c.behavior.states.isInState && 
@@ -417,6 +422,7 @@ class DebugOverlay {
                     <div class="debug-info">Hembras: ${females.length} (${readyFemales} listas)</div>
                     <div class="debug-info">--- Estados ---</div>
                     <div class="debug-info">Cortejando: ${courtingMales.length}</div>
+                    <div class="debug-info">Comprometidas: ${committedFemales.length}</div>
                     <div class="debug-info">Apareándose: ${matingCount}</div>
                     <div class="debug-info">Cuidando: ${nursingFemales.length}</div>
                     <div class="debug-info">--- Pretendientes ---</div>
