@@ -2,6 +2,51 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [3.1.10-alpha] - 2024-12-19
+
+### 🔧 CAJA 3 - Fase 3.1: CORRECCIÓN SISTEMA DE LINAJES Y CUIDADO MATERNAL ✅
+
+#### 🚨 **PROBLEMAS CRÍTICOS SOLUCIONADOS**
+- **Parentesco establecido incorrectamente**: Se establecía DESPUÉS del estado NURSING
+- **Bebés no seguían madres**: Sistema de seguimiento no encontraba relación familiar
+- **Símbolos familiares ausentes**: No se aplicaban a offspring recién nacidos
+- **Cuidado maternal inconsistente**: Madres cuidaban criaturas que no eran sus hijos
+
+#### 🔧 **CORRECCIONES IMPLEMENTADAS**
+- **Orden correcto**: Parentesco establecido INMEDIATAMENTE después de crear offspring
+- **Seguimiento mejorado**: Búsqueda de madre por parentesco (más confiable que por estado)
+- **Símbolos inmediatos**: Actualización forzada de símbolos visuales tras establecer linaje
+- **Verificación parentesco**: Madres verifican que realmente sean madres del bebé
+- **Transferencia energía**: Sistema más robusto con verificaciones adicionales
+
+#### 🎯 **FLUJO CORREGIDO**
+1. **Crear offspring** con DNA mezclado
+2. **Establecer parentesco** inmediatamente (madre, padre, generación, linaje)
+3. **Actualizar símbolos** visuales forzadamente
+4. **Activar efectos** de nacimiento
+5. **Estado NURSING** solo después de todo lo anterior
+
+#### 🤱 **SISTEMA MATERNAL MEJORADO**
+- **Búsqueda por parentesco**: Bebés buscan madre por `creature.parents.mother`
+- **Verificación familiar**: Madres verifican `baby.parents.mother === this.creature.id`
+- **Transferencia segura**: Energía mínima 15 para madre, sistema modular
+- **Logs informativos**: Debug tracking para identificar problemas
+
+#### 👶 **COMPORTAMIENTO BEBÉS CORREGIDO**
+- **Seguimiento automático**: Bebés detectan madre por relación familiar
+- **Estados coordinados**: SEEKING para seguir madre en estado NURSING
+- **Fallback robusto**: Doble verificación (parentesco + estado) para encontrar madre
+
+#### 📊 **VALIDACIÓN COMPLETADA**
+- ✅ **Parentesco inmediato**: Establecido antes de cambiar estados
+- ✅ **Símbolos visibles**: Aparecen desde el nacimiento
+- ✅ **Seguimiento funcional**: Bebés siguen a madres correctamente
+- ✅ **Cuidado maternal**: Solo madres reales cuidan a sus hijos
+- ✅ **Transferencia energía**: Sistema robusto y verificado
+- ✅ **Debug completo**: Logs informativos para tracking
+
+---
+
 ## [3.1.9-alpha] - 2024-12-19
 
 ### 🎉 CAJA 3 - Fase 3.1: LOOP REPRODUCTIVO COMPLETO EXITOSO ✅
