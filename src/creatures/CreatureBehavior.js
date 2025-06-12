@@ -217,31 +217,53 @@ class CreatureBehavior {
                     offspringInfo.dna
                 );
                 
-                // Activar efecto visual de nacimiento
-                if (window.gameEffects) {
-                    window.gameEffects.createBirthEffect(offspringInfo.x, offspringInfo.y);
-                }
-                
-                if (offspring && window.eventBus) {
-                    window.eventBus.emit('creature:offspring_born', {
-                        parent1: male.id,
-                        parent2: female.id,
-                        offspring: offspring.id,
-                        position: { x: offspringInfo.x, y: offspringInfo.y },
-                        dna: offspringInfo.dna
-                    });
-                }
-                
-                // Solo la hembra pasa a estado NURSING para cuidar al bebé
-                if (offspring && this.creature.dna && this.creature.dna.isFemale()) {
-                    // Establecer parentesco
+                if (offspring) {
+                    // 🔧 CORRECCIÓN: Establecer parentesco INMEDIATAMENTE después de crear offspring
                     if (window.gameLineage) {
                         window.gameLineage.setParentage(offspring, male, female);
+                        console.log(`👨‍👩‍👧‍👦 PARENTESCO: Establecido para ${offspring.id} (Madre: ${female.id}, Padre: ${male.id})`);
                     }
                     
-                    this.states.setState(CREATURE_STATES.NURSING, offspring);
+                    // Actualizar símbolos visuales inmediatamente
+                    if (window.gameVisualId) {
+                        // Buscar el sprite del offspring en el manager
+                        const sprite = window.gameEngine.creatureManager.sprites?.get(offspring.id);
+                        if (sprite) {
+                            sprite.updateFamilySymbol();
+                            console.log(`🏷️ SÍMBOLO: Actualizado para offspring ${offspring.id} con linaje ${offspring.lineageId}`);
+                        } else {
+                            console.warn(`⚠️ SÍMBOLO: No se encontró sprite para offspring ${offspring.id}`);
+                        }
+                    }
+                    
+                    // Activar efecto visual de nacimiento
+                    if (window.gameEffects) {
+                        window.gameEffects.createBirthEffect(offspringInfo.x, offspringInfo.y);
+                    }
+                    
+                    // Emitir evento con información completa
+                    if (window.eventBus) {
+                        window.eventBus.emit('creature:offspring_born', {
+                            parent1: male.id,
+                            parent2: female.id,
+                            offspring: offspring.id,
+                            position: { x: offspringInfo.x, y: offspringInfo.y },
+                            dna: offspringInfo.dna,
+                            lineageId: offspring.lineageId,
+                            generation: offspring.generation
+                        });
+                    }
+                    
+                    // Solo la hembra pasa a estado NURSING para cuidar al bebé
+                    if (this.creature.dna && this.creature.dna.isFemale()) {
+                        this.states.setState(CREATURE_STATES.NURSING, offspring);
+                        console.log(`🤱 NURSING: Hembra ${female.id} comienza a cuidar bebé ${offspring.id}`);
+                    } else {
+                        // El macho vuelve a IDLE después de reproducirse
+                        this.states.setState(CREATURE_STATES.IDLE);
+                    }
                 } else {
-                    // El macho vuelve a IDLE después de reproducirse
+                    console.warn('⚠️ REPRODUCCIÓN: Falló la creación del offspring');
                     this.states.setState(CREATURE_STATES.IDLE);
                 }
             } else {
@@ -441,19 +463,41 @@ class CreatureBehavior {
             return false;
         }
         
-        // Buscar una madre que esté en estado NURSING con esta criatura como objetivo
-        const allCreatures = window.gameEngine.creatureManager.getAllCreatures();
-        const mother = allCreatures.find(creature => 
-            creature.isAlive && 
-            creature.behavior && 
-            creature.behavior.states &&
-            creature.behavior.states.isInState(CREATURE_STATES.NURSING) &&
-            creature.behavior.states.getTarget() === this.creature
-        );
+        // 🔧 CORRECCIÓN: Buscar madre usando información de parentesco
+        let mother = null;
+        
+        // Método 1: Buscar por parentesco (más confiable)
+        if (this.creature.parents && this.creature.parents.mother) {
+            const allCreatures = window.gameEngine.creatureManager.getAllCreatures();
+            mother = allCreatures.find(creature => 
+                creature.isAlive && 
+                creature.id === this.creature.parents.mother &&
+                creature.behavior && 
+                creature.behavior.states &&
+                creature.behavior.states.isInState(CREATURE_STATES.NURSING)
+            );
+        }
+        
+        // Método 2: Fallback - buscar madre que esté cuidando a esta criatura
+        if (!mother) {
+            const allCreatures = window.gameEngine.creatureManager.getAllCreatures();
+            mother = allCreatures.find(creature => 
+                creature.isAlive && 
+                creature.behavior && 
+                creature.behavior.states &&
+                creature.behavior.states.isInState(CREATURE_STATES.NURSING) &&
+                creature.behavior.states.getTarget() === this.creature
+            );
+        }
         
         if (mother) {
             // Cambiar a estado SEEKING para seguir a la madre
             this.states.setState(CREATURE_STATES.SEEKING, mother);
+            
+            // Log ocasional para debug
+            if (Math.random() < 0.02) { // 2% chance por frame
+                console.log(`👶 SEGUIMIENTO: Bebé ${this.creature.id} sigue a madre ${mother.id}`);
+            }
             return true;
         }
         
@@ -466,26 +510,46 @@ class CreatureBehavior {
     checkNursingProcess(deltaTime) {
         const baby = this.states.getTarget();
         if (!baby || !baby.isAlive) {
+            console.log(`🤱 NURSING: Madre ${this.creature.id} termina cuidado (bebé no disponible)`);
+            this.states.setState(CREATURE_STATES.IDLE);
+            return;
+        }
+        
+        // 🔧 CORRECCIÓN: Verificar que realmente sea su hijo
+        const isMyChild = baby.parents && baby.parents.mother === this.creature.id;
+        if (!isMyChild) {
+            console.warn(`⚠️ NURSING: Madre ${this.creature.id} no es madre de ${baby.id}, terminando cuidado`);
             this.states.setState(CREATURE_STATES.IDLE);
             return;
         }
         
         // Transferir energía de madre a bebé
-        const transferRate = CONSTANTS.REPRODUCTION.ENERGY_TRANSFER_RATE || 0.5;
+        const transferRate = CONSTANTS.REPRODUCTION.ENERGY_TRANSFER_RATE || 0.3;
         const energyToTransfer = transferRate * deltaTime;
         
-        if (this.creature.energy > energyToTransfer + 10) { // Mantener mínimo 10 energía
-            this.creature.energy -= energyToTransfer;
-            baby.energy = Math.min(100, baby.energy + energyToTransfer);
+        if (this.creature.energy > energyToTransfer + 15) { // Mantener mínimo 15 energía
+            this.creature.energySystem.consume(energyToTransfer);
+            baby.energySystem.restore(energyToTransfer);
+            
+            // Log ocasional para debug
+            if (Math.random() < 0.01) { // 1% chance por frame
+                console.log(`🤱 NURSING: Madre ${this.creature.id} transfiere ${energyToTransfer.toFixed(1)} energía a bebé ${baby.id}`);
+            }
             
             // El bebé sigue a la madre (esto se maneja en el movimiento del bebé)
             if (window.eventBus) {
                 window.eventBus.emit('creature:nursing', {
                     motherId: this.creature.id,
                     babyId: baby.id,
-                    energyTransferred: energyToTransfer
+                    energyTransferred: energyToTransfer,
+                    motherEnergy: this.creature.energy,
+                    babyEnergy: baby.energy
                 });
             }
+        } else {
+            // Si la madre no tiene suficiente energía, terminar cuidado
+            console.log(`🤱 NURSING: Madre ${this.creature.id} termina cuidado (energía insuficiente: ${this.creature.energy.toFixed(1)})`);
+            this.states.setState(CREATURE_STATES.IDLE);
         }
     }
 
