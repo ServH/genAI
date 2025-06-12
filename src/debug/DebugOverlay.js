@@ -255,8 +255,10 @@ class DebugOverlay {
             
             // Estadísticas básicas
             if (stats.basic) {
+                const maxCapacity = manager.maxCreatures || 50;
                 content = `
-                    <div class="debug-info">Activas: ${stats.basic.aliveCreatures}/${stats.basic.totalCreatures}</div>
+                    <div class="debug-info">Población: ${stats.basic.aliveCreatures}/${maxCapacity}</div>
+                    <div class="debug-info">Total creadas: ${stats.basic.totalCreatures}</div>
                     <div class="debug-info">Sprites: ${stats.basic.sprites}</div>
                     <div class="debug-info">Updates: ${stats.basic.updateCounter}</div>
                 `;

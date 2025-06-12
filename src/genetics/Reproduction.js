@@ -27,6 +27,16 @@ class Reproduction {
             femaleSelections: 0
         };
         
+        // 🔍 DIAGNÓSTICO: Sistema de logs agregados
+        this.diagnostics = {
+            lastSummary: Date.now(),
+            summaryInterval: 5000, // 5 segundos
+            activeCourting: new Set(),
+            activeMating: new Set(),
+            distanceFailures: 0,
+            energyFailures: 0
+        };
+        
         console.log('Reproduction: Sistema con género inicializado');
     }
 
@@ -160,7 +170,11 @@ class Reproduction {
         // Verificar distancia física
         const distance = this.calculateDistance(male, female);
         if (distance > CONSTANTS.CREATURE_STATES.MATING_DISTANCE) {
-            console.log(`❌ REPRODUCTION: Muy lejos - distancia ${distance.toFixed(1)} > ${CONSTANTS.CREATURE_STATES.MATING_DISTANCE}`);
+            this.diagnostics.distanceFailures++;
+            // Solo log detallado cada 10 fallos para evitar spam
+            if (this.diagnostics.distanceFailures % 10 === 1) {
+                console.log(`❌ REPRODUCTION: Muy lejos - distancia ${distance.toFixed(1)} > ${CONSTANTS.CREATURE_STATES.MATING_DISTANCE} (fallo #${this.diagnostics.distanceFailures})`);
+            }
             return null;
         }
 
@@ -262,10 +276,44 @@ class Reproduction {
     }
 
     /**
+     * 🔍 DIAGNÓSTICO: Actualiza y muestra resumen de reproducción
+     */
+    updateDiagnostics() {
+        const now = Date.now();
+        if (now - this.diagnostics.lastSummary >= this.diagnostics.summaryInterval) {
+            // Contar estados actuales
+            let courtingPairs = 0;
+            let matingPairs = 0;
+            
+            if (window.gameEngine && window.gameEngine.creatureManager) {
+                const creatures = window.gameEngine.creatureManager.getAllCreatures().filter(c => c.isAlive);
+                courtingPairs = creatures.filter(c => 
+                    c.behavior?.states?.isInState?.(CREATURE_STATES.COURTING)
+                ).length;
+                matingPairs = creatures.filter(c => 
+                    c.behavior?.states?.isInState?.(CREATURE_STATES.MATING)
+                ).length;
+            }
+            
+            console.log(`📊 REPRODUCTION SUMMARY (${(this.diagnostics.summaryInterval/1000)}s):
+                Cortejando: ${courtingPairs} | Apareándose: ${matingPairs} | Nacimientos: ${this.stats.successfulMatings}
+                Fallos distancia: ${this.diagnostics.distanceFailures} | Rechazos: ${this.stats.maleRejections}
+                Selecciones activas: ${this.femaleSelections.size} | Cooldowns: ${this.reproductionCooldowns.size}`);
+            
+            this.diagnostics.lastSummary = now;
+            // Reset contadores para próximo período
+            this.diagnostics.distanceFailures = 0;
+        }
+    }
+
+    /**
      * Obtiene estadísticas del sistema
      * @returns {Object}
      */
     getStats() {
+        // Actualizar diagnósticos
+        this.updateDiagnostics();
+        
         return {
             ...this.stats,
             activeCooldowns: this.reproductionCooldowns.size,

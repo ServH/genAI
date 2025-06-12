@@ -171,6 +171,14 @@ class CreatureBehavior {
         const distance = this.distanceTo(partner.x, partner.y);
         const matingDistance = CONSTANTS.CREATURE_STATES.MATING_DISTANCE;
         
+        // 🔍 DIAGNÓSTICO: Log inteligente cada 3 segundos por pareja
+        if (!this.lastMatingDiagnostic || Date.now() - this.lastMatingDiagnostic > 3000) {
+            const partnerGender = partner.dna ? (partner.dna.isMale() ? 'M' : 'F') : '?';
+            const myGender = this.creature.dna ? (this.creature.dna.isMale() ? 'M' : 'F') : '?';
+            console.log(`🔍 MATING CHECK: ${myGender}${this.creature.id.slice(-3)} + ${partnerGender}${partner.id.slice(-3)} | Distancia: ${distance.toFixed(1)}px (necesita ≤${matingDistance}px) | Estados: ${this.states.getCurrentState()} + ${partner.behavior?.states?.getCurrentState() || '?'}`);
+            this.lastMatingDiagnostic = Date.now();
+        }
+        
         if (distance <= matingDistance && window.gameReproduction) {
             // Determinar macho y hembra
             let male, female;
