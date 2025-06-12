@@ -2,6 +2,47 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [3.1.4-alpha] - 2024-12-19
+
+### 🔍 CAJA 3 - Fase 3.1: Optimización para Observación de Reproducción ✅
+
+#### 🎯 Problema Solucionado
+- **Población insuficiente**: Solo 10 criaturas impedían observar reproducción
+- **Parámetros lentos**: Configuración original dificultaba ver bebés y linajes
+- **Visualización faltante**: Símbolos familiares no se mostraban en pantalla
+
+#### ⚡ Optimizaciones Implementadas
+- **Población aumentada**: 10 → 50 criaturas iniciales para observar reproducción
+- **Reproducción acelerada**: Umbral 60% energía (vs 80%), cooldown 3s (vs 5s)
+- **Crecimiento rápido**: Bebé→Juvenil 10s, Juvenil→Adulto 20s (vs 20s/40s)
+- **Energía balanceada**: Drenaje 0.3/s (vs 0.5/s), vida ~333s promedio
+- **Movimiento optimizado**: Coste 0.05 energía (vs 0.1) por movimiento
+
+#### 👁️ Visualización Familiar Completa
+- **Símbolos en pantalla**: CreatureSprite muestra símbolos encima de criaturas
+- **Escalado dinámico**: Símbolos y criaturas crecen con edad
+- **Colores generacionales**: Blanco→Amarillo→Naranja→Rojo→Magenta→Violeta
+- **Identificación clara**: 15 símbolos únicos por familia (♦●▲■★)
+
+#### 📊 Debug Expandido
+- **Panel Población**: Métricas tiempo real (natalidad, mortalidad, diversidad)
+- **Panel Linajes**: Estadísticas familiares y símbolos disponibles
+- **Visualización completa**: Todos los sistemas observables en debug overlay
+
+#### 🎮 Experiencia Mejorada
+- **Observación inmediata**: Reproducción visible desde el inicio
+- **Feedback visual**: Bebés siguen madres, símbolos identifican familias
+- **Métricas claras**: Sostenibilidad poblacional en tiempo real
+- **Configuración balanceada**: Parámetros optimizados para demostración
+
+#### 📁 Archivos Modificados
+- `src/core/Constants.js` - Configuración optimizada para observación
+- `src/creatures/CreatureSprite.js` - Visualización símbolos familiares
+- `src/debug/DebugOverlay.js` - Paneles población + linajes
+- `main.js` - Mensaje actualizado con nuevos objetivos
+
+---
+
 ## [3.1.3-alpha] - 2024-12-19
 
 ### 🚀 CAJA 3 - Fase 3.1: Sistemas Fundamentales para Evolución ✅
