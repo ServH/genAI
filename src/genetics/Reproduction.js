@@ -294,15 +294,22 @@ class Reproduction {
      * @param {Creature} creature2 - Segunda criatura
      */
     clearMatingReferences(creature1, creature2) {
+        // Aplicar cooldown temporal para evitar bucles infinitos
+        const cooldownTime = 2000; // 2 segundos
+        const now = Date.now();
+        
+        this.reproductionCooldowns.set(creature1.id, now);
+        this.reproductionCooldowns.set(creature2.id, now);
+        
         // Resetear ambas criaturas a IDLE si están en MATING
         if (creature1.behavior?.states?.isInState(CREATURE_STATES.MATING)) {
             creature1.behavior.states.setState(CREATURE_STATES.IDLE);
-            console.log(`🔄 RESET: ${creature1.id} reseteado a IDLE por referencias inconsistentes`);
+            console.log(`🔄 RESET: ${creature1.id} reseteado a IDLE por referencias inconsistentes (cooldown 2s)`);
         }
         
         if (creature2.behavior?.states?.isInState(CREATURE_STATES.MATING)) {
             creature2.behavior.states.setState(CREATURE_STATES.IDLE);
-            console.log(`🔄 RESET: ${creature2.id} reseteado a IDLE por referencias inconsistentes`);
+            console.log(`🔄 RESET: ${creature2.id} reseteado a IDLE por referencias inconsistentes (cooldown 2s)`);
         }
     }
 

@@ -180,6 +180,15 @@ class CreatureBehavior {
         }
         
         if (distance <= matingDistance && window.gameReproduction) {
+            // 🔄 VERIFICAR SINCRONIZACIÓN: Asegurar que ambas criaturas estén en MATING
+            if (!this.states.isInState(CREATURE_STATES.MATING) || 
+                !partner.behavior?.states?.isInState(CREATURE_STATES.MATING)) {
+                
+                // Si no están ambas en MATING, usar sincronización bidireccional
+                this.synchronizeMatingTransition(partner);
+                return; // Esperar al siguiente frame para proceder
+            }
+
             // Determinar macho y hembra
             let male, female;
             if (this.creature.dna && this.creature.dna.isMale()) {
