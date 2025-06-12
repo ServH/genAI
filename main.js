@@ -72,8 +72,8 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Información de debug en consola
 console.log(`
-🧬 GenAI - CAJA 3 Fase 3.1: Sistema de Género COMPLETADO
-========================================================
+🧬 GenAI - CAJA 3 Fase 3.1: Sistema de Género + Evolución Natural
+================================================================
 ✅ SISTEMA DE GÉNERO IMPLEMENTADO:
 - Género en ADN: 0=macho, 1=hembra
 - 5 machos + 5 hembras fundadores balanceados
@@ -83,12 +83,19 @@ console.log(`
 - Cooldown para machos rechazados (5s)
 - Máximo 3 pretendientes por hembra
 
+🌱 EVOLUCIÓN NATURAL HABILITADA:
+- Respawn automático DESHABILITADO
+- Población crece/decrece naturalmente por reproducción/muerte
+- Capacidad máxima: 50 criaturas
+- Solo respawn de emergencia si extinción total (0 criaturas)
+
 🎮 COMPORTAMIENTOS OBSERVABLES:
 - Machos cortejan a hembras cercanas
 - Hembras evalúan y eligen al mejor macho
 - Solo parejas seleccionadas pueden reproducirse
 - Hembras cuidan bebés (NURSING), machos vuelven a buscar
+- ¡Población puede crecer hasta 50 criaturas por reproducción!
 
 Controles: D = Debug con estadísticas género, G = Grid, Espacio = Pausa
-========================================================
+================================================================
 `); 

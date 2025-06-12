@@ -9,6 +9,7 @@ class CreatureLifecycle {
     constructor(manager) {
         this.manager = manager;
         this.factory = null;
+        this.lastLoggedCount = 0; // Para evitar spam de logs
         this.spawnStats = {
             totalSpawned: 0,
             totalDied: 0,
@@ -52,17 +53,18 @@ class CreatureLifecycle {
     }
     
     /**
-     * Verifica si necesita respawn automático
+     * Verifica si necesita respawn automático - DESHABILITADO para permitir evolución
+     * Solo respawnea si la población cae a 0 para evitar extinción total
      */
     checkRespawn() {
         const aliveCount = this.manager.getAliveCount();
-        const targetCount = CONSTANTS.CREATURES.INITIAL_COUNT;
         
-        if (aliveCount < targetCount) {
-            const toSpawn = targetCount - aliveCount;
-            console.log(`CreatureLifecycle: Respawning ${toSpawn} criaturas (${aliveCount}/${targetCount})`);
+        // Solo respawnear si hay extinción total (0 criaturas)
+        if (aliveCount === 0) {
+            const emergencySpawn = 2; // Spawn mínimo para recuperación
+            console.log(`CreatureLifecycle: ¡EXTINCIÓN! Respawning ${emergencySpawn} criaturas de emergencia`);
             
-            for (let i = 0; i < toSpawn; i++) {
+            for (let i = 0; i < emergencySpawn; i++) {
                 const creature = this.factory.createCreature();
                 if (creature) {
                     this.manager.addCreature(creature);
@@ -72,12 +74,18 @@ class CreatureLifecycle {
             }
             
             if (window.eventBus) {
-                eventBus.emit('creatures:respawned', {
-                    spawned: toSpawn,
+                eventBus.emit('creatures:emergency_respawn', {
+                    spawned: emergencySpawn,
                     aliveCount: this.manager.getAliveCount(),
                     totalRespawned: this.spawnStats.totalRespawned
                 });
             }
+        }
+        
+        // Log para debug: mostrar población actual sin intervenir
+        if (aliveCount > 0 && aliveCount !== this.lastLoggedCount) {
+            console.log(`CreatureLifecycle: Población natural: ${aliveCount} criaturas (máx: ${this.manager.maxCreatures})`);
+            this.lastLoggedCount = aliveCount;
         }
     }
     

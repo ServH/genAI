@@ -2,6 +2,52 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [3.1.5-alpha] - 2024-12-19
+
+### 🧬 CAJA 3 - Fase 3.1: Sistema de Género Sexual Completo ✅
+
+#### 🚀 **Sistema de Selección Femenina Implementado**
+- **Solo machos buscan**: Machos activamente cortejan hembras cercanas
+- **Hembras seleccionan**: Evalúan múltiples pretendientes y eligen al mejor
+- **Selección inteligente**: Criterios por genes superiores (velocidad, tamaño, visión, distancia)
+- **Cooldown rechazos**: Machos rechazados esperan 5s antes de volver a cortejar
+- **Límite pretendientes**: Máximo 3 machos por hembra para evitar saturación
+
+#### 🔧 **Reproduction.js Completamente Refactorizado**
+- **findMate()**: Solo machos buscan, filtrado por género y disponibilidad
+- **addSuitor()**: Sistema de registro de pretendientes con límites
+- **performFemaleSelection()**: Algoritmo de selección con puntuación ponderada
+- **rejectMale()**: Cooldown automático para machos rechazados
+- **reproduce()**: Verificación completa de selección femenina antes de aparearse
+
+#### 🎮 **Comportamientos Sexuales Realistas**
+- **Cortejo activo**: Solo machos buscan pareja y cortejan
+- **Selección femenina**: Hembras evalúan y eligen entre opciones
+- **Roles post-reproducción**: Hembras cuidan bebés (NURSING), machos buscan nuevas parejas
+- **Estados exclusivos**: Durante cortejo no se permite IDLE/EATING hasta completar
+
+#### 📊 **Debug Overlay Expandido con Género**
+- **Población por género**: Conteo machos/hembras con estado reproductivo
+- **Estadísticas selección**: Rechazos, selecciones, pretendientes activos
+- **Estados reproductivos**: Cortejando, apareándose, cuidando en tiempo real
+- **Métricas avanzadas**: Cooldowns, selecciones femeninas activas
+
+#### 🎯 **Validación Sistema Sexual Completada**
+- ✅ **Búsqueda unidireccional**: Solo machos buscan pareja
+- ✅ **Selección femenina**: Hembras eligen al mejor pretendiente
+- ✅ **Criterios genéticos**: Selección por genes superiores
+- ✅ **Cooldowns funcionales**: Machos rechazados esperan antes de reintentar
+- ✅ **Roles diferenciados**: Comportamientos post-reproducción por género
+- ✅ **Debug completo**: Estadísticas género en tiempo real
+
+#### 📁 **Archivos Modificados**
+- `src/genetics/Reproduction.js` - Sistema selección femenina completo
+- `src/creatures/CreatureBehavior.js` - Búsqueda solo machos + roles diferenciados
+- `src/debug/DebugOverlay.js` - Estadísticas género en tiempo real
+- `main.js` - Mensaje actualizado con sistema sexual completo
+
+---
+
 ## [3.1.4-alpha] - 2024-12-19
 
 ### 🔍 CAJA 3 - Fase 3.1: Optimización para Observación de Reproducción ✅
