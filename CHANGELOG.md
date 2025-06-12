@@ -2,6 +2,41 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [3.1.2-alpha] - 2024-12-19
+
+### 🧬 CAJA 3 - Fase 3.1: Comportamiento Reproductivo Completo ✅
+
+#### ✨ Nuevos Estados y Comportamientos Implementados
+- **COURTING**: Movimiento circular alrededor de pareja (3 segundos)
+- **NURSING**: Cuidado maternal con transferencia de energía (30 segundos)
+- **Seguimiento automático**: Bebés siguen a sus madres durante nursing
+- **Transiciones fluidas**: IDLE → COURTING → MATING → NURSING
+
+#### 🎮 Comportamientos Reproductivos Avanzados
+- **Cortejo circular**: Movimiento orbital alrededor de pareja potencial
+- **Cuidado maternal**: Transferencia 0.5 energía/segundo madre → bebé
+- **Velocidad reducida**: 30% velocidad normal durante nursing
+- **Seguimiento inteligente**: Bebés detectan y siguen a madres automáticamente
+
+#### 🔧 Arquitectura Modular Mantenida
+- **CreatureBehavior.js**: Lógica cortejo + nursing + seguimiento
+- **CreatureMovement.js**: Movimiento circular + velocidad adaptativa
+- **Sistemas independientes**: Comunicación vía EventBus
+- **Configuración centralizada**: COURTING_RADIUS + ENERGY_TRANSFER_RATE
+
+#### 🎯 Validación Comportamental Completada
+- ✅ **Cortejo funcional**: Movimiento circular visible durante 3s
+- ✅ **Transiciones automáticas**: Estados cambian por tiempo
+- ✅ **Cuidado maternal**: Energía transferida madre → bebé
+- ✅ **Seguimiento bebé**: Crías siguen a madres automáticamente
+- ✅ **Performance estable**: Sin degradación con nuevos comportamientos
+
+#### 📁 Archivos Modificados
+- `src/creatures/CreatureBehavior.js` - Lógica cortejo + nursing + seguimiento
+- `src/creatures/CreatureMovement.js` - Movimiento circular + velocidad nursing
+
+---
+
 ## [3.1.1-alpha] - 2024-12-19
 
 ### 🎨 CAJA 3 - Fase 3.1: Refactorización Efectos Visuales ✅
