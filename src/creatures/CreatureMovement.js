@@ -34,6 +34,27 @@ class CreatureMovement {
                 }
                 break;
                 
+            case CREATURE_STATES.COURTING:
+                if (target) {
+                    this.courtingMovement(target, deltaTime);
+                } else {
+                    this.brownianMovement(deltaTime);
+                }
+                break;
+                
+            case CREATURE_STATES.MATING:
+                if (target) {
+                    this.moveToTarget(target, deltaTime);
+                } else {
+                    this.brownianMovement(deltaTime);
+                }
+                break;
+                
+            case CREATURE_STATES.NURSING:
+                // Movimiento muy lento o estático mientras cuida
+                this.nursingMovement(deltaTime);
+                break;
+                
             case CREATURE_STATES.EATING:
                 // No moverse mientras come
                 break;
@@ -105,11 +126,69 @@ class CreatureMovement {
         this.creature.direction += organicVariance;
     }
 
+    /**
+     * Movimiento circular de cortejo - fixfeatures
+     */
+    courtingMovement(target, deltaTime) {
+        // Calcular distancia al objetivo
+        const distance = CreatureMovementUtils.calculateDistance(
+            this.creature.x, this.creature.y, target.x, target.y
+        );
+        
+        const courtingRadius = CONSTANTS.REPRODUCTION.COURTING_RADIUS || 80;
+        
+        if (distance > courtingRadius) {
+            // Si está lejos, acercarse primero
+            this.moveToTarget(target, deltaTime);
+        } else {
+            // Movimiento circular alrededor de la pareja
+            const centerX = target.x;
+            const centerY = target.y;
+            
+            // Calcular ángulo actual respecto al centro
+            const currentAngle = Math.atan2(this.creature.y - centerY, this.creature.x - centerX);
+            
+            // Incrementar ángulo para movimiento circular
+            const angularSpeed = 2.0 * deltaTime; // velocidad angular
+            const newAngle = currentAngle + angularSpeed;
+            
+            // Calcular nueva posición en círculo
+            const radius = Math.min(distance, courtingRadius * 0.8); // Mantener radio
+            const newX = centerX + Math.cos(newAngle) * radius;
+            const newY = centerY + Math.sin(newAngle) * radius;
+            
+            // Calcular dirección hacia nueva posición
+            const targetDirection = Math.atan2(newY - this.creature.y, newX - this.creature.x);
+            this.smoothDirection(targetDirection, deltaTime);
+        }
+    }
+
+    /**
+     * Movimiento lento durante cuidado maternal - fixfeatures
+     */
+    nursingMovement(deltaTime) {
+        // Movimiento muy lento y suave
+        const now = Date.now();
+        
+        if (now - this.lastDirectionChange > 5000) { // Cambiar dirección cada 5 segundos
+            const variance = 0.1; // Muy poca variación
+            const directionChange = (Math.random() - 0.5) * variance;
+            this.creature.direction += directionChange;
+            this.lastDirectionChange = now;
+        }
+    }
+
         /**
      * Aplica el movimiento a la posición de la criatura
      */
     applyMovement(deltaTime) {
-        const speed = this.creature.speed * deltaTime;
+        let speed = this.creature.speed * deltaTime;
+        
+        // Reducir velocidad durante nursing
+        if (this.creature.behavior && this.creature.behavior.states && 
+            this.creature.behavior.states.isInState(CREATURE_STATES.NURSING)) {
+            speed *= 0.3; // 30% de velocidad normal
+        }
         
         this.creature.x += Math.cos(this.creature.direction) * speed;
         this.creature.y += Math.sin(this.creature.direction) * speed;

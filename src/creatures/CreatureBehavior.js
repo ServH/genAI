@@ -46,6 +46,11 @@ class CreatureBehavior {
         
         // 2. Buscar comida o pareja con visión si está en IDLE
         if (this.states.isInState(CREATURE_STATES.IDLE)) {
+            // Verificar si es un bebé que debe seguir a su madre
+            if (this.checkIfShouldFollowMother()) {
+                return; // El comportamiento de seguimiento se maneja en checkIfShouldFollowMother
+            }
+            
             const reproductionThreshold = CONSTANTS.REPRODUCTION.ENERGY_THRESHOLD;
             const hungerThreshold = 60; // Solo buscar comida si energía < 60
             
@@ -72,19 +77,29 @@ class CreatureBehavior {
             this.checkTargetReached();
         }
         
-        // 4. Verificar reproducción si está en MATING
+        // 4. Verificar cortejo si está en COURTING
+        if (this.states.isInState(CREATURE_STATES.COURTING)) {
+            this.checkCourtingProcess();
+        }
+        
+        // 5. Verificar reproducción si está en MATING
         if (this.states.isInState(CREATURE_STATES.MATING)) {
             this.checkMatingProcess();
         }
         
-        // 5. Actualizar movimiento según estado
+        // 6. Verificar cuidado maternal si está en NURSING
+        if (this.states.isInState(CREATURE_STATES.NURSING)) {
+            this.checkNursingProcess(deltaTime);
+        }
+        
+        // 7. Actualizar movimiento según estado
         const currentState = this.states.getCurrentState();
         const target = this.states.getTarget();
         this.movement.update(deltaTime, currentState, target);
     }
     
     /**
-     * Busca pareja para reproducción - Fase 3.1
+     * Busca pareja para reproducción - Fase 3.1 + fixfeatures
      */
     searchForMate() {
         if (!window.gameEngine || !window.gameEngine.creatureManager || !window.gameReproduction) {
@@ -95,14 +110,9 @@ class CreatureBehavior {
         const mate = window.gameReproduction.findMate(this.creature, allCreatures);
         
         if (mate) {
-            console.log(`💕 MATING: ${this.creature.id} cambió a estado MATING con pareja ${mate.id}`);
-            // Cambiar a estado MATING con objetivo
-            this.states.setState(CREATURE_STATES.MATING, mate);
-            
-            // Activar efecto visual de conexión
-            if (window.gameEffects) {
-                window.gameEffects.startMatingConnection(this.creature, mate);
-            }
+            console.log(`💕 COURTING: ${this.creature.id} cambió a estado COURTING con pareja ${mate.id}`);
+            // Cambiar a estado COURTING con objetivo
+            this.states.setState(CREATURE_STATES.COURTING, mate);
             
             if (window.eventBus) {
                 window.eventBus.emit('creature:mate_found', {
@@ -180,10 +190,18 @@ class CreatureBehavior {
                         dna: offspringDNA
                     });
                 }
+                
+                // La madre pasa a estado NURSING para cuidar al bebé
+                if (offspring) {
+                    this.states.setState(CREATURE_STATES.NURSING, offspring);
+                    console.log(`👶 NURSING: ${this.creature.id} cambió a estado NURSING para cuidar a ${offspring.id}`);
+                } else {
+                    this.states.setState(CREATURE_STATES.IDLE);
+                }
+            } else {
+                // Si no se pudo reproducir, volver a IDLE
+                this.states.setState(CREATURE_STATES.IDLE);
             }
-            
-            // Volver a IDLE después del apareamiento
-            this.states.setState(CREATURE_STATES.IDLE);
         }
     }
 
@@ -293,6 +311,88 @@ class CreatureBehavior {
         }
     }
     
+    /**
+     * Verifica el proceso de cortejo - fixfeatures
+     */
+    checkCourtingProcess() {
+        const mate = this.states.getTarget();
+        if (!mate || !mate.isAlive) {
+            this.states.setState(CREATURE_STATES.IDLE);
+            return;
+        }
+        
+        // Verificar si están cerca para empezar el apareamiento
+        const distance = this.distanceTo(mate.x, mate.y);
+        const courtingDistance = CONSTANTS.REPRODUCTION.COURTING_RADIUS || 80;
+        
+        if (distance <= courtingDistance) {
+            // Transición automática a MATING después del tiempo de cortejo
+            // (manejado por CreatureStatesUtils.checkTimeBasedTransitions)
+            
+            // Activar efecto visual de conexión durante cortejo
+            if (window.gameEffects) {
+                window.gameEffects.startMatingConnection(this.creature, mate);
+            }
+        }
+    }
+
+    /**
+     * Verifica si esta criatura debe seguir a su madre - fixfeatures
+     */
+    checkIfShouldFollowMother() {
+        if (!window.gameEngine || !window.gameEngine.creatureManager) {
+            return false;
+        }
+        
+        // Buscar una madre que esté en estado NURSING con esta criatura como objetivo
+        const allCreatures = window.gameEngine.creatureManager.getAllCreatures();
+        const mother = allCreatures.find(creature => 
+            creature.isAlive && 
+            creature.behavior && 
+            creature.behavior.states &&
+            creature.behavior.states.isInState(CREATURE_STATES.NURSING) &&
+            creature.behavior.states.getTarget() === this.creature
+        );
+        
+        if (mother) {
+            // Cambiar a estado SEEKING para seguir a la madre
+            this.states.setState(CREATURE_STATES.SEEKING, mother);
+            console.log(`👶 FOLLOWING: ${this.creature.id} siguiendo a madre ${mother.id}`);
+            return true;
+        }
+        
+        return false;
+    }
+
+    /**
+     * Verifica el proceso de cuidado maternal - fixfeatures
+     */
+    checkNursingProcess(deltaTime) {
+        const baby = this.states.getTarget();
+        if (!baby || !baby.isAlive) {
+            this.states.setState(CREATURE_STATES.IDLE);
+            return;
+        }
+        
+        // Transferir energía de madre a bebé
+        const transferRate = CONSTANTS.REPRODUCTION.ENERGY_TRANSFER_RATE || 0.5;
+        const energyToTransfer = transferRate * deltaTime;
+        
+        if (this.creature.energy > energyToTransfer + 10) { // Mantener mínimo 10 energía
+            this.creature.energy -= energyToTransfer;
+            baby.energy = Math.min(100, baby.energy + energyToTransfer);
+            
+            // El bebé sigue a la madre (esto se maneja en el movimiento del bebé)
+            if (window.eventBus) {
+                window.eventBus.emit('creature:nursing', {
+                    motherId: this.creature.id,
+                    babyId: baby.id,
+                    energyTransferred: energyToTransfer
+                });
+            }
+        }
+    }
+
     /**
      * Obtiene información de debug del comportamiento
      */
