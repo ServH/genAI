@@ -74,15 +74,15 @@ window.addEventListener('unhandledrejection', (event) => {
 console.log(`
 GenAI - Simulador de Vida Emergente
 ===================================
-Fase: ${CONSTANTS.CURRENT_PHASE}
-Objetivo: Reproducción sexual básica con genética
-- Búsqueda de pareja: Energía >80%, radio 500px
-- Compatibilidad: Distancia genética 5-80%
-- Mezcla genética: 50/50 de genes parentales
-- Cooldown: 5s entre reproducciones
-- Cría: Spawn en punto medio entre padres
-- Efectos visuales: Pulsos, conexiones, partículas
-- Debug: Panel reproducción con estadísticas
+Fase: ${CONSTANTS.CURRENT_PHASE} - OPTIMIZADO PARA OBSERVACIÓN
+Objetivo: Sistemas Fundamentales para Evolución
+- Población inicial: 50 criaturas (vs 10 anterior)
+- Reproducción acelerada: Umbral 60% energía, cooldown 3s
+- Crecimiento rápido: Bebé→Juvenil 10s, Juvenil→Adulto 20s
+- Energía balanceada: Drenaje 0.3/s, vida ~333s promedio
+- Símbolos familiares: Visualización completa de linajes
+- Debug completo: Paneles población + linajes en tiempo real
+¡Ahora podrás ver bebés, crecimiento y símbolos familiares!
 Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
 ===================================
 `); 

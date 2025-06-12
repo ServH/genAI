@@ -71,6 +71,14 @@ class DebugOverlay {
                     <div id="debug-effects">Cargando...</div>
                 </div>
                 <div class="debug-section">
+                    <h4>Población</h4>
+                    <div id="debug-population">Cargando...</div>
+                </div>
+                <div class="debug-section">
+                    <h4>Linajes</h4>
+                    <div id="debug-lineage">Cargando...</div>
+                </div>
+                <div class="debug-section">
                     <h4>Controles</h4>
                     <div id="debug-controls">
                         <div class="debug-info">D: Toggle Debug</div>
@@ -180,6 +188,8 @@ class DebugOverlay {
         this.updateGenetics();
         this.updateReproduction();
         this.updateEffects();
+        this.updatePopulation(); // fixfeatures
+        this.updateLineage(); // fixfeatures
         this.lastUpdate = now;
     }
 
@@ -416,6 +426,62 @@ class DebugOverlay {
         }
         
         effectsDiv.innerHTML = content;
+    }
+
+    /**
+     * Actualiza la sección de población - fixfeatures
+     */
+    updatePopulation() {
+        const populationDiv = document.getElementById('debug-population');
+        if (!populationDiv) return;
+        
+        let content = '<div class="debug-info">Sin datos</div>';
+        
+        if (window.gameEngine && window.gameEngine.creatureManager && 
+            window.gameEngine.creatureManager.stats) {
+            const metrics = window.gameEngine.creatureManager.stats.getPopulationMetrics();
+            content = `
+                <div class="debug-info">Población: ${metrics.currentPopulation}</div>
+                <div class="debug-info">Nacimientos: ${metrics.totalBirths}</div>
+                <div class="debug-info">Muertes: ${metrics.totalDeaths}</div>
+                <div class="debug-info">Tasa Natalidad: ${metrics.birthRate.toFixed(3)}/s</div>
+                <div class="debug-info">Tasa Mortalidad: ${metrics.deathRate.toFixed(3)}/s</div>
+                <div class="debug-info">Esperanza Vida: ${metrics.avgLifespan.toFixed(1)}s</div>
+                <div class="debug-info">Gen Promedio: ${metrics.avgGeneration.toFixed(1)}</div>
+                <div class="debug-info">Diversidad: ${(metrics.geneticDiversity * 100).toFixed(1)}%</div>
+                <div class="debug-info">Sostenibilidad: ${metrics.sustainabilityIndex.toFixed(2)}</div>
+                <div class="debug-info">Tiempo: ${metrics.timeElapsed}s</div>
+            `;
+        }
+        
+        populationDiv.innerHTML = content;
+    }
+
+    /**
+     * Actualiza la sección de linajes - fixfeatures
+     */
+    updateLineage() {
+        const lineageDiv = document.getElementById('debug-lineage');
+        if (!lineageDiv) return;
+        
+        let content = '<div class="debug-info">Sin datos</div>';
+        
+        if (window.gameLineage && window.gameVisualId) {
+            const lineageStats = window.gameLineage.getLineageStats();
+            const visualStats = window.gameVisualId.getStats();
+            
+            content = `
+                <div class="debug-info">Familias: ${lineageStats.totalFamilies}</div>
+                <div class="debug-info">Generaciones: ${lineageStats.totalGenerations}</div>
+                <div class="debug-info">Tamaño Promedio: ${lineageStats.avgFamilySize.toFixed(1)}</div>
+                <div class="debug-info">Familia Antigua: ${lineageStats.oldestFamily || 'N/A'}</div>
+                <div class="debug-info">Familia Grande: ${lineageStats.largestFamily || 'N/A'}</div>
+                <div class="debug-info">Símbolos Usados: ${visualStats.symbolsUsed}/${visualStats.availableSymbols}</div>
+                <div class="debug-info">Símbolos Libres: ${visualStats.symbolsRemaining}</div>
+            `;
+        }
+        
+        lineageDiv.innerHTML = content;
     }
 
     /**

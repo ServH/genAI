@@ -18,9 +18,9 @@ const CONSTANTS = {
     WORLD: {
         CHUNK_SIZE: 500,
         MAX_ENTITIES: 500,
-        INITIAL_CREATURES: 10,
-        WIDTH: 3000,  // Mundo fijo más grande
-        HEIGHT: 2000, // Mundo fijo más grande
+        INITIAL_CREATURES: 50, // Aumentado para ver reproducción
+        WIDTH: 1200,  // Mundo fijo más grande
+        HEIGHT: 800, // Mundo fijo más grande
         BORDER_TYPE: 'wall', // 'wall', 'wrap', o 'infinite'
         BORDER_MARGIN: 50 // Margen para rebote suave
     },
@@ -67,8 +67,8 @@ const CONSTANTS = {
 
     // Configuración de Criaturas
     CREATURES: {
-        INITIAL_COUNT: 10,
-        MAX_COUNT: 100,
+        INITIAL_COUNT: 50, // Consistente con WORLD.INITIAL_CREATURES
+        MAX_COUNT: 200, // Aumentado para permitir más reproducción
         BASE_RADIUS: 20,
         MIN_SPEED: 20, // px/s
         MAX_SPEED: 80, // px/s
@@ -86,8 +86,8 @@ const CONSTANTS = {
     // Configuración de Energía - fixfeatures mejorada
     ENERGY: {
         INITIAL: 100,
-        DRAIN_RATE: 0.5, // energía por segundo (más realista)
-        MOVEMENT_COST: 0.1, // coste adicional por movimiento
+        DRAIN_RATE: 0.3, // energía por segundo (ajustado para más tiempo de vida)
+        MOVEMENT_COST: 0.05, // coste adicional por movimiento (reducido)
         CRITICAL_THRESHOLD: 15, // desvanecimiento de color
         PULSE_THRESHOLD: 5, // pulso visual
         DEATH_THRESHOLD: 0,
@@ -95,8 +95,8 @@ const CONSTANTS = {
         REPRODUCTION_RECOVERY: 20000, // 20s sin poder reproducirse tras nacer
         GROWTH_STAGES: [
             { age: 0, scale: 0.5, name: 'baby' },    // Bebé
-            { age: 20, scale: 0.8, name: 'juvenile' },   // Juvenil  
-            { age: 40, scale: 1.0, name: 'adult' }    // Adulto
+            { age: 10, scale: 0.8, name: 'juvenile' },   // Juvenil (más rápido)
+            { age: 20, scale: 1.0, name: 'adult' }    // Adulto (más rápido)
         ]
     },
 
@@ -148,17 +148,17 @@ const CONSTANTS = {
         }
     },
 
-    // Configuración de Reproducción - Fase 3.1 + fixfeatures
+    // Configuración de Reproducción - Fase 3.1 + fixfeatures (optimizada para observación)
     REPRODUCTION: {
-        ENERGY_THRESHOLD: 80,        // % energía mínima para reproducirse
-        SEARCH_RADIUS: 500,          // pixels de radio de búsqueda de pareja (muy grande)
+        ENERGY_THRESHOLD: 60,        // % energía mínima para reproducirse (reducido)
+        SEARCH_RADIUS: 300,          // pixels de radio de búsqueda de pareja
         GENETIC_COMPATIBILITY: 1.0,  // 100% compatibilidad para test rápido
-        ENERGY_COST: 40,            // energía consumida por cada padre
-        COOLDOWN: 5000,             // ms de cooldown entre reproducciones (reducido)
+        ENERGY_COST: 30,            // energía consumida por cada padre (reducido)
+        COOLDOWN: 3000,             // ms de cooldown entre reproducciones (más rápido)
         OFFSPRING_ENERGY: 100,      // energía inicial de la cría
-        MATING_DISTANCE: 50,        // pixels mínimos para aparearse (aumentado)
-        COURTING_RADIUS: 80,        // pixels para movimiento circular
-        ENERGY_TRANSFER_RATE: 0.5,  // energía/segundo de madre a bebé
+        MATING_DISTANCE: 40,        // pixels mínimos para aparearse
+        COURTING_RADIUS: 60,        // pixels para movimiento circular (más pequeño)
+        ENERGY_TRANSFER_RATE: 0.3,  // energía/segundo de madre a bebé (reducido)
         
         // Modo debug para forzar apareamiento
         DEBUG_MODE: {
