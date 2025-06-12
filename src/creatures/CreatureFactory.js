@@ -46,8 +46,15 @@ class CreatureFactory {
             spawnY = pos.y;
         }
         
-        // Crear ADN para la criatura - Fase 3.0
-        const dna = new DNA();
+        // Crear ADN para la criatura - Sistema de Género
+        let dna;
+        if (window.gameFounderGenetics && window.gameFounderGenetics.hasFoundersRemaining()) {
+            // Usar sistema de fundadores para los primeros 10
+            dna = window.gameFounderGenetics.generateFounderDNA();
+        } else {
+            // DNA aleatorio normal para descendencia
+            dna = new DNA();
+        }
         
         // Crear criatura con ADN
         const creature = new Creature(spawnX, spawnY, dna);
@@ -59,13 +66,15 @@ class CreatureFactory {
         this.creaturesCreated++;
         this.lastSpawnTime = performance.now();
         
-        console.log(`CreatureFactory: Criatura ${creature.id} creada en (${Math.round(spawnX)}, ${Math.round(spawnY)})`);
+        const gender = dna.getGender();
+        console.log(`CreatureFactory: Criatura ${creature.id} (${gender}) creada en (${Math.round(spawnX)}, ${Math.round(spawnY)})`);
         
         if (window.eventBus) {
             eventBus.emit('factory:creatureSpawned', {
                 id: creature.id,
                 x: spawnX,
                 y: spawnY,
+                gender: gender,
                 total: this.creaturesCreated
             });
         }

@@ -136,7 +136,7 @@ const CONSTANTS = {
         DIRECTION_VARIANCE: 0.3 // variación en movimiento browniano
     },
 
-    // Configuración Genética - Fase 3.0 + 3.1
+    // Configuración Genética - Fase 3.0 + 3.1 + Sistema de Género
     GENETICS: {
         GENES: {
             SPEED: { min: 0.5, max: 2.0, default: 1.0 },
@@ -144,11 +144,12 @@ const CONSTANTS = {
             VISION: { min: 100, max: 300, default: 200 },
             COLOR_R: { min: 0.0, max: 1.0, default: 0.5 },
             COLOR_G: { min: 0.0, max: 1.0, default: 0.5 },
-            COLOR_B: { min: 0.0, max: 1.0, default: 0.5 }
+            COLOR_B: { min: 0.0, max: 1.0, default: 0.5 },
+            GENDER: { min: 0, max: 1, default: 0.5 } // 0 = male, 1 = female
         }
     },
 
-    // Configuración de Reproducción - Fase 3.1 + fixfeatures (optimizada para observación)
+    // Configuración de Reproducción - Fase 3.1 + Sistema de Género
     REPRODUCTION: {
         ENERGY_THRESHOLD: 60,        // % energía mínima para reproducirse (reducido)
         SEARCH_RADIUS: 300,          // pixels de radio de búsqueda de pareja
@@ -159,6 +160,20 @@ const CONSTANTS = {
         MATING_DISTANCE: 40,        // pixels mínimos para aparearse
         COURTING_RADIUS: 60,        // pixels para movimiento circular (más pequeño)
         ENERGY_TRANSFER_RATE: 0.3,  // energía/segundo de madre a bebé (reducido)
+        
+                 // Sistema de Género
+        GENDER: {
+            MALE_THRESHOLD: 0.5,     // valores < 0.5 = macho
+            FEMALE_THRESHOLD: 0.5,   // valores >= 0.5 = hembra
+            REJECTION_COOLDOWN: 5000, // ms cooldown para machos rechazados
+            MAX_SUITORS: 3,          // máximo machos cortejando una hembra
+            SELECTION_FACTORS: {     // pesos para selección femenina
+                DISTANCE: 0.3,       // 30% cercanía
+                SPEED: 0.3,          // 30% velocidad
+                SIZE: 0.2,           // 20% tamaño
+                VISION: 0.2          // 20% visión
+            }
+        },
         
         // Modo debug para forzar apareamiento
         DEBUG_MODE: {

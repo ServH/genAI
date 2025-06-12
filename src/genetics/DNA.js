@@ -101,6 +101,28 @@ class DNA {
     }
     
     /**
+     * Obtiene el género de la criatura
+     */
+    getGender() {
+        const genderValue = this.getGene('GENDER');
+        return genderValue < CONSTANTS.REPRODUCTION.GENDER.MALE_THRESHOLD ? 'male' : 'female';
+    }
+
+    /**
+     * Verifica si es macho
+     */
+    isMale() {
+        return this.getGender() === 'male';
+    }
+
+    /**
+     * Verifica si es hembra
+     */
+    isFemale() {
+        return this.getGender() === 'female';
+    }
+
+    /**
      * Obtiene información del ADN para debug
      */
     getInfo() {
@@ -108,6 +130,7 @@ class DNA {
             id: this.id,
             generation: this.generation,
             genes: { ...this.genes },
+            gender: this.getGender(),
             parentIds: [...this.parentIds],
             age: Date.now() - this.createdAt
         };
