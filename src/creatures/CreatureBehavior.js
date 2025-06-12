@@ -349,7 +349,7 @@ class CreatureBehavior {
     }
     
     /**
-     * Verifica el proceso de cortejo - fixfeatures
+     * Verifica el proceso de cortejo con acercamiento gradual - fixfeatures
      */
     checkCourtingProcess() {
         const mate = this.states.getTarget();
@@ -358,18 +358,43 @@ class CreatureBehavior {
             return;
         }
         
-        // Verificar si están cerca para empezar el apareamiento
-        const distance = this.distanceTo(mate.x, mate.y);
-        const courtingDistance = CONSTANTS.REPRODUCTION.COURTING_RADIUS || 80;
+        // Calcular acercamiento gradual basado en tiempo de cortejo
+        const timeInCourting = this.states.getTimeInCurrentState();
+        const initialRadius = CONSTANTS.REPRODUCTION.COURTING_RADIUS;
+        const minRadius = CONSTANTS.REPRODUCTION.COURTING_MIN_RADIUS;
+        const approachRate = CONSTANTS.REPRODUCTION.COURTING_APPROACH_RATE;
         
-        if (distance <= courtingDistance) {
-            // Transición automática a MATING después del tiempo de cortejo
-            // (manejado por CreatureStatesUtils.checkTimeBasedTransitions)
-            
-            // Activar efecto visual de conexión durante cortejo
-            if (window.gameEffects) {
-                window.gameEffects.startMatingConnection(this.creature, mate);
-            }
+        // Radio objetivo disminuye gradualmente con el tiempo
+        const radiusReduction = timeInCourting * approachRate;
+        const targetRadius = Math.max(minRadius, initialRadius - radiusReduction);
+        
+        // Verificar distancia actual
+        const distance = this.distanceTo(mate.x, mate.y);
+        
+        // 🔍 DIAGNÓSTICO: Log inteligente cada 3 segundos por pareja
+        if (!this.lastCourtingDiagnostic || Date.now() - this.lastCourtingDiagnostic > 3000) {
+            const partnerGender = mate.dna ? (mate.dna.isMale() ? 'M' : 'F') : '?';
+            const myGender = this.creature.dna ? (this.creature.dna.isMale() ? 'M' : 'F') : '?';
+            console.log(`💕 COURTING: ${myGender}${this.creature.id.slice(-3)} cortejando ${partnerGender}${mate.id.slice(-3)} | Distancia: ${distance.toFixed(1)}px | Radio objetivo: ${targetRadius.toFixed(1)}px | Tiempo: ${timeInCourting.toFixed(1)}s`);
+            this.lastCourtingDiagnostic = Date.now();
+        }
+        
+        // Si están lo suficientemente cerca para aparearse, transición a MATING
+        if (distance <= CONSTANTS.REPRODUCTION.MATING_DISTANCE) {
+            // 🔄 SINCRONIZACIÓN BIDIRECCIONAL: Ambas criaturas deben cambiar a MATING
+            this.synchronizeMatingTransition(mate);
+            console.log(`💖 MATING: ${this.creature.id} cambió a MATING (distancia: ${distance.toFixed(1)}px ≤ ${CONSTANTS.REPRODUCTION.MATING_DISTANCE}px)`);
+            return;
+        }
+        
+        // Activar efecto visual de conexión durante cortejo
+        if (window.gameEffects) {
+            window.gameEffects.startMatingConnection(this.creature, mate);
+        }
+        
+        // Actualizar radio de cortejo en el sistema de movimiento
+        if (this.movement && this.movement.setCourtingRadius) {
+            this.movement.setCourtingRadius(targetRadius);
         }
     }
 
@@ -427,6 +452,23 @@ class CreatureBehavior {
                     energyTransferred: energyToTransfer
                 });
             }
+        }
+    }
+
+    /**
+     * 🔄 NUEVO: Sincroniza transición a MATING para ambas criaturas
+     * @param {Creature} mate - Pareja para apareamiento
+     */
+    synchronizeMatingTransition(mate) {
+        // Cambiar esta criatura a MATING con la pareja como target
+        this.states.setState(CREATURE_STATES.MATING, mate);
+        
+        // Cambiar la pareja a MATING con esta criatura como target
+        if (mate.behavior && mate.behavior.states) {
+            mate.behavior.states.setState(CREATURE_STATES.MATING, this.creature);
+            console.log(`🔄 SYNC: Ambas criaturas ${this.creature.id} y ${mate.id} sincronizadas en estado MATING`);
+        } else {
+            console.log(`⚠️ SYNC: No se pudo sincronizar pareja ${mate.id} - falta behavior/states`);
         }
     }
 

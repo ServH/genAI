@@ -49,7 +49,9 @@ class CreatureStatesUtils {
                 return stateTimer >= config.seekingTimeout ? CREATURE_STATES.IDLE : null;
                 
             case CREATURE_STATES.COURTING:
-                return stateTimer >= config.courtingDuration ? CREATURE_STATES.MATING : null;
+                // COURTING ahora transiciona por distancia, no por tiempo
+                // La transición se maneja en checkCourtingProcess()
+                return null;
                 
             case CREATURE_STATES.MATING:
                 return stateTimer >= config.matingDuration ? CREATURE_STATES.IDLE : null;

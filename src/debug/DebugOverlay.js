@@ -406,6 +406,11 @@ class DebugOverlay {
                 const readyMales = males.filter(c => c.energy >= CONSTANTS.REPRODUCTION.ENERGY_THRESHOLD).length;
                 const readyFemales = females.filter(c => c.energy >= CONSTANTS.REPRODUCTION.ENERGY_THRESHOLD).length;
                 
+                // Contar hembras con pretendientes
+                const femalesWithSuitors = females.filter(f => window.gameReproduction.hasSuitors(f));
+                const totalSuitors = femalesWithSuitors.reduce((sum, f) => 
+                    sum + window.gameReproduction.getSuitorCount(f), 0);
+                
                 content += `
                     <div class="debug-info">--- Población ---</div>
                     <div class="debug-info">Machos: ${males.length} (${readyMales} listos)</div>
@@ -414,6 +419,10 @@ class DebugOverlay {
                     <div class="debug-info">Cortejando: ${courtingMales.length}</div>
                     <div class="debug-info">Apareándose: ${matingCount}</div>
                     <div class="debug-info">Cuidando: ${nursingFemales.length}</div>
+                    <div class="debug-info">--- Pretendientes ---</div>
+                    <div class="debug-info">Hembras c/Pretend.: ${femalesWithSuitors.length}</div>
+                    <div class="debug-info">Total Pretend.: ${totalSuitors}</div>
+                    <div class="debug-info">Vel. Reducida: ${femalesWithSuitors.length > 0 ? 'Sí' : 'No'}</div>
                 `;
             }
         }

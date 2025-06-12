@@ -102,10 +102,26 @@ class Reproduction {
             return distanceToFemale < distanceToClosest ? female : closest;
         });
 
+        // Verificar si ya fue seleccionado por esta hembra
+        const selectedMale = this.getSelectedMale(closestFemale);
+        if (selectedMale && selectedMale.id === creature.id) {
+            // Ya fue seleccionado, devolver la hembra para que pueda cortejar
+            return closestFemale;
+        }
+
         // Registrar al macho como pretendiente
         this.addSuitor(closestFemale, creature);
 
-        return closestFemale;
+        // Verificar si fue seleccionado después de addSuitor
+        const newSelectedMale = this.getSelectedMale(closestFemale);
+        if (newSelectedMale && newSelectedMale.id === creature.id) {
+            // Fue seleccionado, puede empezar cortejo
+            console.log(`✅ SELECTED: Macho ${creature.id} fue seleccionado por hembra ${closestFemale.id}`);
+            return closestFemale;
+        }
+
+        // No fue seleccionado, no devolver hembra (no puede cortejar aún)
+        return null;
     }
 
     /**
@@ -148,6 +164,17 @@ class Reproduction {
      * @returns {Object|null} - Información del offspring o null si falla
      */
     reproduce(male, female) {
+        // 🔄 SINCRONIZACIÓN BIDIRECCIONAL: Verificar antes de proceder
+        return this.attemptReproduction(male, female);
+    }
+
+    /**
+     * 🔄 NUEVO: Intenta reproducción con verificación bidireccional
+     * @param {Creature} male - Macho
+     * @param {Creature} female - Hembra
+     * @returns {Object|null} - Información del offspring o null si falla
+     */
+    attemptReproduction(male, female) {
         // Verificar géneros correctos
         if (!male.dna || !female.dna || !male.dna.isMale() || !female.dna.isFemale()) {
             console.log(`❌ REPRODUCTION: Géneros incorrectos - ${male.id}:${male.dna?.getGender()}, ${female.id}:${female.dna?.getGender()}`);
@@ -160,10 +187,28 @@ class Reproduction {
             return null;
         }
 
+        // 🔄 VERIFICACIÓN BIDIRECCIONAL: Ambos deben reconocerse mutuamente
+        const maleTarget = male.behavior?.states?.getTarget();
+        const femaleTarget = female.behavior?.states?.getTarget();
+        
+        // Verificar referencias bidireccionales
+        if (!maleTarget || maleTarget.id !== female.id) {
+            console.log(`❌ SYNC: Macho ${male.id} no tiene como target a hembra ${female.id} (target: ${maleTarget?.id || 'ninguno'})`);
+            this.clearMatingReferences(male, female);
+            return null;
+        }
+        
+        if (!femaleTarget || femaleTarget.id !== male.id) {
+            console.log(`❌ SYNC: Hembra ${female.id} no tiene como target a macho ${male.id} (target: ${femaleTarget?.id || 'ninguno'})`);
+            this.clearMatingReferences(male, female);
+            return null;
+        }
+
         // Verificar que la hembra haya seleccionado a este macho
         const selectedMale = this.getSelectedMale(female);
         if (!selectedMale || selectedMale.id !== male.id) {
             console.log(`❌ REPRODUCTION: Hembra ${female.id} no seleccionó a macho ${male.id} (seleccionó: ${selectedMale?.id || 'ninguno'})`);
+            this.clearMatingReferences(male, female);
             return null;
         }
 
@@ -178,6 +223,17 @@ class Reproduction {
             return null;
         }
 
+        // ✅ TODAS LAS VERIFICACIONES PASADAS - PROCEDER CON REPRODUCCIÓN
+        return this.performReproduction(male, female);
+    }
+
+    /**
+     * 🔄 NUEVO: Ejecuta la reproducción después de todas las verificaciones
+     * @param {Creature} male - Macho verificado
+     * @param {Creature} female - Hembra verificada
+     * @returns {Object} - Información del offspring
+     */
+    performReproduction(male, female) {
         // Calcular distancia genética para estadísticas
         const geneticDistance = GeneticUtils.calculateGeneticDistance(male.dna, female.dna);
         
@@ -195,6 +251,9 @@ class Reproduction {
 
         // Limpiar selección femenina
         this.clearFemaleSelection(female);
+        
+        // 🔄 LIMPIAR REFERENCIAS BIDIRECCIONALES
+        this.clearMatingReferences(male, female);
         
         // Actualizar estadísticas
         this.stats.totalReproductions++;
@@ -227,6 +286,24 @@ class Reproduction {
             energy: this.config.offspringEnergy,
             parents: [male, female]
         };
+    }
+
+    /**
+     * 🔄 NUEVO: Limpia referencias de apareamiento inconsistentes
+     * @param {Creature} creature1 - Primera criatura
+     * @param {Creature} creature2 - Segunda criatura
+     */
+    clearMatingReferences(creature1, creature2) {
+        // Resetear ambas criaturas a IDLE si están en MATING
+        if (creature1.behavior?.states?.isInState(CREATURE_STATES.MATING)) {
+            creature1.behavior.states.setState(CREATURE_STATES.IDLE);
+            console.log(`🔄 RESET: ${creature1.id} reseteado a IDLE por referencias inconsistentes`);
+        }
+        
+        if (creature2.behavior?.states?.isInState(CREATURE_STATES.MATING)) {
+            creature2.behavior.states.setState(CREATURE_STATES.IDLE);
+            console.log(`🔄 RESET: ${creature2.id} reseteado a IDLE por referencias inconsistentes`);
+        }
     }
 
     /**
@@ -434,6 +511,26 @@ class Reproduction {
     getSelectedMale(female) {
         const selection = this.femaleSelections.get(female.id);
         return selection ? selection.selectedMale : null;
+    }
+
+    /**
+     * Verifica si una hembra tiene pretendientes activos
+     * @param {Creature} female - Hembra
+     * @returns {boolean} - True si tiene pretendientes
+     */
+    hasSuitors(female) {
+        const selection = this.femaleSelections.get(female.id);
+        return selection && selection.suitors.length > 0;
+    }
+
+    /**
+     * Obtiene el número de pretendientes de una hembra
+     * @param {Creature} female - Hembra
+     * @returns {number} - Número de pretendientes
+     */
+    getSuitorCount(female) {
+        const selection = this.femaleSelections.get(female.id);
+        return selection ? selection.suitors.length : 0;
     }
 
     /**

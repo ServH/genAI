@@ -2,6 +2,39 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [3.1.7-alpha] - 2024-12-19
+
+### 🔄 CAJA 3 - Fase 3.1: Sincronización Bidireccional de Reproducción ✅
+
+#### 🚨 **PROBLEMA CRÍTICO SOLUCIONADO**
+- **Referencias perdidas**: Criaturas llegaban a MATING pero perdían referencia de pareja
+- **Bucles infinitos**: Estados MATING "sin pareja" causaban loops de cortejo
+- **Falta sincronización**: Una criatura tenía target pero la otra no
+
+#### 🔄 **Sistema de Sincronización Bidireccional Implementado**
+- **attemptReproduction()**: Verificación completa antes de reproducción
+- **Verificación bidireccional**: Ambas criaturas deben reconocerse mutuamente
+- **synchronizeMatingTransition()**: Transición sincronizada a estado MATING
+- **clearMatingReferences()**: Limpieza automática de referencias inconsistentes
+
+#### 🛠️ **Correcciones Técnicas**
+- **Reproduction.js**: Método reproduce() refactorizado con verificaciones
+- **CreatureBehavior.js**: Sincronización bidireccional en transición MATING
+- **Verificación de targets**: Ambas criaturas deben tener target mutuo
+- **Reset automático**: Estados inconsistentes se resetean a IDLE
+
+#### 🎯 **Validación de Sincronización**
+- ✅ **Referencias bidireccionales**: Ambas criaturas se reconocen mutuamente
+- ✅ **Transición sincronizada**: Cambio simultáneo a estado MATING
+- ✅ **Limpieza automática**: Referencias inconsistentes se limpian
+- ✅ **Logs diagnósticos**: Información clara de sincronización
+
+#### 📁 **Archivos Modificados**
+- `src/genetics/Reproduction.js` - Sistema verificación bidireccional
+- `src/creatures/CreatureBehavior.js` - Sincronización transición MATING
+
+---
+
 ## [3.1.6-alpha] - 2024-12-19
 
 ### 🌱 CAJA 3 - Fase 3.1: Evolución Natural Habilitada ✅

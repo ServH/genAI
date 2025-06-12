@@ -10,11 +10,19 @@ class CreatureMovement {
         this.creature = creature;
         this.targetDirection = null;
         this.lastDirectionChange = 0;
+        this.courtingRadius = null; // Radio dinámico para cortejo
         
         // Configuración desde utilidades
         this.config = CreatureMovementUtils.getConfig();
         
         console.log(`CreatureMovement: Sistema inicializado para ${creature.id}`);
+    }
+
+    /**
+     * Establece el radio de cortejo dinámico
+     */
+    setCourtingRadius(radius) {
+        this.courtingRadius = radius;
     }
 
     /**
@@ -127,7 +135,7 @@ class CreatureMovement {
     }
 
     /**
-     * Movimiento circular de cortejo - fixfeatures
+     * Movimiento circular de cortejo con acercamiento gradual - fixfeatures
      */
     courtingMovement(target, deltaTime) {
         // Calcular distancia al objetivo
@@ -135,13 +143,14 @@ class CreatureMovement {
             this.creature.x, this.creature.y, target.x, target.y
         );
         
-        const courtingRadius = CONSTANTS.REPRODUCTION.COURTING_RADIUS || 80;
+        // Usar radio dinámico si está disponible, sino usar el por defecto
+        const courtingRadius = this.courtingRadius || CONSTANTS.REPRODUCTION.COURTING_RADIUS || 80;
         
-        if (distance > courtingRadius) {
-            // Si está lejos, acercarse primero
+        if (distance > courtingRadius * 1.2) {
+            // Si está muy lejos, acercarse primero
             this.moveToTarget(target, deltaTime);
         } else {
-            // Movimiento circular alrededor de la pareja
+            // Movimiento circular alrededor de la pareja con acercamiento gradual
             const centerX = target.x;
             const centerY = target.y;
             
@@ -152,10 +161,10 @@ class CreatureMovement {
             const angularSpeed = 2.0 * deltaTime; // velocidad angular
             const newAngle = currentAngle + angularSpeed;
             
-            // Calcular nueva posición en círculo
-            const radius = Math.min(distance, courtingRadius * 0.8); // Mantener radio
-            const newX = centerX + Math.cos(newAngle) * radius;
-            const newY = centerY + Math.sin(newAngle) * radius;
+            // Calcular nueva posición en círculo con radio que se reduce gradualmente
+            const targetRadius = Math.min(courtingRadius, distance * 0.9); // Acercarse gradualmente
+            const newX = centerX + Math.cos(newAngle) * targetRadius;
+            const newY = centerY + Math.sin(newAngle) * targetRadius;
             
             // Calcular dirección hacia nueva posición
             const targetDirection = Math.atan2(newY - this.creature.y, newX - this.creature.x);
@@ -188,6 +197,20 @@ class CreatureMovement {
         if (this.creature.behavior && this.creature.behavior.states && 
             this.creature.behavior.states.isInState(CREATURE_STATES.NURSING)) {
             speed *= 0.3; // 30% de velocidad normal
+        }
+        
+        // Reducir velocidad de hembras cuando tienen pretendientes
+        if (this.creature.dna && this.creature.dna.isFemale() && window.gameReproduction) {
+            if (window.gameReproduction.hasSuitors(this.creature)) {
+                const reduction = CONSTANTS.REPRODUCTION.GENDER.FEMALE_MOVEMENT_REDUCTION;
+                speed *= reduction; // 40% de velocidad normal
+                
+                // Log ocasional para debug
+                if (Math.random() < 0.01) { // 1% chance por frame
+                    const suitorCount = window.gameReproduction.getSuitorCount(this.creature);
+                    console.log(`🚶‍♀️ FEMALE MOVEMENT: Hembra ${this.creature.id} reduce velocidad (${suitorCount} pretendientes)`);
+                }
+            }
         }
         
         this.creature.x += Math.cos(this.creature.direction) * speed;

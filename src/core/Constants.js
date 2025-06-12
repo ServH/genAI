@@ -158,7 +158,9 @@ const CONSTANTS = {
         COOLDOWN: 3000,             // ms de cooldown entre reproducciones (más rápido)
         OFFSPRING_ENERGY: 100,      // energía inicial de la cría
         MATING_DISTANCE: 40,        // pixels mínimos para aparearse
-        COURTING_RADIUS: 60,        // pixels para movimiento circular (más pequeño)
+        COURTING_RADIUS: 60,        // pixels para movimiento circular inicial
+        COURTING_MIN_RADIUS: 30,    // pixels radio mínimo al final del cortejo
+        COURTING_APPROACH_RATE: 10, // pixels/segundo de acercamiento
         ENERGY_TRANSFER_RATE: 0.3,  // energía/segundo de madre a bebé (reducido)
         
                  // Sistema de Género
@@ -167,6 +169,7 @@ const CONSTANTS = {
             FEMALE_THRESHOLD: 0.5,   // valores >= 0.5 = hembra
             REJECTION_COOLDOWN: 5000, // ms cooldown para machos rechazados
             MAX_SUITORS: 3,          // máximo machos cortejando una hembra
+            FEMALE_MOVEMENT_REDUCTION: 0.4, // 40% velocidad cuando tiene pretendientes
             SELECTION_FACTORS: {     // pesos para selección femenina
                 DISTANCE: 0.3,       // 30% cercanía
                 SPEED: 0.3,          // 30% velocidad

@@ -107,6 +107,7 @@ class CreatureStates {
     getCurrentState() { return this.currentState; }
     getTarget() { return this.target; }
     isInState(state) { return this.currentState === state; }
+    getTimeInCurrentState() { return this.stateTimer / 1000; } // convertir ms a segundos
     
     // Limpieza
     destroy() {

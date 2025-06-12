@@ -72,30 +72,31 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Información de debug en consola
 console.log(`
-🧬 GenAI - CAJA 3 Fase 3.1: Sistema de Género + Evolución Natural
+🔄 GenAI - CAJA 3 Fase 3.1: Sincronización Bidireccional de Reproducción
 ================================================================
-✅ SISTEMA DE GÉNERO IMPLEMENTADO:
-- Género en ADN: 0=macho, 1=hembra
-- 5 machos + 5 hembras fundadores balanceados
-- Solo machos buscan pareja activamente
-- Hembras seleccionan entre pretendientes
-- Selección por genes superiores (velocidad, tamaño, visión)
-- Cooldown para machos rechazados (5s)
-- Máximo 3 pretendientes por hembra
+🚨 PROBLEMA CRÍTICO SOLUCIONADO:
+- Referencias perdidas: Criaturas llegaban a MATING pero perdían pareja
+- Bucles infinitos: Estados MATING "sin pareja" causaban loops
+- Falta sincronización: Una criatura tenía target pero la otra no
 
-🌱 EVOLUCIÓN NATURAL HABILITADA:
-- Respawn automático DESHABILITADO
-- Población crece/decrece naturalmente por reproducción/muerte
-- Capacidad máxima: 50 criaturas
-- Solo respawn de emergencia si extinción total (0 criaturas)
+🔄 SINCRONIZACIÓN BIDIRECCIONAL IMPLEMENTADA:
+- Verificación completa antes de reproducción
+- Ambas criaturas deben reconocerse mutuamente
+- Transición sincronizada a estado MATING
+- Limpieza automática de referencias inconsistentes
 
-🎮 COMPORTAMIENTOS OBSERVABLES:
-- Machos cortejan a hembras cercanas
-- Hembras evalúan y eligen al mejor macho
-- Solo parejas seleccionadas pueden reproducirse
-- Hembras cuidan bebés (NURSING), machos vuelven a buscar
-- ¡Población puede crecer hasta 50 criaturas por reproducción!
+🛠️ CORRECCIONES TÉCNICAS:
+- attemptReproduction(): Verificación bidireccional completa
+- synchronizeMatingTransition(): Cambio simultáneo a MATING
+- clearMatingReferences(): Reset automático de estados inconsistentes
+- Logs diagnósticos: Información clara de sincronización
 
-Controles: D = Debug con estadísticas género, G = Grid, Espacio = Pausa
+🎯 REPRODUCCIÓN AHORA FUNCIONAL:
+- Referencias bidireccionales verificadas
+- Transiciones sincronizadas
+- Estados consistentes
+- ¡Nacimientos finalmente posibles!
+
+Controles: D = Debug con estadísticas reproducción, G = Grid, Espacio = Pausa
 ================================================================
 `); 
