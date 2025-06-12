@@ -99,26 +99,32 @@ class CreatureBehavior {
     }
     
     /**
-     * Busca pareja para reproducción - Fase 3.1 + fixfeatures
+     * Busca pareja para reproducción - Solo machos buscan
      */
     searchForMate() {
+        // Solo los machos buscan pareja
+        if (!this.creature.dna || !this.creature.dna.isMale()) {
+            return;
+        }
+
         if (!window.gameEngine || !window.gameEngine.creatureManager || !window.gameReproduction) {
             return;
         }
         
         const allCreatures = window.gameEngine.creatureManager.getAllCreatures();
-        const mate = window.gameReproduction.findMate(this.creature, allCreatures);
+        const female = window.gameReproduction.findMate(this.creature, allCreatures);
         
-        if (mate) {
-            console.log(`💕 COURTING: ${this.creature.id} cambió a estado COURTING con pareja ${mate.id}`);
+        if (female) {
+            console.log(`💕 COURTING: Macho ${this.creature.id} cambió a estado COURTING con hembra ${female.id}`);
             // Cambiar a estado COURTING con objetivo
-            this.states.setState(CREATURE_STATES.COURTING, mate);
+            this.states.setState(CREATURE_STATES.COURTING, female);
             
             if (window.eventBus) {
                 window.eventBus.emit('creature:mate_found', {
                     id: this.creature.id,
-                    mateId: mate.id,
-                    distance: this.distanceTo(mate.x, mate.y)
+                    mateId: female.id,
+                    distance: this.distanceTo(female.x, female.y),
+                    gender: 'male_courting_female'
                 });
             }
         }
@@ -152,60 +158,78 @@ class CreatureBehavior {
     }
     
     /**
-     * Verifica el proceso de apareamiento - Fase 3.1
+     * Verifica el proceso de apareamiento - Sistema de género
      */
     checkMatingProcess() {
-        const mate = this.states.getTarget();
-        if (!mate || !mate.isAlive) {
+        const partner = this.states.getTarget();
+        if (!partner || !partner.isAlive) {
             this.states.setState(CREATURE_STATES.IDLE);
             return;
         }
         
         // Verificar si ambos están cerca
-        const distance = this.distanceTo(mate.x, mate.y);
-        const matingDistance = 30; // pixels
+        const distance = this.distanceTo(partner.x, partner.y);
+        const matingDistance = CONSTANTS.CREATURE_STATES.MATING_DISTANCE;
         
         if (distance <= matingDistance && window.gameReproduction) {
+            // Determinar macho y hembra
+            let male, female;
+            if (this.creature.dna && this.creature.dna.isMale()) {
+                male = this.creature;
+                female = partner;
+            } else if (this.creature.dna && this.creature.dna.isFemale()) {
+                male = partner;
+                female = this.creature;
+            } else {
+                // Sin género válido, volver a IDLE
+                this.states.setState(CREATURE_STATES.IDLE);
+                return;
+            }
+
             // Intentar reproducción
-            const offspringDNA = window.gameReproduction.reproduce(this.creature, mate);
+            const offspringInfo = window.gameReproduction.reproduce(male, female);
             
-            if (offspringDNA && window.gameEngine && window.gameEngine.creatureManager) {
-                // Calcular posición de la cría
-                const position = window.gameReproduction.calculateOffspringPosition(this.creature, mate);
-                
+            if (offspringInfo && window.gameEngine && window.gameEngine.creatureManager) {
                 // Crear nueva criatura con DNA mezclado
-                const offspring = window.gameEngine.creatureManager.spawnCreatureWithDNA(position.x, position.y, offspringDNA);
+                const offspring = window.gameEngine.creatureManager.spawnCreatureWithDNA(
+                    offspringInfo.x, 
+                    offspringInfo.y, 
+                    offspringInfo.dna
+                );
                 
                 // Activar efecto visual de nacimiento
                 if (window.gameEffects) {
-                    window.gameEffects.createBirthEffect(position.x, position.y);
+                    window.gameEffects.createBirthEffect(offspringInfo.x, offspringInfo.y);
                 }
                 
                 if (offspring && window.eventBus) {
                     window.eventBus.emit('creature:offspring_born', {
-                        parent1: this.creature.id,
-                        parent2: mate.id,
+                        parent1: male.id,
+                        parent2: female.id,
                         offspring: offspring.id,
-                        position: position,
-                        dna: offspringDNA
+                        position: { x: offspringInfo.x, y: offspringInfo.y },
+                        dna: offspringInfo.dna
                     });
                 }
                 
-                // La madre pasa a estado NURSING para cuidar al bebé
-                if (offspring) {
-                    // Establecer parentesco - fixfeatures
+                // Solo la hembra pasa a estado NURSING para cuidar al bebé
+                if (offspring && this.creature.dna && this.creature.dna.isFemale()) {
+                    // Establecer parentesco
                     if (window.gameLineage) {
-                        window.gameLineage.setParentage(offspring, this.creature, mate);
+                        window.gameLineage.setParentage(offspring, male, female);
                     }
                     
                     this.states.setState(CREATURE_STATES.NURSING, offspring);
-                    console.log(`👶 NURSING: ${this.creature.id} cambió a estado NURSING para cuidar a ${offspring.id}`);
+                    console.log(`👶 NURSING: Hembra ${this.creature.id} cambió a estado NURSING para cuidar a ${offspring.id}`);
                 } else {
+                    // El macho vuelve a IDLE después de reproducirse
                     this.states.setState(CREATURE_STATES.IDLE);
+                    console.log(`♂️ IDLE: Macho ${this.creature.id} vuelve a IDLE después de reproducirse`);
                 }
             } else {
                 // Si no se pudo reproducir, volver a IDLE
                 this.states.setState(CREATURE_STATES.IDLE);
+                console.log(`❌ IDLE: ${this.creature.id} no pudo reproducirse, vuelve a IDLE`);
             }
         }
     }

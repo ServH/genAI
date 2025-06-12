@@ -72,18 +72,23 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Información de debug en consola
 console.log(`
-GenAI - Simulador de Vida Emergente
-===================================
-Fase: ${CONSTANTS.CURRENT_PHASE} - OPTIMIZADO PARA OBSERVACIÓN
-Objetivo: Sistemas Fundamentales para Evolución
-- Población inicial: 10 criaturas aleatorias con genes únicos
-- Capacidad máxima: 50 criaturas (espacio para reproducción)
-- Reproducción acelerada: Umbral 60% energía, cooldown 3s
-- Crecimiento rápido: Bebé→Juvenil 10s, Juvenil→Adulto 20s
-- Energía balanceada: Drenaje 0.3/s, vida ~333s promedio
-- Símbolos familiares: Cada familia desarrolla su propio símbolo
-- Debug completo: Paneles población + linajes en tiempo real
-¡Observa cómo 10 criaturas crean familias y llenan el mundo!
-Controles: D = Debug, G = Grid, Espacio = Pausa, Mouse = Cámara
-===================================
+🧬 GenAI - CAJA 3 Fase 3.1: Sistema de Género COMPLETADO
+========================================================
+✅ SISTEMA DE GÉNERO IMPLEMENTADO:
+- Género en ADN: 0=macho, 1=hembra
+- 5 machos + 5 hembras fundadores balanceados
+- Solo machos buscan pareja activamente
+- Hembras seleccionan entre pretendientes
+- Selección por genes superiores (velocidad, tamaño, visión)
+- Cooldown para machos rechazados (5s)
+- Máximo 3 pretendientes por hembra
+
+🎮 COMPORTAMIENTOS OBSERVABLES:
+- Machos cortejan a hembras cercanas
+- Hembras evalúan y eligen al mejor macho
+- Solo parejas seleccionadas pueden reproducirse
+- Hembras cuidan bebés (NURSING), machos vuelven a buscar
+
+Controles: D = Debug con estadísticas género, G = Grid, Espacio = Pausa
+========================================================
 `); 

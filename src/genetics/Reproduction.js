@@ -15,61 +15,87 @@ class Reproduction {
         };
         
         this.reproductionCooldowns = new Map(); // creature.id -> timestamp
+        this.rejectionCooldowns = new Map(); // male.id -> timestamp (machos rechazados)
+        this.femaleSelections = new Map(); // female.id -> {suitors: [], selectedMale: null}
+        
         this.stats = {
             totalReproductions: 0,
             successfulMatings: 0,
             failedCompatibility: 0,
-            averageGeneticDistance: 0
+            averageGeneticDistance: 0,
+            maleRejections: 0,
+            femaleSelections: 0
         };
         
-        console.log('Reproduction: Sistema inicializado');
+        console.log('Reproduction: Sistema con género inicializado');
     }
 
     /**
-     * Busca pareja para una criatura
+     * Busca pareja para una criatura (solo machos buscan)
      * @param {Creature} creature - Criatura que busca pareja
      * @param {Array} allCreatures - Todas las criaturas disponibles
-     * @returns {Creature|null} - Pareja encontrada o null
+     * @returns {Creature|null} - Hembra encontrada o null
      */
     findMate(creature, allCreatures) {
+        // Solo los machos buscan pareja
+        if (!creature.dna || !creature.dna.isMale()) {
+            return null;
+        }
+
         // Verificar si puede reproducirse
         if (!this.canReproduce(creature)) {
             return null;
         }
 
-        const potentialMates = allCreatures.filter(other => {
+        // Verificar cooldown de rechazo
+        if (this.isRejected(creature)) {
+            return null;
+        }
+
+        // Buscar hembras disponibles
+        const availableFemales = allCreatures.filter(other => {
             // No puede reproducirse consigo misma
             if (other.id === creature.id) return false;
             
-            // Ambas deben tener DNA
-            if (!other.dna || !creature.dna) return false;
+            // Debe ser hembra
+            if (!other.dna || !other.dna.isFemale()) return false;
             
-            // La pareja también debe poder reproducirse
+            // La hembra también debe poder reproducirse
             if (!this.canReproduce(other)) return false;
             
             // Verificar distancia física
             const distance = this.calculateDistance(creature, other);
             if (distance > this.config.searchRadius) return false;
             
-            // Verificar parentesco (prevenir incesto) - fixfeatures
+            // Verificar parentesco (prevenir incesto)
             if (window.gameLineage && !window.gameLineage.canMate(creature, other)) {
                 return false;
             }
             
-            // Para test: todas las parejas son compatibles
+            // Verificar que la hembra no tenga demasiados pretendientes
+            const selection = this.femaleSelections.get(other.id);
+            if (selection && selection.suitors.length >= CONSTANTS.REPRODUCTION.GENDER.MAX_SUITORS) {
+                return false;
+            }
+            
             return true;
         });
 
-        // Encontrar la pareja más cercana físicamente
-        if (potentialMates.length === 0) {
+        // Encontrar la hembra más cercana
+        if (availableFemales.length === 0) {
             return null;
         }
 
-        return potentialMates.reduce((closest, mate) => {
-            const distanceToMate = this.calculateDistance(creature, mate);
+        const closestFemale = availableFemales.reduce((closest, female) => {
+            const distanceToFemale = this.calculateDistance(creature, female);
             const distanceToClosest = this.calculateDistance(creature, closest);
-            return distanceToMate < distanceToClosest ? mate : closest;
+            return distanceToFemale < distanceToClosest ? female : closest;
         });
+
+        // Registrar al macho como pretendiente
+        this.addSuitor(closestFemale, creature);
+
+        return closestFemale;
     }
 
     /**
@@ -106,31 +132,55 @@ class Reproduction {
     }
 
     /**
-     * Ejecuta la reproducción entre dos criaturas
-     * @param {Creature} parent1 - Primer padre
-     * @param {Creature} parent2 - Segundo padre
-     * @returns {DNA|null} - DNA de la cría o null si falla
+     * Ejecuta la reproducción entre macho y hembra
+     * @param {Creature} male - Macho
+     * @param {Creature} female - Hembra
+     * @returns {Object|null} - Información del offspring o null si falla
      */
-    reproduce(parent1, parent2) {
+    reproduce(male, female) {
+        // Verificar géneros correctos
+        if (!male.dna || !female.dna || !male.dna.isMale() || !female.dna.isFemale()) {
+            console.log(`❌ REPRODUCTION: Géneros incorrectos - ${male.id}:${male.dna?.getGender()}, ${female.id}:${female.dna?.getGender()}`);
+            return null;
+        }
+
         // Verificar que ambos pueden reproducirse
-        if (!this.canReproduce(parent1) || !this.canReproduce(parent2)) {
+        if (!this.canReproduce(male) || !this.canReproduce(female)) {
+            console.log(`❌ REPRODUCTION: No pueden reproducirse - M:${this.canReproduce(male)}, F:${this.canReproduce(female)}`);
+            return null;
+        }
+
+        // Verificar que la hembra haya seleccionado a este macho
+        const selectedMale = this.getSelectedMale(female);
+        if (!selectedMale || selectedMale.id !== male.id) {
+            console.log(`❌ REPRODUCTION: Hembra ${female.id} no seleccionó a macho ${male.id} (seleccionó: ${selectedMale?.id || 'ninguno'})`);
+            return null;
+        }
+
+        // Verificar distancia física
+        const distance = this.calculateDistance(male, female);
+        if (distance > CONSTANTS.CREATURE_STATES.MATING_DISTANCE) {
+            console.log(`❌ REPRODUCTION: Muy lejos - distancia ${distance.toFixed(1)} > ${CONSTANTS.CREATURE_STATES.MATING_DISTANCE}`);
             return null;
         }
 
         // Calcular distancia genética para estadísticas
-        const geneticDistance = GeneticUtils.calculateGeneticDistance(parent1.dna, parent2.dna);
+        const geneticDistance = GeneticUtils.calculateGeneticDistance(male.dna, female.dna);
         
         // Mezclar genes (50/50)
-        const offspringDNA = this.mixGenes(parent1.dna, parent2.dna);
+        const offspringDNA = this.mixGenes(male.dna, female.dna);
         
         // Consumir energía de los padres
-        parent1.energySystem.consume(this.config.energyCost);
-        parent2.energySystem.consume(this.config.energyCost);
+        male.energySystem.consume(this.config.energyCost);
+        female.energySystem.consume(this.config.energyCost);
         
         // Establecer cooldown
         const now = Date.now();
-        this.reproductionCooldowns.set(parent1.id, now);
-        this.reproductionCooldowns.set(parent2.id, now);
+        this.reproductionCooldowns.set(male.id, now);
+        this.reproductionCooldowns.set(female.id, now);
+
+        // Limpiar selección femenina
+        this.clearFemaleSelection(female);
         
         // Actualizar estadísticas
         this.stats.totalReproductions++;
@@ -138,19 +188,31 @@ class Reproduction {
         this.stats.averageGeneticDistance = 
             (this.stats.averageGeneticDistance * (this.stats.successfulMatings - 1) + geneticDistance) / 
             this.stats.successfulMatings;
+
+        // Calcular posición del offspring (punto medio)
+        const offspringX = (male.x + female.x) / 2;
+        const offspringY = (male.y + female.y) / 2;
         
         // Emitir evento
         if (window.eventBus) {
             eventBus.emit('reproduction:successful', {
-                parent1: parent1.id,
-                parent2: parent2.id,
+                parent1: male.id,
+                parent2: female.id,
                 geneticDistance,
                 offspringDNA,
-                parentageData: { parent1, parent2 } // Para establecer parentesco después
+                parentageData: { parent1: male, parent2: female } // Para establecer parentesco después
             });
         }
+
+        console.log(`🧬 REPRODUCTION: Macho ${male.id} + Hembra ${female.id} = offspring en (${offspringX.toFixed(1)}, ${offspringY.toFixed(1)})`);
         
-        return offspringDNA;
+        return {
+            dna: offspringDNA,
+            x: offspringX,
+            y: offspringY,
+            energy: this.config.offspringEnergy,
+            parents: [male, female]
+        };
     }
 
     /**
@@ -206,8 +268,132 @@ class Reproduction {
     getStats() {
         return {
             ...this.stats,
-            activeCooldowns: this.reproductionCooldowns.size
+            activeCooldowns: this.reproductionCooldowns.size,
+            rejectedMales: this.rejectionCooldowns.size,
+            activeFemaleSelections: this.femaleSelections.size
         };
+    }
+
+    /**
+     * Agrega un macho como pretendiente de una hembra
+     * @param {Creature} female - Hembra
+     * @param {Creature} male - Macho pretendiente
+     */
+    addSuitor(female, male) {
+        if (!this.femaleSelections.has(female.id)) {
+            this.femaleSelections.set(female.id, {
+                suitors: [],
+                selectedMale: null,
+                selectionTime: null
+            });
+        }
+
+        const selection = this.femaleSelections.get(female.id);
+        
+        // Agregar macho si no está ya en la lista
+        if (!selection.suitors.find(s => s.id === male.id)) {
+            selection.suitors.push(male);
+            console.log(`💕 SUITOR: Macho ${male.id} corteja a hembra ${female.id} (${selection.suitors.length}/${CONSTANTS.REPRODUCTION.GENDER.MAX_SUITORS})`);
+        }
+
+        // Si es el primer pretendiente o han pasado 2 segundos, hacer selección
+        if (selection.suitors.length === 1 || 
+            (selection.selectionTime && Date.now() - selection.selectionTime > 2000)) {
+            this.performFemaleSelection(female);
+        }
+    }
+
+    /**
+     * La hembra selecciona al mejor macho
+     * @param {Creature} female - Hembra que selecciona
+     */
+    performFemaleSelection(female) {
+        const selection = this.femaleSelections.get(female.id);
+        if (!selection || selection.suitors.length === 0) return;
+
+        // Calcular puntuación para cada pretendiente
+        const scoredSuitors = selection.suitors.map(male => {
+            const distance = this.calculateDistance(female, male);
+            const factors = CONSTANTS.REPRODUCTION.GENDER.SELECTION_FACTORS;
+            
+            // Normalizar valores (0-1, mayor es mejor)
+            const distanceScore = Math.max(0, 1 - (distance / this.config.searchRadius));
+            const speedScore = (male.dna.getGene('SPEED') - 0.5) / 1.5; // 0.5-2.0 -> 0-1
+            const sizeScore = (male.dna.getGene('SIZE') - 0.7) / 0.6;   // 0.7-1.3 -> 0-1
+            const visionScore = (male.dna.getGene('VISION') - 100) / 200; // 100-300 -> 0-1
+            
+            const totalScore = 
+                distanceScore * factors.DISTANCE +
+                speedScore * factors.SPEED +
+                sizeScore * factors.SIZE +
+                visionScore * factors.VISION;
+
+            return { male, score: totalScore, distance };
+        });
+
+        // Seleccionar al mejor macho
+        const bestSuitor = scoredSuitors.reduce((best, current) => 
+            current.score > best.score ? current : best
+        );
+
+        selection.selectedMale = bestSuitor.male;
+        selection.selectionTime = Date.now();
+
+        // Rechazar a los otros machos
+        const rejectedMales = selection.suitors.filter(male => male.id !== bestSuitor.male.id);
+        rejectedMales.forEach(male => this.rejectMale(male));
+
+        // Limpiar lista de pretendientes, mantener solo el elegido
+        selection.suitors = [bestSuitor.male];
+
+        this.stats.femaleSelections++;
+        console.log(`👑 SELECTION: Hembra ${female.id} eligió a macho ${bestSuitor.male.id} (score: ${bestSuitor.score.toFixed(2)})`);
+    }
+
+    /**
+     * Rechaza un macho y aplica cooldown
+     * @param {Creature} male - Macho rechazado
+     */
+    rejectMale(male) {
+        this.rejectionCooldowns.set(male.id, Date.now());
+        this.stats.maleRejections++;
+        console.log(`💔 REJECTED: Macho ${male.id} rechazado, cooldown ${CONSTANTS.REPRODUCTION.GENDER.REJECTION_COOLDOWN}ms`);
+    }
+
+    /**
+     * Verifica si un macho está en cooldown de rechazo
+     * @param {Creature} male - Macho a verificar
+     * @returns {boolean}
+     */
+    isRejected(male) {
+        const rejectionTime = this.rejectionCooldowns.get(male.id);
+        if (!rejectionTime) return false;
+
+        const timeSince = Date.now() - rejectionTime;
+        if (timeSince >= CONSTANTS.REPRODUCTION.GENDER.REJECTION_COOLDOWN) {
+            this.rejectionCooldowns.delete(male.id);
+            return false;
+        }
+
+        return true;
+    }
+
+    /**
+     * Obtiene el macho seleccionado por una hembra
+     * @param {Creature} female - Hembra
+     * @returns {Creature|null} - Macho seleccionado o null
+     */
+    getSelectedMale(female) {
+        const selection = this.femaleSelections.get(female.id);
+        return selection ? selection.selectedMale : null;
+    }
+
+    /**
+     * Limpia selección de una hembra (después de reproducirse)
+     * @param {Creature} female - Hembra
+     */
+    clearFemaleSelection(female) {
+        this.femaleSelections.delete(female.id);
     }
 
     /**
@@ -216,9 +402,25 @@ class Reproduction {
      */
     cleanupCooldowns(aliveCreatureIds) {
         const aliveSet = new Set(aliveCreatureIds);
+        
+        // Limpiar cooldowns de reproducción
         for (const [creatureId] of this.reproductionCooldowns) {
             if (!aliveSet.has(creatureId)) {
                 this.reproductionCooldowns.delete(creatureId);
+            }
+        }
+
+        // Limpiar cooldowns de rechazo
+        for (const [creatureId] of this.rejectionCooldowns) {
+            if (!aliveSet.has(creatureId)) {
+                this.rejectionCooldowns.delete(creatureId);
+            }
+        }
+
+        // Limpiar selecciones femeninas
+        for (const [femaleId] of this.femaleSelections) {
+            if (!aliveSet.has(femaleId)) {
+                this.femaleSelections.delete(femaleId);
             }
         }
     }

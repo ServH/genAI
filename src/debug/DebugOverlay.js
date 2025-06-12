@@ -353,7 +353,7 @@ class DebugOverlay {
     }
 
     /**
-     * Actualiza la sección de reproducción - Fase 3.1
+     * Actualiza la sección de reproducción - Sistema de género
      */
     updateReproduction() {
         const reproductionDiv = document.getElementById('debug-reproduction');
@@ -361,9 +361,8 @@ class DebugOverlay {
         
         let content = '<div class="debug-info">Cargando reproducción...</div>';
         
-        if (window.gameReproduction && window.gameCompatibility) {
+        if (window.gameReproduction) {
             const reproStats = window.gameReproduction.getStats();
-            const compatStats = window.gameCompatibility.getStats();
             
             // Estadísticas de reproducción
             content = `
@@ -372,29 +371,47 @@ class DebugOverlay {
                 <div class="debug-info">Exitosos: ${reproStats.successfulMatings}</div>
                 <div class="debug-info">Cooldowns: ${reproStats.activeCooldowns}</div>
                 <div class="debug-info">Dist. Gen. Prom: ${(reproStats.averageGeneticDistance * 100).toFixed(1)}%</div>
-                <div class="debug-info">--- Compatibilidad ---</div>
-                <div class="debug-info">Checks: ${compatStats.totalChecks}</div>
-                <div class="debug-info">Compatibles: ${compatStats.compatiblePairs}</div>
-                <div class="debug-info">Incompatibles: ${compatStats.incompatiblePairs}</div>
-                <div class="debug-info">Tasa Compat: ${(compatStats.compatibilityRate * 100).toFixed(1)}%</div>
+                <div class="debug-info">--- Sistema Género ---</div>
+                <div class="debug-info">Rechazos: ${reproStats.maleRejections}</div>
+                <div class="debug-info">Selecciones: ${reproStats.femaleSelections}</div>
+                <div class="debug-info">Machos Rechazados: ${reproStats.rejectedMales}</div>
+                <div class="debug-info">Hembras Eligiendo: ${reproStats.activeFemaleSelections}</div>
             `;
             
-            // Estadísticas de estados MATING
+            // Estadísticas de población por género
             if (window.gameEngine && window.gameEngine.creatureManager) {
                 const manager = window.gameEngine.creatureManager;
-                const creatures = manager.getAllCreatures().filter(c => c.isAlive);
+                const creatures = manager.getAllCreatures().filter(c => c.isAlive && c.dna);
+                
+                const males = creatures.filter(c => c.dna.isMale());
+                const females = creatures.filter(c => c.dna.isFemale());
+                const courtingMales = males.filter(c => 
+                    c.behavior && c.behavior.states && 
+                    c.behavior.states.isInState && 
+                    c.behavior.states.isInState(CREATURE_STATES.COURTING)
+                );
                 const matingCount = creatures.filter(c => 
                     c.behavior && c.behavior.states && 
                     c.behavior.states.isInState && 
                     c.behavior.states.isInState(CREATURE_STATES.MATING)
                 ).length;
+                const nursingFemales = females.filter(c => 
+                    c.behavior && c.behavior.states && 
+                    c.behavior.states.isInState && 
+                    c.behavior.states.isInState(CREATURE_STATES.NURSING)
+                );
                 
-                const readyToMate = creatures.filter(c => c.energy >= 80).length;
+                const readyMales = males.filter(c => c.energy >= CONSTANTS.REPRODUCTION.ENERGY_THRESHOLD).length;
+                const readyFemales = females.filter(c => c.energy >= CONSTANTS.REPRODUCTION.ENERGY_THRESHOLD).length;
                 
                 content += `
+                    <div class="debug-info">--- Población ---</div>
+                    <div class="debug-info">Machos: ${males.length} (${readyMales} listos)</div>
+                    <div class="debug-info">Hembras: ${females.length} (${readyFemales} listas)</div>
                     <div class="debug-info">--- Estados ---</div>
+                    <div class="debug-info">Cortejando: ${courtingMales.length}</div>
                     <div class="debug-info">Apareándose: ${matingCount}</div>
-                    <div class="debug-info">Listas (>80E): ${readyToMate}</div>
+                    <div class="debug-info">Cuidando: ${nursingFemales.length}</div>
                 `;
             }
         }
