@@ -4,9 +4,6 @@
  * Performance: Cache de cálculos, throttling de mutaciones, optimización de memoria
  */
 
-import { CONSTANTS } from '../core/Constants.js';
-import { gameRandom } from '../utils/Random.js';
-
 class Mutations {
     constructor() {
         // Performance: Cache de mutaciones recientes para evitar recálculos
@@ -18,7 +15,7 @@ class Mutations {
         this.mutationCooldown = 100; // ms mínimo entre mutaciones
         
         // Funcionalidad: Configuración de mutaciones
-        this.config = CONSTANTS.MUTATIONS;
+        this.config = window.CONSTANTS.MUTATIONS;
     }
 
     /**
@@ -65,7 +62,7 @@ class Mutations {
      * Determina si un gen debe mutar (10% probabilidad)
      */
     shouldMutateGene() {
-        return gameRandom.randomFloat(0, 1) < this.config.PROBABILITY;
+        return window.gameRandom.randomFloat(0, 1) < this.config.PROBABILITY;
     }
 
     /**
@@ -73,7 +70,7 @@ class Mutations {
      */
     mutateGeneValue(currentValue, geneType) {
         const variation = this.config.VARIATION;
-        const change = gameRandom.randomFloat(-variation, variation);
+        const change = window.gameRandom.randomFloat(-variation, variation);
         const newValue = currentValue * (1 + change);
         
         // Aplicar límites según tipo de gen
@@ -118,4 +115,4 @@ class Mutations {
 }
 
 // Instancia global del sistema de mutaciones
-export const gameMutations = new Mutations(); 
+window.gameMutations = new Mutations(); 

@@ -51,12 +51,22 @@ class PerformanceManager {
     async init(renderer) {
         if (this.isInitialized) return;
         
+        console.log('PerformanceManager: Iniciando inicialización...');
+        console.log('Renderer recibido:', renderer ? 'OK' : 'NULL');
+        
         // Inicializar cache de texturas
         if (CONSTANTS.PERFORMANCE.USE_RENDER_TEXTURE) {
-            this.textureCache = new TextureCache();
-            this.textureCache.init(renderer);
-            window.gameTextureCache = this.textureCache;
-            this.optimizations.renderTextures = true;
+            console.log('PerformanceManager: Inicializando TextureCache...');
+            try {
+                this.textureCache = new TextureCache();
+                this.textureCache.init(renderer);
+                window.gameTextureCache = this.textureCache;
+                this.optimizations.renderTextures = true;
+                console.log('PerformanceManager: TextureCache inicializado correctamente');
+            } catch (error) {
+                console.error('PerformanceManager: Error inicializando TextureCache:', error);
+                this.optimizations.renderTextures = false;
+            }
         }
         
         // Configurar modo de optimización
@@ -67,10 +77,8 @@ class PerformanceManager {
         
         this.isInitialized = true;
         
-        if (CONSTANTS.DEBUG.MODE) {
-            console.log('PerformanceManager: Sistema inicializado completamente');
-            console.log('Optimizaciones activas:', this.optimizations);
-        }
+        console.log('PerformanceManager: Sistema inicializado completamente');
+        console.log('Optimizaciones activas:', this.optimizations);
     }
 
     /**
@@ -95,19 +103,15 @@ class PerformanceManager {
      * Desactiva características de debug para mejor performance
      */
     disableDebugFeatures() {
-        // Sobrescribir console.log en modo performance
-        if (!CONSTANTS.DEBUG.VERBOSE_LOGGING) {
-            const originalLog = console.log;
-            console.log = (...args) => {
-                // Solo mostrar logs críticos
-                if (args[0] && args[0].includes('ERROR') || args[0].includes('CRITICAL')) {
-                    originalLog.apply(console, args);
-                }
-            };
-        }
+        // NO sobrescribir console.log para evitar silenciar errores importantes
+        // En su lugar, usar flags para controlar logging específico
         
         this.optimizations.debugMode = false;
         this.optimizations.verboseLogging = false;
+        
+        if (CONSTANTS.DEBUG.MODE) {
+            console.log('PerformanceManager: Características de debug desactivadas');
+        }
     }
 
     /**
