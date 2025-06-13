@@ -131,13 +131,14 @@ class CreatureFactory {
     }
 
     /**
-     * Crea una criatura con DNA específico - Fase 3.1
+     * Crea una criatura con DNA específico - Fase 3.2 (Arquitectura Dual)
      * @param {number} x - Posición X
      * @param {number} y - Posición Y
      * @param {DNA} dna - DNA específico para la criatura
+     * @param {boolean} hasMutation - Flag de mutación (opcional)
      * @returns {Creature} - Nueva criatura con DNA heredado
      */
-    createCreatureWithDNA(x, y, dna) {
+    createCreatureWithDNA(x, y, dna, hasMutation = false) {
         // Validar posición
         if (!this.isValidPosition(x, y)) {
             console.warn('CreatureFactory: Posición inválida para criatura con DNA, ajustando');
@@ -151,6 +152,11 @@ class CreatureFactory {
         
         // Aplicar efectos genéticos del DNA heredado
         Genes.applyToCreature(creature, dna);
+        
+        // Arquitectura Dual: Marcar criatura como mutada si corresponde
+        if (hasMutation) {
+            creature.hasMutation = true;
+        }
         
         // Actualizar estadísticas
         this.creaturesCreated++;

@@ -75,6 +75,12 @@ class CreatureManager {
             const sprite = new CreatureSprite(creature);
             this.sprites.set(creature.id, sprite);
             this.stage.addChild(sprite.getContainer());
+            
+            // Arquitectura Dual: Activar glow de mutación si corresponde
+            if (creature.hasMutation) {
+                sprite.createMutationGlow();
+                console.log(`CreatureManager: Glow de mutación activado para criatura ${creature.id}`);
+            }
         }
         
         console.log(`CreatureManager: Criatura ${creature.id} agregada (${this.creatures.size}/${this.maxCreatures})`);
@@ -204,21 +210,22 @@ class CreatureManager {
     }
 
     /**
-     * Crea una nueva criatura con DNA específico - Fase 3.1
+     * Crea una nueva criatura con DNA específico - Fase 3.2 (Arquitectura Dual)
      * @param {number} x - Posición X
      * @param {number} y - Posición Y  
      * @param {DNA} dna - DNA para la nueva criatura
+     * @param {boolean} hasMutation - Flag de mutación (opcional)
      * @returns {Creature|null} - Nueva criatura o null si falla
      */
-    spawnCreatureWithDNA(x, y, dna) {
+    spawnCreatureWithDNA(x, y, dna, hasMutation = false) {
         if (this.creatures.size >= this.maxCreatures) {
             console.warn('CreatureManager: No se puede crear criatura, máximo alcanzado');
             return null;
         }
 
         try {
-            // Crear criatura con DNA específico
-            const creature = this.factory.createCreatureWithDNA(x, y, dna);
+            // Crear criatura con DNA específico + flag de mutación
+            const creature = this.factory.createCreatureWithDNA(x, y, dna, hasMutation);
             
             if (creature && this.addCreature(creature)) {
                 console.log(`CreatureManager: Criatura ${creature.id} creada con DNA heredado en (${x}, ${y})`);

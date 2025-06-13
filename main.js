@@ -72,32 +72,40 @@ window.addEventListener('unhandledrejection', (event) => {
 
 // Información de debug en consola
 console.log(`
-🔄 GenAI - CAJA 3 Fase 3.1: Sistema de Sincronización Bidireccional COMPLETO
+🧬 GenAI - CAJA 3 Fase 3.2: MUTACIONES (Arquitectura Dual) ✅
 ================================================================
-🎯 NUEVO FLUJO REPRODUCTIVO CON ESTADO COMMITTED:
-1. Macho busca hembra → COURTING
-2. Hembra selecciona macho → COMMITTED (nuevo estado)
-3. Macho se acerca → Sincronización bidireccional → MATING
-4. Verificación completa → Reproducción exitosa
+🎯 SISTEMA DE MUTACIONES IMPLEMENTADO:
+- 10% probabilidad de mutación por gen
+- Variación ±20% del valor actual
+- Glow verde que se desvanece en 5 segundos
+- Límites genéticos para evitar valores extremos
 
-🔄 SINCRONIZACIÓN BIDIRECCIONAL IMPLEMENTADA:
-- Estado COMMITTED agregado para hembras comprometidas
-- Verificación bidireccional antes de reproducción
-- Transición sincronizada a estado MATING
-- Limpieza automática de referencias inconsistentes
+🏗️ ARQUITECTURA DUAL APLICADA:
+✅ Funcionalidad Completa:
+  - Mutations.js: Sistema completo de mutaciones
+  - Glow visual verde brillante
+  - Integración en reproducción sexual
+  - Herencia + mutación en un solo paso
 
-🛠️ ARQUITECTURA MEJORADA:
-- COMMITTED_TIMEOUT: 10s para evitar bloqueos
-- synchronizeMatingTransition(): Solo machos inician transición
-- checkCommittedProcess(): Hembras esperan al macho seleccionado
-- Debug overlay: Muestra "Comprometidas" en tiempo real
+✅ Performance Optimizada:
+  - Cache de mutaciones (evita recálculos)
+  - Throttling de mutaciones (100ms cooldown)
+  - Graphics simples (sin efectos complejos)
+  - Limpieza automática de memoria
 
-🎯 REPRODUCCIÓN ROBUSTA Y FUNCIONAL:
-- Estados claros: COURTING → COMMITTED → MATING → NURSING
-- Referencias bidireccionales verificadas
-- Transiciones sincronizadas
-- ¡Sistema completamente funcional!
+🔬 EVOLUCIÓN VISIBLE:
+- Criaturas mutadas brillan en verde al nacer
+- Genes pueden evolucionar gradualmente
+- Diversidad genética aumenta naturalmente
+- Presión selectiva + mutación = evolución
 
-Controles: D = Debug con estadísticas reproducción, G = Grid, Espacio = Pausa
+🎮 EXPERIENCIA MEJORADA:
+- Mutaciones visualmente obvias
+- Sistema simple pero efectivo
+- Sin impacto en performance
+- Base para evolución compleja
+
+Controles: D = Debug, G = Grid, Espacio = Pausa
+¡Observa las criaturas verdes brillantes - son mutantes!
 ================================================================
 `); 

@@ -212,6 +212,26 @@ const CONSTANTS = {
         }
     },
 
+    // Configuración de Mutaciones - Fase 3.2 (Arquitectura Dual)
+    MUTATIONS: {
+        PROBABILITY: 0.1,           // 10% probabilidad por gen
+        VARIATION: 0.2,             // ±20% variación del valor actual
+        GLOW_DURATION: 5000,        // 5 segundos de glow verde
+        GLOW_COLOR: 0x00ff00,       // Verde brillante
+        GLOW_ALPHA: 0.6,            // Transparencia del glow
+        
+        // Límites para genes mutados (Performance: evita valores extremos)
+        GENE_LIMITS: {
+            SPEED: { min: 0.3, max: 3.0 },
+            SIZE: { min: 0.5, max: 2.0 },
+            VISION: { min: 80, max: 400 },
+            COLOR_R: { min: 0.0, max: 1.0 },
+            COLOR_G: { min: 0.0, max: 1.0 },
+            COLOR_B: { min: 0.0, max: 1.0 },
+            GENDER: { min: 0.0, max: 1.0 }
+        }
+    },
+
     // Configuración de Efectos Visuales - Fase 3.1
     EFFECTS: {
         // Pulsos de búsqueda de pareja
@@ -238,8 +258,8 @@ const CONSTANTS = {
     },
 
     // Versión del proyecto
-    VERSION: "3.1.0-alpha",
-    CURRENT_PHASE: "CAJA 3 - Fase 3.1: Reproducción Básica"
+    VERSION: "3.2.0-alpha",
+    CURRENT_PHASE: "CAJA 3 - Fase 3.2: Mutaciones"
 };
 
 // Hacer disponible globalmente

@@ -210,11 +210,12 @@ class CreatureBehavior {
             const offspringInfo = window.gameReproduction.reproduce(male, female);
             
             if (offspringInfo && window.gameEngine && window.gameEngine.creatureManager) {
-                // Crear nueva criatura con DNA mezclado
+                // Arquitectura Dual: Crear nueva criatura con DNA mezclado + flag de mutación
                 const offspring = window.gameEngine.creatureManager.spawnCreatureWithDNA(
                     offspringInfo.x, 
                     offspringInfo.y, 
-                    offspringInfo.dna
+                    offspringInfo.dna,
+                    offspringInfo.hasMutation  // Fase 3.2: Flag de mutación
                 );
                 
                 if (offspring) {

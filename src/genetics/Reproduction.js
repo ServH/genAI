@@ -1,6 +1,7 @@
 /**
- * Sistema de Reproducción - CAJA 3 Fase 3.1
- * Maneja la reproducción sexual básica con genética
+ * Sistema de Reproducción - CAJA 3 Fase 3.2 (Arquitectura Dual)
+ * Maneja la reproducción sexual básica con genética + mutaciones integradas
+ * Dependencias: Mutations.js (gameMutations global)
  */
 class Reproduction {
     constructor() {
@@ -228,8 +229,10 @@ class Reproduction {
         // Calcular distancia genética para estadísticas
         const geneticDistance = GeneticUtils.calculateGeneticDistance(male.dna, female.dna);
         
-        // Mezclar genes (50/50)
-        const offspringDNA = this.mixGenes(male.dna, female.dna);
+        // Arquitectura Dual: Mezclar genes + aplicar mutaciones
+        const geneResult = this.mixGenes(male.dna, female.dna);
+        const offspringDNA = geneResult.dna;
+        const hasMutation = geneResult.hasMutation;
         
         // Consumir energía de los padres
         male.energySystem.consume(this.config.energyCost);
@@ -273,7 +276,8 @@ class Reproduction {
             x: offspringX,
             y: offspringY,
             energy: this.config.offspringEnergy,
-            parents: [male, female]
+            parents: [male, female],
+            hasMutation: hasMutation  // Arquitectura Dual: Flag de mutación
         };
     }
 
@@ -339,15 +343,15 @@ class Reproduction {
     }
 
     /**
-     * Mezcla los genes de dos padres (50/50)
+     * Mezcla los genes de dos padres (50/50) + Mutaciones (Arquitectura Dual)
      * @param {DNA} dna1 - DNA del primer padre
      * @param {DNA} dna2 - DNA del segundo padre
-     * @returns {DNA} - DNA de la cría
+     * @returns {Object} - { dna: DNA, hasMutation: boolean }
      */
     mixGenes(dna1, dna2) {
         const offspringDNA = new DNA();
         
-        // Mezclar cada gen (50% probabilidad de cada padre)
+        // Funcionalidad: Mezclar cada gen (50% probabilidad de cada padre)
         Object.keys(dna1.genes).forEach(geneName => {
             if (Math.random() < 0.5) {
                 offspringDNA.genes[geneName] = dna1.genes[geneName];
@@ -356,7 +360,16 @@ class Reproduction {
             }
         });
         
-        return offspringDNA;
+        // Arquitectura Dual: Aplicar mutaciones con performance integrada
+        const mutationResult = window.gameMutations.mutateDNA(offspringDNA.genes);
+        
+        // Actualizar DNA con genes mutados
+        offspringDNA.genes = mutationResult.dna;
+        
+        return {
+            dna: offspringDNA,
+            hasMutation: mutationResult.hasMutation
+        };
     }
 
     /**

@@ -26,6 +26,11 @@ class CreatureSprite {
         this.symbolText = null;
         this.lastLineageId = null;
         
+        // Arquitectura Dual: Sistema de glow de mutación (Fase 3.2)
+        this.mutationGlow = null;
+        this.mutationGlowStartTime = null;
+        this.mutationGlowDuration = CONSTANTS.MUTATIONS.GLOW_DURATION;
+        
         this.setupSprite();
         this.updateVisuals();
         
@@ -63,6 +68,9 @@ class CreatureSprite {
         
         // Actualizar símbolo familiar - fixfeatures
         this.updateFamilySymbol();
+        
+        // Arquitectura Dual: Actualizar glow de mutación
+        this.updateMutationGlow(deltaTime);
         
         // Redibujar forma orgánica
         this.updateVisuals();
@@ -196,6 +204,90 @@ class CreatureSprite {
         this.graphics.beginFill(centerColor, centerAlpha);
         this.graphics.drawCircle(0, 0, centerRadius);
         this.graphics.endFill();
+        
+        // Arquitectura Dual: Agregar glow de mutación si está activo
+        this.addMutationGlow();
+    }
+
+    /**
+     * Arquitectura Dual: Actualiza el glow de mutación (Fase 3.2)
+     * Funcionalidad: Glow verde que se desvanece en 5 segundos
+     * Performance: Solo actualiza si hay glow activo
+     */
+    updateMutationGlow(deltaTime) {
+        // Performance: Solo procesar si hay glow activo
+        if (!this.mutationGlowStartTime) return;
+        
+        const now = Date.now();
+        const elapsed = now - this.mutationGlowStartTime;
+        
+        // Funcionalidad: Remover glow después de duración
+        if (elapsed >= this.mutationGlowDuration) {
+            this.removeMutationGlow();
+        }
+    }
+
+    /**
+     * Arquitectura Dual: Crea glow de mutación
+     * Funcionalidad: Glow verde brillante
+     * Performance: Graphics simple, sin efectos complejos
+     */
+    createMutationGlow() {
+        // Performance: Solo crear si no existe
+        if (this.mutationGlow) return;
+        
+        this.mutationGlow = new PIXI.Graphics();
+        this.mutationGlowStartTime = Date.now();
+        
+        // Agregar al container
+        this.container.addChild(this.mutationGlow);
+        
+        console.log(`CreatureSprite: Glow de mutación creado para criatura ${this.creature.id}`);
+    }
+
+    /**
+     * Arquitectura Dual: Agrega glow visual durante renderizado
+     * Performance: Solo si glow está activo
+     */
+    addMutationGlow() {
+        // Performance: Solo procesar si hay glow activo
+        if (!this.mutationGlow || !this.mutationGlowStartTime) return;
+        
+        const now = Date.now();
+        const elapsed = now - this.mutationGlowStartTime;
+        const progress = elapsed / this.mutationGlowDuration;
+        
+        // Funcionalidad: Alpha que se desvanece (1.0 → 0.0)
+        const alpha = CONSTANTS.MUTATIONS.GLOW_ALPHA * (1 - progress);
+        
+        if (alpha <= 0) {
+            this.removeMutationGlow();
+            return;
+        }
+        
+        // Performance: Graphics simple
+        this.mutationGlow.clear();
+        this.mutationGlow.beginFill(CONSTANTS.MUTATIONS.GLOW_COLOR, alpha);
+        
+        // Obtener escala de crecimiento
+        const growthScale = this.creature.growth ? this.creature.growth.getScale() : 1.0;
+        const glowRadius = this.baseRadius * 1.3 * growthScale; // 30% más grande que la criatura
+        
+        this.mutationGlow.drawCircle(0, 0, glowRadius);
+        this.mutationGlow.endFill();
+    }
+
+    /**
+     * Arquitectura Dual: Remueve glow de mutación
+     * Performance: Limpieza completa de memoria
+     */
+    removeMutationGlow() {
+        if (this.mutationGlow) {
+            this.container.removeChild(this.mutationGlow);
+            this.mutationGlow.destroy();
+            this.mutationGlow = null;
+        }
+        this.mutationGlowStartTime = null;
     }
 
     /**
@@ -319,6 +411,9 @@ class CreatureSprite {
      * Destruye el sprite y limpia recursos
      */
     destroy() {
+        // Arquitectura Dual: Limpiar glow de mutación
+        this.removeMutationGlow();
+        
         // Limpiar símbolo familiar
         if (this.symbolText) {
             this.container.removeChild(this.symbolText);
