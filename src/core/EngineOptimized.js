@@ -83,7 +83,7 @@ class EngineOptimized {
             
             // Inicializar sistema de performance PRIMERO
             this.performanceManager = new PerformanceManager();
-            await this.performanceManager.init(this.renderer.getApp().renderer);
+            await this.performanceManager.init(this.renderer.getRenderer());
             window.gamePerformanceManager = this.performanceManager;
             
             // Crear contenedor del mundo
@@ -417,5 +417,9 @@ class EngineOptimized {
     }
 }
 
+// Crear instancia global
+const gameEngine = new EngineOptimized();
+
 // Hacer disponible globalmente
-window.EngineOptimized = EngineOptimized; 
+window.EngineOptimized = EngineOptimized;
+window.gameEngine = gameEngine; 
