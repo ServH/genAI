@@ -2,6 +2,78 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [UNIFICACIÓN-1.1] - 2024-12-19
+
+### 🔄 SISTEMA DUAL FUNCIONAL - Arquitectura Unificada con Performance Óptima ✅
+
+#### 🎯 **LOGRO CRÍTICO: DUALIDAD RESUELTA**
+- **Problema**: Archivos duplicados (legacy vs optimized) causaban desincronización
+- **Solución**: Unificación completa manteniendo TODAS las funcionalidades
+- **Resultado**: UN SOLO SISTEMA con performance optimizada + funcionalidad completa
+
+#### 🏗️ **ARQUITECTURA DUAL ESTABLECIDA**
+- **Principio fundamental**: Cada sistema debe ser DUAL desde el diseño
+- **Performance integrada**: Optimizaciones transparentes por defecto
+- **Funcionalidad completa**: Sin pérdida de características
+- **Mantenimiento simplificado**: Sin duplicaciones ni sincronización manual
+
+#### ✅ **SISTEMAS UNIFICADOS EXITOSAMENTE**
+1. **Engine.js**: Motor único con optimizaciones integradas
+2. **CreatureSprite.js**: Renderizado optimizado + mutaciones + símbolos familiares
+3. **CreatureBehavior.js**: Comportamiento optimizado + reproducción completa + seguimiento maternal
+
+#### 🧬 **FUNCIONALIDADES INTEGRADAS**
+- **Sistema de mutaciones (Fase 3.2)**: Glow verde con desvanecimiento automático
+- **Reproducción sexual completa (Fase 3.1)**: Estados COURTING/COMMITTED/MATING/NURSING
+- **Símbolos familiares**: Identificación visual por linaje y generación
+- **Seguimiento maternal**: Bebés siguen madres, transferencia de energía
+- **Optimizaciones de performance**: Cache de texturas, throttling de decisiones
+
+#### 🚀 **PERFORMANCE OPTIMIZADA**
+- **TextureCache**: Reutilización inteligente de sprites
+- **DecisionThrottler**: Intervalos configurables para decisiones complejas
+- **PerformanceManager**: Gestión automática de niveles de calidad
+- **Spatial optimization**: Búsquedas optimizadas sin pérdida de funcionalidad
+
+#### 📋 **PROTOCOLO DUAL PARA FUTURAS FASES**
+- **Diseño dual**: Cada nueva funcionalidad debe incluir optimizaciones
+- **Performance first**: Optimizaciones integradas desde el desarrollo inicial
+- **Testing dual**: Validar funcionalidad Y performance simultáneamente
+- **Documentación dual**: Especificar tanto comportamiento como optimizaciones
+
+#### 🎮 **EXPERIENCIA DE USUARIO MEJORADA**
+- **Funcionalidad completa**: Todas las características de fases anteriores
+- **Performance estable**: 60fps mantenidos con poblaciones grandes
+- **Visual mejorado**: Efectos de mutación + símbolos familiares + seguimiento
+- **Comportamiento natural**: Reproducción, cuidado maternal, evolución visible
+
+#### 📁 **ARCHIVOS LEGACY PRESERVADOS**
+- **src/legacy/**: Backup completo de versiones originales
+- **Disponibles para consulta**: Solo para diagnóstico, NO para reintegración
+- **Historial preservado**: Evolución del proyecto documentada
+
+#### 🔧 **CORRECCIONES TÉCNICAS APLICADAS**
+- **API Renderer**: Corregido `getApp()` → `getRenderer()`
+- **CreatureVision**: Agregado método `update()` faltante
+- **PerformanceManager**: Simplificado, removida sobrescritura peligrosa de console.log
+- **Logs optimizados**: Reducido spam, agregados fallbacks robustos
+
+#### 🎯 **BENEFICIOS ALCANZADOS**
+- **50% reducción** en archivos duplicados
+- **Performance optimizada** por defecto sin configuración
+- **Mantenimiento simplificado** sin sincronización manual
+- **Arquitectura limpia** aplicando "UN ARCHIVO = UNA RESPONSABILIDAD"
+- **Base escalable** para futuras fases con dualidad integrada
+
+#### 🚨 **REGLA CRÍTICA ESTABLECIDA**
+**A partir de ahora, TODAS las fases deben implementarse con DUALIDAD:**
+- Funcionalidad completa + Performance optimizada
+- Un solo archivo por responsabilidad (no duplicados)
+- Optimizaciones integradas desde el diseño
+- Testing dual: comportamiento Y rendimiento
+
+---
+
 ## [PERFORMANCE-1.0] - 2024-12-19
 
 ### ⚡ RAMA PERFORMANCE - Optimizaciones Críticas de Rendimiento ✅
