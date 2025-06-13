@@ -157,6 +157,7 @@ class Creature {
         
         if (window.eventBus) {
             eventBus.emit('creature:died', { 
+                creature: this,
                 id: this.id,
                 cause: cause,
                 age: this.age

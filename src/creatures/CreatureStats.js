@@ -26,6 +26,37 @@ class CreatureStats {
             uniqueGenes: new Set(),
             totalGenes: 0
         };
+        
+        // Configurar event listeners para registrar nacimientos y muertes
+        this.setupEventListeners();
+    }
+    
+    /**
+     * Configura los event listeners para registrar eventos de población
+     */
+    setupEventListeners() {
+        if (window.eventBus) {
+            // Escuchar nacimientos
+            window.eventBus.on('creature:offspring_born', (data) => {
+                if (data.offspring) {
+                    this.recordBirth(data.offspring);
+                }
+            });
+            
+            // Escuchar muertes
+            window.eventBus.on('creature:died', (data) => {
+                if (data.creature) {
+                    this.recordDeath(data.creature);
+                }
+            });
+            
+            // También escuchar spawns normales (no reproductivos)
+            window.eventBus.on('creature:born', (data) => {
+                if (data.creature) {
+                    this.recordBirth(data.creature);
+                }
+            });
+        }
     }
     
     /**
@@ -275,15 +306,24 @@ class CreatureStats {
      */
     recordBirth(creature) {
         this.populationMetrics.births++;
-        if (creature.generation !== undefined) {
+        
+        // Registrar generación si está disponible
+        if (creature.generation !== undefined && creature.generation !== null) {
             this.populationMetrics.generationSum += creature.generation;
+        } else {
+            // Si no tiene generación, asumir generación 0 (fundador)
+            this.populationMetrics.generationSum += 0;
         }
+        
+        // Registrar información genética si está disponible
         if (creature.dna) {
             this.populationMetrics.totalGenes++;
             // Crear hash simple del DNA para diversidad
             const geneHash = JSON.stringify(creature.dna.genes);
             this.populationMetrics.uniqueGenes.add(geneHash);
         }
+        
+        console.log(`📊 STATS: Nacimiento registrado - Total: ${this.populationMetrics.births}, Gen: ${creature.generation || 0}`);
     }
 
     /**
@@ -291,9 +331,17 @@ class CreatureStats {
      */
     recordDeath(creature) {
         this.populationMetrics.deaths++;
-        if (creature.age !== undefined) {
+        
+        // Registrar edad/tiempo de vida si está disponible
+        if (creature.age !== undefined && creature.age !== null) {
             this.populationMetrics.totalLifespan += creature.age;
+        } else if (creature.birthTime) {
+            // Calcular edad basada en tiempo de nacimiento
+            const age = (Date.now() - creature.birthTime) / 1000; // segundos
+            this.populationMetrics.totalLifespan += age;
         }
+        
+        console.log(`💀 STATS: Muerte registrada - Total: ${this.populationMetrics.deaths}, Edad: ${creature.age || 'N/A'}`);
     }
 
     /**
