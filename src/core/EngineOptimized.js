@@ -125,10 +125,7 @@ class EngineOptimized {
             this.creatureManager = new CreatureManager();
             await this.creatureManager.init(this.worldContainer, this.camera);
             
-            // Configurar modo optimizado en CreatureManager
-            if (this.useOptimizedSystems) {
-                this.creatureManager.setOptimizedMode(true);
-            }
+            // Nota: Las optimizaciones se aplican automáticamente por la carga de archivos optimizados
             
             // Hacer creatureManager disponible globalmente para reproducción
             window.gameEngine = this;
