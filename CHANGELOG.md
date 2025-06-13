@@ -2,6 +2,87 @@
 
 Registro detallado de cambios por fase del proyecto GenAI.
 
+## [PERFORMANCE-1.0] - 2024-12-19
+
+### ⚡ RAMA PERFORMANCE - Optimizaciones Críticas de Rendimiento ✅
+
+#### 🚨 **PROBLEMAS DE PERFORMANCE SOLUCIONADOS**
+- **Renderizado de Sprites (Crítico)**: CreatureSprite.js redibujaba formas orgánicas complejas cada frame
+- **Detección O(N²)**: Búsquedas de pareja y comida ejecutándose 60 veces por segundo
+- **Logs Excesivos**: console.log y eventos de debug impactando performance
+- **Memoria creciente**: Sin reutilización de texturas ni cache de recursos
+
+#### ⚡ **SISTEMAS DE OPTIMIZACIÓN IMPLEMENTADOS**
+
+##### 🎨 **Sistema de Cache de Texturas (TextureCache.js - 120 líneas)**
+- **Cache inteligente**: RenderTextures reutilizables basadas en DNA y características
+- **Claves únicas**: Generación por DNA, etapa de crecimiento y nivel de energía
+- **Sistema LRU**: Límite configurable con limpieza automática de cache
+- **Reutilización**: Texturas similares compartidas entre criaturas
+
+##### ⏱️ **Sistema de Throttling (CreatureDecisionThrottler.js - 120 líneas)**
+- **Decisiones throttled**: Intervalos de 0.5-1.0 segundos para decisiones complejas
+- **Sistema de prioridades**: Cola de decisiones pendientes con importancia
+- **Limpieza automática**: Decisiones obsoletas eliminadas automáticamente
+- **Configuración flexible**: Intervalos ajustables por tipo de decisión
+
+##### 🎭 **Sprite Optimizado (CreatureSpriteOptimized.js - 120 líneas)**
+- **RenderTexture**: Elimina redibujado constante de formas orgánicas
+- **Updates mínimos**: Solo posición, opacidad y rotación sutil
+- **Regeneración inteligente**: Solo en cambios importantes (crecimiento)
+- **Animación sutil**: Efecto "respiración" manteniendo sensación de vida
+
+##### 🧠 **Comportamiento Optimizado (CreatureBehaviorOptimized.js - 120 líneas)**
+- **Throttling integrado**: Decisiones complejas con intervalos configurables
+- **Cache de búsquedas**: Resultados válidos por 1 segundo
+- **Movimiento fluido**: Siempre actualizado, decisiones throttled
+- **Prioridades dinámicas**: Pareja vs comida según contexto
+
+##### 📊 **Gestor de Performance (PerformanceManager.js - 120 líneas)**
+- **Coordinador central**: Gestión automática de todas las optimizaciones
+- **Monitoreo FPS**: Detección automática de caídas de rendimiento
+- **Niveles adaptativos**: Performance, Balanced, Quality según hardware
+- **Optimización automática**: Ajustes dinámicos basados en métricas
+
+##### 🚀 **Motor Optimizado (EngineOptimized.js - 120 líneas)**
+- **Gameloop optimizado**: Medición de frameTime y optimizaciones automáticas
+- **Updates throttled**: Sistemas no críticos con intervalos configurables
+- **Integración completa**: Coordinación de todos los sistemas de performance
+- **Verificación periódica**: Análisis de performance cada 5 segundos
+
+#### 🔧 **CONFIGURACIÓN CENTRALIZADA (Constants.js)**
+- **DEBUG.MODE**: Flag para activar/desactivar modo performance
+- **PERFORMANCE**: Configuración completa de throttling, cache y optimizaciones
+- **Parámetros ajustables**: Intervalos, límites de cache, niveles de calidad
+
+#### 📁 **ARCHIVOS NUEVOS CREADOS**
+- `src/rendering/TextureCache.js` - Sistema de cache de texturas
+- `src/creatures/CreatureDecisionThrottler.js` - Throttling de decisiones
+- `src/creatures/CreatureSpriteOptimized.js` - Renderizado optimizado
+- `src/creatures/CreatureBehaviorOptimized.js` - Comportamiento optimizado
+- `src/systems/PerformanceManager.js` - Gestión central de performance
+- `src/core/EngineOptimized.js` - Motor con optimizaciones integradas
+
+#### 📁 **ARCHIVOS MODIFICADOS**
+- `src/core/Constants.js` - Configuración de performance agregada
+- `index.html` - Integración de 6 nuevos módulos de performance
+
+#### 🎯 **MEJORAS DE RENDIMIENTO ESPERADAS**
+- **Renderizado**: 70-80% reducción en redibujado de sprites
+- **Decisiones**: 60-70% reducción en cálculos O(N²)
+- **Memoria**: Cache inteligente con límites configurables
+- **FPS**: Mantenimiento estable >50fps con poblaciones grandes
+- **Escalabilidad**: Soporte para 100+ criaturas simultáneas
+
+#### 🏗️ **ARQUITECTURA MANTENIDA**
+- ✅ **UN ARCHIVO = UNA RESPONSABILIDAD**: Cada módulo <120 líneas
+- ✅ **Sistemas independientes**: Comunicación vía EventBus
+- ✅ **Configuración centralizada**: Constants.js para todos los parámetros
+- ✅ **Compatibilidad**: Sistemas existentes sin modificación
+- ✅ **Modularidad**: Optimizaciones activables/desactivables
+
+---
+
 ## [3.1.10-alpha] - 2024-12-19
 
 ### 🔧 CAJA 3 - Fase 3.1: CORRECCIÓN SISTEMA DE LINAJES Y CUIDADO MATERNAL ✅
