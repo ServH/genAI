@@ -25,11 +25,34 @@ const CONSTANTS = {
         BORDER_MARGIN: 50 // Margen para rebote suave
     },
 
-    // Configuración de Debug
+    // Configuración de Debug y Performance
     DEBUG: {
         SHOW_FPS: true,
         SHOW_ENTITY_COUNT: true,
-        UPDATE_INTERVAL: 100 // ms
+        UPDATE_INTERVAL: 100, // ms
+        MODE: false, // Flag global para debug (false = performance mode)
+        VERBOSE_LOGGING: false, // Logs detallados
+        EMIT_RENDER_EVENTS: false // Eventos de renderizado
+    },
+
+    // Configuración de Performance
+    PERFORMANCE: {
+        // Throttling de decisiones
+        DECISION_COOLDOWN_MIN: 0.5, // segundos mínimo entre decisiones
+        DECISION_COOLDOWN_MAX: 1.0, // segundos máximo entre decisiones
+        
+        // Renderizado optimizado
+        USE_RENDER_TEXTURE: true, // Usar RenderTexture para sprites
+        TEXTURE_CACHE_SIZE: 100, // Máximo texturas en cache
+        REDRAW_ON_STAGE_CHANGE: true, // Solo redibujar en cambios importantes
+        
+        // Búsqueda optimizada
+        SPATIAL_GRID_SIZE: 100, // Tamaño de grid espacial
+        MAX_SEARCH_DISTANCE: 300, // Distancia máxima de búsqueda
+        
+        // Batching de operaciones
+        BATCH_SIZE: 10, // Operaciones por batch
+        BATCH_INTERVAL: 16 // ms entre batches (60fps)
     },
 
     // Colores del Proyecto

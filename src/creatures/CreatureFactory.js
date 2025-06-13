@@ -77,6 +77,11 @@ class CreatureFactory {
                 gender: gender,
                 total: this.creaturesCreated
             });
+            
+            // Emitir evento de nacimiento para estadísticas
+            eventBus.emit('creature:born', {
+                creature: creature
+            });
         }
         
         return creature;
@@ -160,6 +165,11 @@ class CreatureFactory {
                 y: y,
                 dna: dna,
                 total: this.creaturesCreated
+            });
+            
+            // Emitir evento de nacimiento para estadísticas
+            eventBus.emit('creature:born', {
+                creature: creature
             });
         }
         
