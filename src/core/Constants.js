@@ -18,7 +18,7 @@ const CONSTANTS = {
     WORLD: {
         CHUNK_SIZE: 500,
         MAX_ENTITIES: 500,
-        INITIAL_CREATURES: 10, // 10 criaturas iniciales aleatorias
+        INITIAL_CREATURES: 100, // 10 criaturas iniciales aleatorias
         WIDTH: 1200,  // Mundo fijo más grande
         HEIGHT: 800, // Mundo fijo más grande
         BORDER_TYPE: 'wall', // 'wall', 'wrap', o 'infinite'
@@ -67,8 +67,8 @@ const CONSTANTS = {
 
     // Configuración de Criaturas
     CREATURES: {
-        INITIAL_COUNT: 10, // 10 criaturas iniciales aleatorias
-        MAX_COUNT: 50, // Capacidad máxima para reproducción
+        INITIAL_COUNT: 100, // 10 criaturas iniciales aleatorias
+        MAX_COUNT: 500, // Capacidad máxima para reproducción
         BASE_RADIUS: 20,
         MIN_SPEED: 20, // px/s
         MAX_SPEED: 80, // px/s
@@ -102,12 +102,17 @@ const CONSTANTS = {
 
     // Configuración de Recursos
     RESOURCES: {
-        MAX_FOOD: 20,
+        MAX_FOOD: 200,
         SPAWN_INTERVAL: 2000, // ms - cada 2 segundos
         ENERGY_VALUE: 30, // energía que restaura cada comida
         DETECTION_RADIUS: 50, // px - radio de detección
         FOOD_RADIUS_MIN: 8,
-        FOOD_RADIUS_MAX: 12,
+        FOOD_RADIUS_MAX: 10,
+        SIZE_TABLE: [
+            { radius: 6, energy: 15 },
+            { radius: 8, energy: 25 },
+            { radius: 10, energy: 35 }
+        ],
         INITIAL_FOOD_RATIO: 0.3 // 30% del máximo al inicio
     },
 

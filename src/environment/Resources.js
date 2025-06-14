@@ -131,13 +131,16 @@ class Resources {
         const worldWidth = window.innerWidth - margin * 2;
         const worldHeight = window.innerHeight - margin * 2;
         
+        const table = CONSTANTS.RESOURCES.SIZE_TABLE || [ { radius: 8, energy: 25 } ];
+        const entry = table[Math.floor(Math.random() * table.length)];
+        
         return {
             id: this.generateId(),
             x: margin + Math.random() * worldWidth,
             y: margin + Math.random() * worldHeight,
-            energyValue: this.energyValue,
-            radius: 8 + Math.random() * 4, // 8-12px
-            color: CONSTANTS.COLORS ? CONSTANTS.COLORS.FOOD : 0xFFD700,
+            energyValue: entry.energy,
+            radius: entry.radius,
+            color: CONSTANTS.COLORS ? CONSTANTS.COLORS.FOOD_GOLD || 0xFFD700 : 0xFFD700,
             age: 0,
             pulsePhase: Math.random() * Math.PI * 2 // Para animación
         };

@@ -1155,6 +1155,27 @@ Las criaturas ahora consultan solo los alimentos dentro de la mitad frontal de s
 
 ---
 
+## [opt-0.5-alpha] - 2025-06-14
+
+### 🎨 CAJA OPTIMIZACIÓN - Fase O.9: Normalización tamaño de comida ✅
+
+#### 🚀 **MEJORA PRINCIPAL**
+Implementada tabla de tamaños (`SIZE_TABLE`) que garantiza que las criaturas sean siempre más grandes que la comida, manteniendo la legibilidad visual.
+
+#### 🛠️ **IMPLEMENTACIÓN**
+- `Constants.RESOURCES` añade `SIZE_TABLE` y ajusta `FOOD_RADIUS_MAX`.
+- `Resources.createFoodItem()` elige tamaño/energía de la tabla.
+
+#### 📈 **RESULTADOS**
+• Visual coherente: comida claramente más pequeña que incluso crías.  
+• Energía ganada proporcional al tamaño del alimento.
+
+#### 📁 **Archivos Modificados**
+- `src/core/Constants.js`  
+- `src/environment/Resources.js`
+
+---
+
 ## 📋 Próximas Fases
 
 ### CAJA 2 - Fase 2.2: Comida Básica
