@@ -10,6 +10,7 @@ class CreatureGrowth {
         this.creature = creature;
         this.currentStage = null;
         this.baseScale = 1.0;
+        this.accumulator = 0; // 🔧 OPTIM O.7: update throttling
         
         // Determinar etapa inicial basada en edad
         this.updateGrowthStage();
@@ -22,6 +23,11 @@ class CreatureGrowth {
      */
     update(deltaTime) {
         if (!this.creature.isAlive) return;
+        
+        // 🔧 O.7: solo actualizar cada 0.5s
+        this.accumulator += deltaTime;
+        if (this.accumulator < 0.5) return;
+        this.accumulator = 0;
         
         const previousStage = this.currentStage;
         this.updateGrowthStage();

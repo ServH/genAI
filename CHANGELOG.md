@@ -1113,6 +1113,25 @@ M ≪ N).
 
 ---
 
+## [opt-0.3-alpha] - 2025-06-14
+
+### 🔧 CAJA OPTIMIZACIÓN - Fase O.7: Throttling de CreatureGrowth ✅
+
+#### 🚀 **MEJORA PRINCIPAL**
+`CreatureGrowth.update()` ahora se ejecuta cada 0.5 s en lugar de cada frame, reduciendo ~60× las comprobaciones de etapa y los logs relacionados. El sistema emite eventos de cambio de etapa con la misma fiabilidad y sin impacto visible.
+
+#### 🛠️ **IMPLEMENTACIÓN**
+- Añadido `accumulator` para acumular `deltaTime` y retornar temprano si < 0.5 s.
+
+#### 📈 **RESULTADOS**
+• ~1 ms menos por frame en simulaciones con 500 criaturas.  
+• Menos tráfico en EventBus y consola.
+
+#### 📁 **Archivo Modificado**
+- `src/creatures/CreatureGrowth.js`
+
+---
+
 ## 📋 Próximas Fases
 
 ### CAJA 2 - Fase 2.2: Comida Básica
