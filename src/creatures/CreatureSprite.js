@@ -33,6 +33,23 @@ class CreatureSprite {
     }
 
     /**
+     * Resetea un sprite para ser reutilizado con una nueva criatura.
+     * @param {Creature} newCreature - La nueva criatura a la que este sprite representará.
+     */
+    reset(newCreature) {
+        this.creature = newCreature;
+        
+        // Resetear propiedades visuales y de animación
+        this.animationTime = Math.random() * Math.PI * 2;
+        this.lastLineageId = null; // Forzar actualización del símbolo
+        
+        // Actualizar el estado visual inmediatamente
+        this.update(0);
+        
+        console.log(`CreatureSprite: Sprite para ${this.creature.id} reseteado.`);
+    }
+
+    /**
      * Configura la estructura del sprite
      */
     setupSprite() {

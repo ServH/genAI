@@ -1,6 +1,6 @@
 /**
  * GenAI - Manager de Criaturas
- * CAJA 2 - Fase 2.2: Comida Básica (Refactorizado)
+ * CAJA 2 - Fase 2.2: Comida Básica (Refactorizado con Pooling)
  * 
  * Gestión del pool de criaturas y sprites con sistemas modulares
  */
@@ -18,9 +18,9 @@ class CreatureManager {
         // Referencias del sistema
         this.stage = null;
         this.camera = null;
-        this.factory = null;
         
         // Sistemas modulares
+        this.pool = null; // OPTIMIZATION: El pool gestionará los objetos
         this.lifecycle = new CreatureLifecycle(this);
         this.stats = new CreatureStats(this);
         
@@ -37,16 +37,21 @@ class CreatureManager {
         this.stage = stage;
         this.camera = camera;
         
-        // Crear factory
-        this.factory = new CreatureFactory();
-        this.lifecycle.setFactory(this.factory);
+        // Crear factory y pool
+        const factory = new CreatureFactory();
+        this.pool = new CreaturePool(factory, this.stage);
         
-        // Spawn inicial de criaturas
+        // Pre-calentar el pool con el número máximo de criaturas
+        this.pool.prewarm(this.maxCreatures);
+        
+        this.lifecycle.setFactory(factory);
+        
+        // Spawn inicial de criaturas usando el pool
         await this.lifecycle.spawnInitialCreatures(this.initialCount);
         
         this.isInitialized = true;
         
-        console.log(`CreatureManager: Inicializado con ${this.creatures.size} criaturas`);
+        console.log(`CreatureManager: Inicializado con ${this.creatures.size} criaturas activas. Pool listo.`);
         
         if (window.eventBus) {
             eventBus.emit('creatures:initialized', {
@@ -56,28 +61,21 @@ class CreatureManager {
         }
     }
 
-
-
     /**
-     * Agrega una criatura al manager
+     * Activa una criatura del pool. No crea nuevos objetos.
+     * @param {Creature} creature - La criatura a activar.
      */
-    addCreature(creature) {
+    activateCreature(creature, sprite) {
         if (this.creatures.size >= this.maxCreatures) {
             console.warn('CreatureManager: Máximo de criaturas alcanzado');
             return false;
         }
         
-        // Agregar criatura al pool
+        // Agregar al mapa de activos
         this.creatures.set(creature.id, creature);
-        
-        // Crear sprite si tenemos stage
-        if (this.stage) {
-            const sprite = new CreatureSprite(creature);
-            this.sprites.set(creature.id, sprite);
-            this.stage.addChild(sprite.getContainer());
-        }
-        
-        console.log(`CreatureManager: Criatura ${creature.id} agregada (${this.creatures.size}/${this.maxCreatures})`);
+        this.sprites.set(creature.id, sprite);
+
+        // El sprite ya está en el stage, solo se hace visible por el pool
         
         if (window.eventBus) {
             eventBus.emit('creatures:added', {
@@ -90,25 +88,19 @@ class CreatureManager {
     }
 
     /**
-     * Remueve una criatura del manager
+     * Libera una criatura de vuelta al pool. No la destruye.
+     * @param {string} creatureId - El ID de la criatura a liberar.
      */
-    removeCreature(creatureId) {
+    releaseCreature(creatureId) {
         const creature = this.creatures.get(creatureId);
         if (!creature) return false;
         
-        // Remover sprite
-        const sprite = this.sprites.get(creatureId);
-        if (sprite) {
-            this.stage.removeChild(sprite.getContainer());
-            sprite.destroy();
-            this.sprites.delete(creatureId);
-        }
+        // Devolver al pool
+        this.pool.release(creature);
         
-        // Remover criatura
-        creature.destroy();
+        // Remover de los mapas activos
         this.creatures.delete(creatureId);
-        
-        console.log(`CreatureManager: Criatura ${creatureId} removida (${this.creatures.size}/${this.maxCreatures})`);
+        this.sprites.delete(creatureId);
         
         if (window.eventBus) {
             eventBus.emit('creatures:removed', {
@@ -204,7 +196,7 @@ class CreatureManager {
     }
 
     /**
-     * Crea una nueva criatura con DNA específico - Fase 3.1
+     * Crea una nueva criatura con DNA específico usando el pool.
      * @param {number} x - Posición X
      * @param {number} y - Posición Y  
      * @param {DNA} dna - DNA para la nueva criatura
@@ -216,44 +208,50 @@ class CreatureManager {
             return null;
         }
 
+        const pooledObjects = this.pool.acquire();
+        if (!pooledObjects) {
+            return null; // El pool está vacío
+        }
+
+        const { creature, sprite } = pooledObjects;
+
         try {
-            // Crear criatura con DNA específico
-            const creature = this.factory.createCreatureWithDNA(x, y, dna);
+            // Resetear y activar la criatura del pool
+            creature.reset(x, y, dna);
+            sprite.reset(creature);
             
-            if (creature && this.addCreature(creature)) {
-                console.log(`CreatureManager: Criatura ${creature.id} creada con DNA heredado en (${x}, ${y})`);
-                
-                if (window.eventBus) {
-                    eventBus.emit('creature:spawned_with_dna', {
-                        id: creature.id,
-                        position: { x, y },
-                        dna: dna,
-                        parentCount: this.creatures.size
-                    });
-                }
-                
-                return creature;
+            // Activarla directamente en los mapas
+            this.creatures.set(creature.id, creature);
+            this.sprites.set(creature.id, sprite);
+
+            console.log(`CreatureManager: Criatura ${creature.id} reutilizada con DNA heredado en (${x}, ${y})`);
+            
+            if (window.eventBus) {
+                eventBus.emit('creature:spawned_with_dna', {
+                    id: creature.id,
+                    position: { x, y },
+                    dna: dna,
+                    parentCount: this.creatures.size
+                });
             }
+            
+            return creature;
         } catch (error) {
-            console.error('CreatureManager: Error creando criatura con DNA:', error);
+            console.error('CreatureManager: Error reutilizando criatura con DNA:', error);
+            // Si algo falla, devolver los objetos al pool
+            this.pool.release(creature);
         }
         
         return null;
     }
 
-
-
     /**
      * Destruye el manager y limpia recursos
      */
     destroy() {
-        // Destruir todas las criaturas y sprites
-        for (const sprite of this.sprites.values()) {
-            sprite.destroy();
-        }
-        
-        for (const creature of this.creatures.values()) {
-            creature.destroy();
+        // Destruir el pool se encarga de todos los objetos (activos e inactivos)
+        if (this.pool) {
+            this.pool.destroy();
         }
         
         this.creatures.clear();
@@ -269,7 +267,7 @@ class CreatureManager {
         
         this.stage = null;
         this.camera = null;
-        this.factory = null;
+        
         this.isInitialized = false;
         
         console.log('CreatureManager: Manager destruido');
