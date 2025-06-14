@@ -11,6 +11,9 @@ class Resources {
         this.food = new Map(); // ID -> FoodItem
         this.foodSprites = new Map(); // ID -> PIXI.Graphics
         
+        // 🔧 OPTIMIZACIÓN O.6: Índice espacial para búsquedas rápidas
+        this.grid = new SpatialGrid(128);
+        
         // Configuración
         this.maxFood = CONSTANTS.RESOURCES ? CONSTANTS.RESOURCES.MAX_FOOD : 20;
         this.spawnInterval = CONSTANTS.RESOURCES ? CONSTANTS.RESOURCES.SPAWN_INTERVAL : 2000; // 2 segundos
@@ -93,6 +96,9 @@ class Resources {
         
         const foodItem = this.createFoodItem();
         this.food.set(foodItem.id, foodItem);
+        
+        // 🔧 O.6: indexar en grid
+        this.grid.insert(foodItem.id, foodItem.x, foodItem.y);
         
         // Crear sprite visual
         if (this.stage) {
@@ -189,8 +195,9 @@ class Resources {
         let nearestFood = null;
         let nearestDistance = Infinity;
         
-        // Buscar comida más cercana en rango
-        for (const foodItem of this.food.values()) {
+        // 🔧 O.6: buscar solo en comida cercana usando SpatialGrid
+        const nearbyFood = this.getNearbyFood(creature.x, creature.y, this.detectionRadius);
+        for (const foodItem of nearbyFood.values()) {
             const distance = this.calculateDistance(creature.x, creature.y, foodItem.x, foodItem.y);
             
             if (distance <= this.detectionRadius && distance < nearestDistance) {
@@ -243,6 +250,10 @@ class Resources {
      * Remueve una comida del sistema
      */
     removeFood(foodId) {
+        // 🔧 O.6: remover de grid antes de eliminar
+        const foodItem = this.food.get(foodId);
+        if (foodItem) this.grid.remove(foodId, foodItem.x, foodItem.y);
+        
         // Remover sprite
         const sprite = this.foodSprites.get(foodId);
         if (sprite && this.stage) {
@@ -310,6 +321,7 @@ class Resources {
         
         this.food.clear();
         this.foodSprites.clear();
+        this.grid.clear();
         
         this.stage = null;
         this.camera = null;
@@ -320,6 +332,18 @@ class Resources {
         if (window.eventBus) {
             eventBus.emit('resources:destroyed');
         }
+    }
+    
+    // 🔧 OPTIMIZACIÓN O.6: devuelve comida cercana dentro de un rango usando SpatialGrid
+    getNearbyFood(x, y, range) {
+        const rect = { x: x - range, y: y - range, width: range * 2, height: range * 2 };
+        const ids = this.grid.queryRect(rect);
+        const map = new Map();
+        ids.forEach(id => {
+            const item = this.food.get(id);
+            if (item) map.set(id, item);
+        });
+        return map;
     }
 }
 

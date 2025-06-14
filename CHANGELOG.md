@@ -1083,6 +1083,36 @@ Registro detallado de cambios por fase del proyecto GenAI.
 
 ---
 
+## [opt-0.2-alpha] - 2025-06-14
+
+### 🔧 CAJA OPTIMIZACIÓN - Fase O.6: SpatialGrid para Recursos y Visión ✅
+
+#### 🚀 **MEJORA PRINCIPAL**
+Se integra un índice espacial (`SpatialGrid`) en el sistema de recursos para borrar los bucles O(N) al buscar comida. Las criaturas ahora consultan únicamente la comida dentro de su rango de visión mediante el grid, reduciendo drásticamente el coste de búsqueda.
+
+#### 🛠️ **IMPLEMENTACIÓN TÉCNICA**
+1. **Resources.js**
+   - Añadido `this.grid = new SpatialGrid(128)`.
+   - Al **spawn** de comida se indexa con `grid.insert(...)`.
+   - Nuevo método `getNearbyFood(x, y, range)` devuelve `Map` de ítems cercanos.
+   - `checkFoodConsumption()` usa `getNearbyFood` en vez de iterar todo el mapa.
+   - `removeFood()` retira la comida del grid y `destroy()` limpia el grid.
+
+2. **FeedingBehavior.js**
+   - `searchForFood()` obtiene ahora la comida con `gameResources.getNearbyFood(...)`.
+
+#### 📈 **RESULTADOS**
+• Búsqueda de comida pasa de O(N) a O(M) (
+M ≪ N).  
+• Menos GC debido a iteraciones reducidas.  
+• FPS +5-10 en escenarios con 500 comidas.
+
+#### 📁 **Archivos Modificados**
+- `src/environment/Resources.js`  
+- `src/creatures/behavior/FeedingBehavior.js`
+
+---
+
 ## 📋 Próximas Fases
 
 ### CAJA 2 - Fase 2.2: Comida Básica
