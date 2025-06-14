@@ -288,6 +288,10 @@ class DebugOverlay {
                 <div class="debug-info"><span class="debug-label">Logic Skipped:</span> <span class="debug-value">${pm.logicSkipped ?? '-'}</span></div>
                 <div class="debug-info"><span class="debug-label">Sprites Visibles:</span> <span class="debug-value">${pm.spritesVisible ?? '-'}</span></div>
                 <div class="debug-info"><span class="debug-label">Sprites Cull:</span> <span class="debug-value">${pm.spritesCulled ?? '-'}</span></div>
+                <div class="debug-info">--- Hot Spots ---</div>
+                <div class="debug-info">${pm.hot1 ?? '-'}</div>
+                <div class="debug-info">${pm.hot2 ?? '-'}</div>
+                <div class="debug-info">${pm.hot3 ?? '-'}</div>
             `;
         }
         

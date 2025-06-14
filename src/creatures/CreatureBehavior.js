@@ -29,6 +29,7 @@ class CreatureBehavior {
      * Actualiza el comportamiento de la criatura
      */
     update(deltaTime) {
+        if (window.profiler) profiler.start('CreatureBehavior');
         if (!this.creature.isAlive) return;
         
         // Actualizar sistemas modulares
@@ -36,6 +37,7 @@ class CreatureBehavior {
         
         // Emitir evento de actualización
         this.emitUpdateEvent();
+        if (window.profiler) profiler.end('CreatureBehavior');
     }
     
     /**

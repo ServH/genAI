@@ -13,6 +13,7 @@ class ReproductionBehavior {
     }
 
     update(delta) {
+        if (window.profiler) profiler.start('ReproductionBehavior');
         const st = this.s.getCurrentState();
         // IDLE: buscar madre o pareja
         if (st === CREATURE_STATES.IDLE) {
@@ -26,6 +27,7 @@ class ReproductionBehavior {
         if (st === CREATURE_STATES.COMMITTED) this._committed();
         if (st === CREATURE_STATES.MATING) this._mating();
         if (st === CREATURE_STATES.NURSING) this._nursing(delta);
+        if (window.profiler) profiler.end('ReproductionBehavior');
     }
 
     /* ----------------- PRIVATE ---------------------------------------- */

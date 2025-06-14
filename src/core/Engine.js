@@ -262,6 +262,14 @@ class Engine {
             debugOverlay.update();
         }
         
+        // Enviar top funciones cada 60 frames (~1s)
+        if (window.profiler && this.creatureManager && this.creatureManager.stats && this.creatureManager.stats.updateCounter % 60 === 0) {
+            const top = profiler.flushTop();
+            const obj = {};
+            top.forEach((t,i)=>obj[`hot${i+1}`]=`${t.label}:${t.avg.toFixed(2)}ms`);
+            if (this.performanceMonitor) this.performanceMonitor.setCustomStats(obj);
+        }
+        
         // 🔧 OPTIMIZACIÓN: Fin lógica
         if (this.performanceMonitor) this.performanceMonitor.endLogic();
     }

@@ -26,8 +26,10 @@ class OrganicShapeRenderer {
 
     /** Actualiza la animación y redibuja la forma */
     update(deltaTime) {
+        if (window.profiler) profiler.start('OrganicShapeRenderer');
         this.animationTime += this.animationSpeed * deltaTime;
         this._drawShape();
+        if (window.profiler) profiler.end('OrganicShapeRenderer');
     }
 
     _drawShape() {

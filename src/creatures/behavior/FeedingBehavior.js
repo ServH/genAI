@@ -15,6 +15,7 @@ class FeedingBehavior {
 
     // Llamado cada frame por el facade
     update(deltaTime) {
+        if (window.profiler) profiler.start('FeedingBehavior');
         const currentState = this.states.getCurrentState();
 
         // Búsqueda sólo en IDLE
@@ -34,6 +35,7 @@ class FeedingBehavior {
         if (currentState === CREATURE_STATES.EATING) {
             this.checkFoodConsumption();
         }
+        if (window.profiler) profiler.end('FeedingBehavior');
     }
 
     // --- Métodos privados ---------------------------------------------
