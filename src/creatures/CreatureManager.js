@@ -24,6 +24,9 @@ class CreatureManager {
         this.lifecycle = new CreatureLifecycle(this);
         this.stats = new CreatureStats(this);
         
+        // 🔧 OPTIMIZACIÓN: SpatialGrid para culling lógico
+        this.grid = new SpatialGrid(256);
+        
         // Estado
         this.isInitialized = false;
         
@@ -56,8 +59,6 @@ class CreatureManager {
         }
     }
 
-
-
     /**
      * Agrega una criatura al manager
      */
@@ -69,6 +70,9 @@ class CreatureManager {
         
         // Agregar criatura al pool
         this.creatures.set(creature.id, creature);
+        
+        // Indexar en grid
+        this.grid.insert(creature.id, creature.x, creature.y);
         
         // Crear sprite si tenemos stage
         if (this.stage) {
@@ -104,6 +108,9 @@ class CreatureManager {
             this.sprites.delete(creatureId);
         }
         
+        // Quitar de grid
+        this.grid.remove(creatureId, creature.x, creature.y);
+        
         // Remover criatura
         creature.destroy();
         this.creatures.delete(creatureId);
@@ -135,10 +142,22 @@ class CreatureManager {
             gameEnergy.update(deltaTime);
         }
         
-        // Actualizar criaturas
-        for (const creature of this.creatures.values()) {
-            if (creature.isAlive) {
+        // Determinar zona lógica (viewport ±200)
+        let logicIds = this.creatures.keys();
+        if (this.camera && this.camera.getViewportRect) {
+            const vp = this.camera.getViewportRect();
+            const logicZone = { x: vp.x - 200, y: vp.y - 200, width: vp.width + 400, height: vp.height + 400 };
+            logicIds = this.grid.queryRect(logicZone).values();
+        }
+
+        // Actualizar criaturas visibles en zona
+        for (const id of logicIds) {
+            const creature = this.creatures.get(id);
+            if (creature && creature.isAlive) {
+                const oldX = creature.x, oldY = creature.y;
                 creature.update(deltaTime);
+                // actualizar grid pos
+                this.grid.update(id, oldX, oldY, creature.x, creature.y);
             }
         }
         
@@ -240,8 +259,6 @@ class CreatureManager {
         
         return null;
     }
-
-
 
     /**
      * Destruye el manager y limpia recursos

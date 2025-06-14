@@ -41,6 +41,9 @@ class Renderer {
                 eventBus.emit('renderer:initialized');
             }
             
+            this.camera = new Camera(this.app);
+            window.spriteCuller = new SpriteCuller(this.camera);
+            
         } catch (error) {
             console.error('Renderer: Error inicializando PixiJS:', error);
             throw error;

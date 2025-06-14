@@ -47,6 +47,9 @@ class CreatureSprite {
         this.container.x = this.creature.x;
         this.container.y = this.creature.y;
         
+        // Culling de visibilidad
+        if (window.spriteCuller) spriteCuller.check(this);
+        
         // Delegar a módulos
         this.energyOverlay.update(deltaTime);
         this.familySymbol.update();
