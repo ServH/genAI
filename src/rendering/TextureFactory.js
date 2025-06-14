@@ -30,10 +30,8 @@ class TextureFactory {
         const osr = new OrganicShapeRenderer(dummySprite);
         osr.update(0); // dibujar forma
 
-        const texture = renderer.generateTexture({
-            source: gfx,
-            region: new PIXI.Rectangle(-radius, -radius, radius * 2, radius * 2)
-        });
+        gfx.position.set(radius, radius); // centrar en área positiva
+        const texture = renderer.generateTexture(gfx, { resolution: 1 });
 
         gfx.clear();
         GraphicsPool.release(gfx);
