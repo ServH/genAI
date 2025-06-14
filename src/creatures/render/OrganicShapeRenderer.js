@@ -38,11 +38,14 @@ class OrganicShapeRenderer {
         
         // Calcular puntos deformados
         for (let i = 0; i < this.deformPoints; i++) {
-            const angle = (i / this.deformPoints) * Math.PI * 2;
-            const deform = Math.sin(this.animationTime + i * 0.5) * this.deformAmount +
-                           Math.cos(this.animationTime * 0.7 + i * 0.3) * this.deformAmount * 0.5;
+            const deg = (i / this.deformPoints) * 360;
+            const cosA = mathLUT.fastCos(deg);
+            const sinA = mathLUT.fastSin(deg);
+            
+            const deform = mathLUT.fastSin((this.animationTime + i * 0.5) * 57.2958) * this.deformAmount +
+                           mathLUT.fastCos((this.animationTime * 0.7 + i * 0.3) * 57.2958) * this.deformAmount * 0.5;
             const radius = this.baseRadius * (1 + deform) * growthScale;
-            points.push({ x: Math.cos(angle) * radius, y: Math.sin(angle) * radius });
+            points.push({ x: cosA * radius, y: sinA * radius });
         }
 
         // Dibujar con curvas suaves

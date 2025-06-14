@@ -30,38 +30,27 @@ class CreatureVisionUtils {
      * Calcula la distancia entre dos puntos
      */
     static calculateDistance(x1, y1, x2, y2) {
-        const dx = x2 - x1;
-        const dy = y2 - y1;
-        return Math.sqrt(dx * dx + dy * dy);
+        return Math.sqrt(mathLUT.dist2(x1, y1, x2, y2));
     }
     
     /**
      * Verifica si un punto está dentro del cono de visión
      */
     static isInVisionCone(creatureX, creatureY, creatureDirection, targetX, targetY, range, angleRad) {
-        // Calcular distancia
-        const distance = this.calculateDistance(creatureX, creatureY, targetX, targetY);
-        if (distance > range) {
+        // Calcular distancia² y comparar con rango² para evitar sqrt
+        if (mathLUT.dist2(creatureX, creatureY, targetX, targetY) > range * range) {
             return false;
         }
-        
-        // Calcular ángulo hacia el objetivo
-        const angleToTarget = Math.atan2(targetY - creatureY, targetX - creatureX);
-        
-        // Normalizar ángulos
-        const creatureDir = this.normalizeAngle(creatureDirection);
-        const targetDir = this.normalizeAngle(angleToTarget);
-        
-        // Calcular diferencia angular
-        let angleDiff = Math.abs(targetDir - creatureDir);
-        if (angleDiff > Math.PI) {
-            angleDiff = 2 * Math.PI - angleDiff;
-        }
-        
-        const halfAngle = angleRad / 2;
-        const isVisible = angleDiff <= halfAngle;
-        
-        // Verificar si está dentro del cono
+        // Calcular ángulo usando producto punto (sin atan2)
+        const dx = targetX - creatureX;
+        const dy = targetY - creatureY;
+        const len = Math.sqrt(dx*dx + dy*dy);
+        const nx = dx / len;
+        const ny = dy / len;
+        const dirX = Math.cos(creatureDirection);
+        const dirY = Math.sin(creatureDirection);
+        const dot = nx * dirX + ny * dirY;
+        const isVisible = dot >= Math.cos(angleRad / 2);
         return isVisible;
     }
     
