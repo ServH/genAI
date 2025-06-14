@@ -18,6 +18,9 @@ class CreatureSprite {
         this.shapeRenderer.update(0);
         this.energyOverlay = new EnergyOverlay(this);
         
+        // Intentar usar textura si es adulto
+        this.tryConvertToTexture();
+        
         console.log(`CreatureSprite: Sprite creado para criatura ${creature.id}`);
     }
 
@@ -40,8 +43,9 @@ class CreatureSprite {
      * Actualiza los visuales del sprite
      */
     update(deltaTime) {
-        // Actualizar forma orgánica
+        // Actualizar forma orgánica (solo si no hay textura)
         if (this.shapeRenderer) this.shapeRenderer.update(deltaTime);
+        else if (!this.spriteTextureApplied) this.tryConvertToTexture();
         
         // Sincronizar posición con criatura
         this.container.x = this.creature.x;
@@ -97,6 +101,26 @@ class CreatureSprite {
         }
         
         this.creature = null;
+    }
+
+    tryConvertToTexture() {
+        const scale = this.creature.growth ? this.creature.growth.getScale() : 1.0;
+        if (scale < 1) return; // Solo adultos por ahora
+        if (this.spriteTextureApplied) return;
+
+        const tex = window.textureFactory?.getTexture(this.creature);
+        if (!tex) return;
+
+        const sprite = new PIXI.Sprite(tex);
+        sprite.anchor.set(0.5);
+        // Reemplazar graphics
+        this.container.removeChild(this.graphics);
+        GraphicsPool.release(this.graphics);
+        this.graphics = null;
+        this.container.addChildAt(sprite, 0);
+        this.spriteTextureApplied = true;
+        this.shapeRenderer.destroy();
+        this.shapeRenderer = null;
     }
 }
 
