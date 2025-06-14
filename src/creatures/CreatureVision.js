@@ -21,7 +21,13 @@ class CreatureVision {
     /**
      * Detecta toda la comida visible en el cono de visión
      */
-    detectFood(foods) {
+    detectFood(foodsParam) {
+        // Si se pasa mapa se usa, si no consultar frontal via Resources
+        let foods = foodsParam;
+        if (!foods) {
+            if (!window.gameResources) return [];
+            foods = gameResources.getNearbyFoodFrontal(this.creature.x, this.creature.y, this.creature.direction, this.range);
+        }
         if (!foods || foods.size === 0) {
             return [];
         }

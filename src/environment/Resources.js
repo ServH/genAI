@@ -345,6 +345,29 @@ class Resources {
         });
         return map;
     }
+    
+    /**
+     * Obtiene comida cercana SOLO en la mitad frontal de la dirección dada
+     * Aproxima la visión con un rectángulo desde (x,y) hasta (x+dir*range).
+     */
+    getNearbyFoodFrontal(x, y, dir, range) {
+        const frontX = x + Math.cos(dir) * range;
+        const frontY = y + Math.sin(dir) * range;
+        const half = range * 0.5;
+        const rect = {
+            x: Math.min(x, frontX) - half,
+            y: Math.min(y, frontY) - half,
+            width: Math.abs(frontX - x) + half * 2,
+            height: Math.abs(frontY - y) + half * 2
+        };
+        const ids = this.grid.queryRect(rect);
+        const map = new Map();
+        ids.forEach(id => {
+            const item = this.food.get(id);
+            if (item) map.set(id, item);
+        });
+        return map;
+    }
 }
 
 // Hacer disponible globalmente

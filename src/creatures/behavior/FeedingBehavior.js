@@ -41,7 +41,7 @@ class FeedingBehavior {
     // --- Métodos privados ---------------------------------------------
     searchForFood() {
         if (!window.gameResources) return;
-        const foods = window.gameResources.getNearbyFood(this.creature.x, this.creature.y, this.vision.range);
+        const foods = window.gameResources.getNearbyFoodFrontal(this.creature.x, this.creature.y, this.creature.direction, this.vision.range);
         const nearest = this.vision.getNearestVisibleFood(foods);
         if (nearest) {
             this.states.setState(CREATURE_STATES.SEEKING, nearest);
