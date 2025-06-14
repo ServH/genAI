@@ -1046,6 +1046,21 @@ Registro detallado de cambios por fase del proyecto GenAI.
 
 ---
 
+## [opt-0.0-alpha] - 2025-06-14
+
+### 🔧 CAJA OPTIMIZACIÓN - Fase O.0: PERFILADO BASE
+
+#### 🚀 NUEVO
+- **PerformanceMonitor.js** (≤100 líneas): Seguimiento de tiempos Logic, Render, Frame y drawCalls. Emite evento `performance:frame`.
+- Integración del monitor en **Engine.js**: Hooks `beginFrame/Logic/endLogic/Frame`.
+- DebugOverlay incluye métricas adicionales (Logic ms, Render ms, Frame ms, DC).
+
+#### 🏁 RESULTADOS INICIALES
+- Métricas visibles en tiempo real en pestaña Sistema.
+- Base lista para detectar cuellos de botella antes de optimizar.
+
+---
+
 ## 📋 Próximas Fases
 
 ### CAJA 2 - Fase 2.2: Comida Básica

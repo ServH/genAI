@@ -28,27 +28,12 @@ class CreatureLifecycle {
      * Spawn inicial de criaturas
      */
     async spawnInitialCreatures(count) {
-        console.log(`CreatureLifecycle: Spawning ${count} criaturas iniciales desde el pool...`);
+        console.log(`CreatureLifecycle: Spawning ${count} criaturas iniciales...`);
         
         for (let i = 0; i < count; i++) {
-            const pooledObjects = this.manager.pool.acquire();
-            if (pooledObjects) {
-                const { creature, sprite } = pooledObjects;
-                const dna = new DNA();
-                
-                creature.reset(
-                    this.factory.getRandomSpawnPosition().x,
-                    this.factory.getRandomSpawnPosition().y,
-                    dna
-                );
-                sprite.reset(creature);
-                
-                // Activar directamente aquí
-                this.manager.creatures.set(creature.id, creature);
-                this.manager.sprites.set(creature.id, sprite);
-
-                this.spawnStats.totalSpawned++;
-            }
+            const creature = this.factory.createCreature();
+            this.manager.addCreature(creature);
+            this.spawnStats.totalSpawned++;
             
             // Pequeña pausa para evitar bloqueo
             if (i % 3 === 0) {
@@ -64,13 +49,6 @@ class CreatureLifecycle {
                 initial: true,
                 totalSpawned: this.spawnStats.totalSpawned
             });
-        }
-        
-        // Log para debug: mostrar población actual sin intervenir
-        const aliveCount = this.manager.getAliveCount();
-        if (aliveCount > 0 && aliveCount !== this.lastLoggedCount) {
-            console.log(`CreatureLifecycle: Población natural: ${aliveCount} criaturas activas (máx: ${this.manager.maxCreatures})`);
-            this.lastLoggedCount = aliveCount;
         }
     }
     
@@ -124,12 +102,12 @@ class CreatureLifecycle {
         }
         
         for (const id of deadCreatures) {
-            this.manager.releaseCreature(id); // OPTIMIZATION: Usar release en lugar de remove
+            this.manager.removeCreature(id);
             this.spawnStats.totalDied++;
         }
         
         if (deadCreatures.length > 0) {
-            console.log(`CreatureLifecycle: ${deadCreatures.length} criaturas muertas liberadas al pool`);
+            console.log(`CreatureLifecycle: ${deadCreatures.length} criaturas muertas limpiadas`);
             
             if (window.eventBus) {
                 eventBus.emit('creatures:cleaned', {
@@ -146,19 +124,10 @@ class CreatureLifecycle {
      * Spawn manual de una criatura
      */
     spawnCreature(x, y) {
-        if (!this.factory || !this.manager.pool) return null;
+        if (!this.factory) return null;
         
-        const pooledObjects = this.manager.pool.acquire();
-        if (pooledObjects) {
-            const { creature, sprite } = pooledObjects;
-            const dna = new DNA();
-            creature.reset(x, y, dna);
-            sprite.reset(creature);
-            
-            // Activar directamente aquí
-            this.manager.creatures.set(creature.id, creature);
-            this.manager.sprites.set(creature.id, sprite);
-
+        const creature = this.factory.createCreature(x, y);
+        if (creature && this.manager.addCreature(creature)) {
             this.spawnStats.totalSpawned++;
             
             if (window.eventBus) {

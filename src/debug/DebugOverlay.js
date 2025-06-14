@@ -276,6 +276,17 @@ class DebugOverlay {
             `;
         }
         
+        // 🔧 OPTIMIZACIÓN: Métricas adicionales de PerformanceMonitor
+        if (window.performanceMonitor) {
+            const pm = performanceMonitor.getStats();
+            content += `
+                <div class="debug-info"><span class="debug-label">Logic:</span> <span class="debug-value">${pm.logic.toFixed(2)}ms</span></div>
+                <div class="debug-info"><span class="debug-label">Render:</span> <span class="debug-value">${pm.render.toFixed(2)}ms</span></div>
+                <div class="debug-info"><span class="debug-label">Frame:</span> <span class="debug-value">${pm.frame.toFixed(2)}ms</span></div>
+                <div class="debug-info"><span class="debug-label">DC:</span> <span class="debug-value">${pm.drawCalls}</span></div>
+            `;
+        }
+        
         performanceDiv.innerHTML = content;
     }
 

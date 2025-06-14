@@ -165,48 +165,10 @@ class Creature {
     }
 
     /**
-     * Resetea una criatura para ser reutilizada por el object pool.
-     * @param {number} x - Nueva posición X.
-     * @param {number} y - Nueva posición Y.
-     * @param {DNA} dna - Nuevo ADN para la criatura.
-     */
-    reset(x, y, dna) {
-        // Resetear posición y movimiento
-        this.x = x;
-        this.y = y;
-        this.direction = Math.random() * Math.PI * 2;
-        this.speed = CONSTANTS.CREATURES.MIN_SPEED + 
-                    Math.random() * (CONSTANTS.CREATURES.MAX_SPEED - CONSTANTS.CREATURES.MIN_SPEED);
-
-        // Resetear estado
-        this.isAlive = true;
-        this.age = 0;
-
-        // Resetear genética
-        this.dna = dna;
-        this.baseSpeed = this.speed;
-        Genes.applyToCreature(this, dna); // Re-aplicar nuevos genes
-
-        // Resetear parentesco
-        this.parents = { mother: null, father: null };
-        this.children = [];
-        this.generation = 0;
-        this.lineageId = null;
-        this.birthTime = Date.now();
-
-        // Resetear sistemas modulares
-        this.energySystem.set(this.energySystem.getMax() * 0.8);
-        this.growth.updateGrowthStage(); // Resetear etapa de crecimiento
-        this.behavior.states.setState(CREATURE_STATES.IDLE); // Resetear estado de comportamiento
-
-        console.log(`Creature: Criatura ${this.id} reseteada para reutilización.`);
-    }
-
-    /**
      * Destruye la criatura
      */
     destroy() {
-        this.isAlive = false; // Asegurarse de que está marcada como no viva
+        this.die('destroyed');
         
         // Limpiar sistemas modulares
         if (this.energySystem) {
