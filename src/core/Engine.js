@@ -185,6 +185,7 @@ class Engine {
         
         // 🔧 OPTIMIZACIÓN: Inicio de frame
         if (this.performanceMonitor) this.performanceMonitor.beginFrame();
+        if (window.spriteCuller) spriteCuller.resetFrame();
         
         // Actualizar sistemas
         this.updateSystems();
@@ -195,6 +196,9 @@ class Engine {
         }
         
         // 🔧 OPTIMIZACIÓN: Fin de frame
+        if (window.spriteCuller && this.performanceMonitor) {
+            this.performanceMonitor.setCustomStats(spriteCuller.getStats());
+        }
         if (this.performanceMonitor) this.performanceMonitor.endFrame();
         
         // Programar siguiente frame

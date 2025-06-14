@@ -284,6 +284,10 @@ class DebugOverlay {
                 <div class="debug-info"><span class="debug-label">Render:</span> <span class="debug-value">${pm.render.toFixed(2)}ms</span></div>
                 <div class="debug-info"><span class="debug-label">Frame:</span> <span class="debug-value">${pm.frame.toFixed(2)}ms</span></div>
                 <div class="debug-info"><span class="debug-label">DC:</span> <span class="debug-value">${pm.drawCalls}</span></div>
+                <div class="debug-info"><span class="debug-label">Logic Activas:</span> <span class="debug-value">${pm.logicUpdated ?? '-'}</span></div>
+                <div class="debug-info"><span class="debug-label">Logic Skipped:</span> <span class="debug-value">${pm.logicSkipped ?? '-'}</span></div>
+                <div class="debug-info"><span class="debug-label">Sprites Visibles:</span> <span class="debug-value">${pm.spritesVisible ?? '-'}</span></div>
+                <div class="debug-info"><span class="debug-label">Sprites Cull:</span> <span class="debug-value">${pm.spritesCulled ?? '-'}</span></div>
             `;
         }
         

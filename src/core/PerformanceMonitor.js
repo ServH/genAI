@@ -20,6 +20,7 @@ class PerformanceMonitor {
         this.renderTime = 0;
         this.frameTime = 0;
         this.drawCalls = 0;
+        this.custom = {};
     }
 
     // ----- Hooks ---------------------------------------------------------
@@ -52,7 +53,8 @@ class PerformanceMonitor {
             logic: this.logicTime,
             render: this.renderTime,
             frame: this.frameTime,
-            drawCalls: this.drawCalls
+            drawCalls: this.drawCalls,
+            ...this.custom
         };
     }
 
@@ -62,6 +64,9 @@ class PerformanceMonitor {
             eventBus.emit('performance:frame', this.getStats());
         }
     }
+
+    // Permite que otros sistemas establezcan métricas adicionales
+    setCustomStats(obj = {}) { this.custom = { ...this.custom, ...obj }; }
 }
 
 // Registrar globalmente para acceso sencillo

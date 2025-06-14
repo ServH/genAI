@@ -185,6 +185,13 @@ class CreatureManager {
                 frame: this.stats.updateCounter
             });
         }
+
+        // Métricas de culling
+        if (window.performanceMonitor) {
+            const updated = Array.isArray(logicIds) ? logicIds.length : this._countIterable(logicIds);
+            const totalAlive = this.getAliveCount();
+            window.performanceMonitor.setCustomStats({ logicUpdated: updated, logicSkipped: totalAlive - updated });
+        }
     }
 
     /**
@@ -295,6 +302,8 @@ class CreatureManager {
             eventBus.emit('creatures:destroyed');
         }
     }
+
+    _countIterable(it) { let c=0; for (/* eslint-disable-line */ const _ of it) c++; return c; }
 }
 
 // Hacer disponible globalmente
