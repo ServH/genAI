@@ -16,6 +16,7 @@ class CreatureBehavior {
         
         // 🔧 OPTIMIZACIÓN: sub-módulo de alimentación
         this.feeding = new FeedingBehavior(creature, this.vision, this.states);
+        this.reproduction = new ReproductionBehavior(creature, this.vision, this.states, this.movement);
         
         // Estado de movimiento
         this.isMoving = true;
@@ -47,7 +48,8 @@ class CreatureBehavior {
         // 2. Lógica de alimentación delegada
         this.feeding.update(deltaTime);
         
-        // 3. Verificar si llegó al objetivo (ahora dentro de FeedingBehavior)
+        // 3. Lógica reproductiva
+        this.reproduction.update(deltaTime);
         
         // 4. Verificar cortejo si está en COURTING
         if (this.states.isInState(CREATURE_STATES.COURTING)) {
@@ -476,6 +478,7 @@ class CreatureBehavior {
         if (this.states) this.states.destroy();
         if (this.movement) this.movement.destroy();
         if (this.feeding) this.feeding.destroy();
+        if (this.reproduction) this.reproduction.destroy();
         
         this.creature = null;
     }
