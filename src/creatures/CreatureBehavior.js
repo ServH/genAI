@@ -172,15 +172,12 @@ class CreatureBehavior {
                     }
                     
                     // Actualizar símbolos visuales inmediatamente
-                    if (window.gameVisualId) {
-                        // Buscar el sprite del offspring en el manager
-                        const sprite = window.gameEngine.creatureManager.sprites?.get(offspring.id);
-                        if (sprite) {
-                            sprite.updateFamilySymbol();
-                            console.log(`🏷️ SÍMBOLO: Actualizado para offspring ${offspring.id} con linaje ${offspring.lineageId}`);
-                        } else {
-                            console.warn(`⚠️ SÍMBOLO: No se encontró sprite para offspring ${offspring.id}`);
-                        }
+                    const sprite = window.gameEngine.creatureManager.sprites?.get(offspring.id);
+                    if (sprite && sprite.familySymbol) {
+                        sprite.familySymbol.update();
+                        console.log(`🏷️ SÍMBOLO: Actualizado para offspring ${offspring.id} con linaje ${offspring.lineageId}`);
+                    } else {
+                        console.warn(`⚠️ SÍMBOLO: No se encontró sprite para offspring ${offspring.id}`);
                     }
                     
                     // Activar efecto visual de nacimiento
