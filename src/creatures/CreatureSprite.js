@@ -105,7 +105,6 @@ class CreatureSprite {
 
     tryConvertToTexture() {
         const scale = this.creature.growth ? this.creature.growth.getScale() : 1.0;
-        if (scale < 1) return; // Solo adultos por ahora
         if (this.spriteTextureApplied) return;
 
         const tex = window.textureFactory?.getTexture(this.creature);
@@ -113,6 +112,7 @@ class CreatureSprite {
 
         const sprite = new PIXI.Sprite(tex);
         sprite.anchor.set(0.5);
+        sprite.scale.set(scale);
         // Reemplazar graphics
         this.container.removeChild(this.graphics);
         GraphicsPool.release(this.graphics);

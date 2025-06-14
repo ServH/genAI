@@ -83,7 +83,9 @@ class MatingEffects {
         
         const config = CONSTANTS.EFFECTS.SEEKING_PULSE;
         
+        let processed = 0;
         for (const [creatureId, pulse] of this.seekingPulses) {
+            if (processed > 40) break; // Limitar rendereos
             const creature = pulse.creature;
             if (!creature?.isAlive) continue;
             
@@ -92,6 +94,7 @@ class MatingEffects {
             const alpha = config.ALPHA * (1 - progress);
             
             this.createPulseGraphic(renderer, creature.x, creature.y, radius, alpha);
+            processed++;
         }
     }
 
@@ -103,7 +106,9 @@ class MatingEffects {
         
         const config = CONSTANTS.EFFECTS.MATING_CONNECTION;
         
+        let count = 0;
         for (const [connectionId, connection] of this.connections) {
+            if (count > 30) break; // Limitar
             const { creature1, creature2 } = connection;
             if (!creature1?.isAlive || !creature2?.isAlive) continue;
             
@@ -112,6 +117,7 @@ class MatingEffects {
             const alpha = config.ALPHA * (1 - progress * 0.5);
             
             this.createConnectionGraphic(renderer, creature1, creature2, alpha, elapsed);
+            count++;
         }
     }
 

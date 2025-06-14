@@ -25,7 +25,9 @@ class Renderer {
                 backgroundColor: CONSTANTS.COLORS.BACKGROUND,
                 antialias: CONSTANTS.CANVAS.ANTIALIAS,
                 resolution: CONSTANTS.CANVAS.RESOLUTION,
-                autoDensity: true
+                autoDensity: true,
+                contextAlpha: false,
+                powerPreference: 'high-performance'
             });
 
             // Ajustes globales de batch
