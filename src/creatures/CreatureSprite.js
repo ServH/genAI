@@ -1,9 +1,4 @@
-/**
- * GenAI - Sprite de Criatura
- * CAJA 2 - Fase 2.0: Criatura Mínima
- * 
- * Renderizado orgánico con deformación sin/cos
- */
+// CreatureSprite (CAJA 2) - render orgánico deformado
 
 class CreatureSprite {
     constructor(creature) {
@@ -11,22 +6,16 @@ class CreatureSprite {
         this.graphics = new PIXI.Graphics();
         this.container = new PIXI.Container();
         
-        // Propiedades de deformación orgánica
-        this.baseRadius = creature.radius;
-        this.deformPoints = CONSTANTS.CREATURES.DEFORM_POINTS;
-        this.deformAmount = CONSTANTS.CREATURES.DEFORM_AMOUNT;
-        this.animationTime = Math.random() * Math.PI * 2; // Offset aleatorio
-        this.animationSpeed = 2.0; // Velocidad de ondulación
-        
-        // Color y estilo
-        this.color = this.hexToNumber(creature.color);
-        this.alpha = 0.8;
+        // 🔧 OPTIMIZACIÓN: delegar forma orgánica a OrganicShapeRenderer
+        this.shapeRenderer = null; // se instanciará en setup
         
         // Sistema de identificación visual - fixfeatures
         this.familySymbol = new FamilySymbol(this);
         
         this.setupSprite();
-        this.updateVisuals();
+        // Renderizador de forma orgánica
+        this.shapeRenderer = new OrganicShapeRenderer(this);
+        this.shapeRenderer.update(0);
         this.energyOverlay = new EnergyOverlay(this);
         
         console.log(`CreatureSprite: Sprite creado para criatura ${creature.id}`);
@@ -51,8 +40,8 @@ class CreatureSprite {
      * Actualiza los visuales del sprite
      */
     update(deltaTime) {
-        // Actualizar tiempo de animación
-        this.animationTime += this.animationSpeed * deltaTime;
+        // Actualizar forma orgánica
+        if (this.shapeRenderer) this.shapeRenderer.update(deltaTime);
         
         // Sincronizar posición con criatura
         this.container.x = this.creature.x;
@@ -62,139 +51,22 @@ class CreatureSprite {
         this.energyOverlay.update(deltaTime);
         this.familySymbol.update();
         
-        // Redibujar forma orgánica
-        this.updateVisuals();
-        
         if (window.eventBus) {
             eventBus.emit('creature:rendered', { 
                 id: this.creature.id,
-                frame: Math.floor(this.animationTime * 10) % 60,
+                frame: Math.floor((this.shapeRenderer?.animationTime || 0) * 10) % 60,
                 energy: this.creature.energy
             });
         }
     }
 
     /**
-     * Actualiza la forma visual orgánica
-     */
-    updateVisuals() {
-        this.graphics.clear();
-        
-        // Crear forma orgánica deformada
-        this.createOrganicShape();
-    }
-
-    /**
-     * Crea la forma orgánica usando deformación sin/cos
-     */
-    createOrganicShape() {
-        const points = [];
-        
-        // Obtener escala de crecimiento - fixfeatures
-        const growthScale = this.creature.growth ? this.creature.growth.getScale() : 1.0;
-        
-        // Generar puntos deformados
-        for (let i = 0; i < this.deformPoints; i++) {
-            const angle = (i / this.deformPoints) * Math.PI * 2;
-            
-            // Deformación base con sin/cos
-            const deform1 = Math.sin(this.animationTime + i * 0.5) * this.deformAmount;
-            const deform2 = Math.cos(this.animationTime * 0.7 + i * 0.3) * this.deformAmount * 0.5;
-            const totalDeform = deform1 + deform2;
-            
-            // Radio deformado con escala de crecimiento
-            const radius = this.baseRadius * (1 + totalDeform) * growthScale;
-            
-            // Calcular posición del punto
-            const x = Math.cos(angle) * radius;
-            const y = Math.sin(angle) * radius;
-            
-            points.push({ x, y });
-        }
-        
-        // Dibujar forma suave conectando los puntos
-        this.drawSmoothShape(points);
-    }
-
-    /**
-     * Dibuja una forma suave conectando los puntos
-     */
-    drawSmoothShape(points) {
-        if (points.length < 3) return;
-        
-        // Color genético o color base - Fase 3.0
-        const displayColor = this.creature.geneticColor || this.color;
-        
-        // Configurar estilo
-        this.graphics.beginFill(displayColor, this.alpha);
-        this.graphics.lineStyle(1, this.color, 0.3);
-        
-        // Comenzar desde el primer punto
-        this.graphics.moveTo(points[0].x, points[0].y);
-        
-        // Crear curvas suaves entre puntos
-        for (let i = 0; i < points.length; i++) {
-            const current = points[i];
-            const next = points[(i + 1) % points.length];
-            const nextNext = points[(i + 2) % points.length];
-            
-            // Punto de control para curva suave
-            const controlX = next.x + (nextNext.x - current.x) * 0.1;
-            const controlY = next.y + (nextNext.y - current.y) * 0.1;
-            
-            // Dibujar curva cuadrática
-            this.graphics.quadraticCurveTo(controlX, controlY, next.x, next.y);
-        }
-        
-        // Cerrar la forma
-        this.graphics.closePath();
-        this.graphics.endFill();
-        
-        // Agregar punto central sutil para dar profundidad
-        this.addCenterPoint();
-    }
-
-    /**
-     * Agrega un punto central para dar profundidad
-     */
-    addCenterPoint() {
-        // Obtener escala de crecimiento - fixfeatures
-        const growthScale = this.creature.growth ? this.creature.growth.getScale() : 1.0;
-        const centerRadius = this.baseRadius * 0.3 * growthScale;
-        const centerAlpha = 0.4;
-        
-        // Color más claro para el centro
-        const centerColor = this.lightenColor(this.color, 0.3);
-        
-        this.graphics.beginFill(centerColor, centerAlpha);
-        this.graphics.drawCircle(0, 0, centerRadius);
-        this.graphics.endFill();
-    }
-
-    /**
-     * Convierte color hex string a número
-     */
-    hexToNumber(hex) {
-        return parseInt(hex.replace('#', ''), 16);
-    }
-
-    /**
-     * Aclara un color para efectos
-     */
-    lightenColor(color, amount) {
-        const r = Math.min(255, ((color >> 16) & 0xFF) + amount * 255);
-        const g = Math.min(255, ((color >> 8) & 0xFF) + amount * 255);
-        const b = Math.min(255, (color & 0xFF) + amount * 255);
-        
-        return (Math.floor(r) << 16) | (Math.floor(g) << 8) | Math.floor(b);
-    }
-
-    /**
      * Establece un nuevo color
      */
     setColor(colorHex) {
-        this.color = this.hexToNumber(colorHex);
-        this.updateVisuals();
+        if (this.shapeRenderer) {
+            this.shapeRenderer.color = parseInt(colorHex.replace('#', ''), 16);
+        }
     }
 
     /**
@@ -212,10 +84,8 @@ class CreatureSprite {
         if (this.familySymbol) this.familySymbol.destroy();
         if (this.energyOverlay) this.energyOverlay.destroy();
         
-        if (this.graphics) {
-            this.graphics.destroy();
-            this.graphics = null;
-        }
+        if (this.shapeRenderer) this.shapeRenderer.destroy();
+        if (this.graphics) { this.graphics.destroy(); this.graphics = null; }
         
         if (this.container) {
             this.container.destroy();
