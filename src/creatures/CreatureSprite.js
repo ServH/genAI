@@ -4,7 +4,7 @@ class CreatureSprite {
     constructor(creature) {
         this.creature = creature;
         this.graphics = GraphicsPool.acquire();
-        this.container = new PIXI.Container();
+        this.container = ContainerPool.acquire();
         
         // 🔧 OPTIMIZACIÓN: delegar forma orgánica a OrganicShapeRenderer
         this.shapeRenderer = null; // se instanciará en setup
@@ -88,7 +88,8 @@ class CreatureSprite {
         if (this.graphics) { this.graphics.clear(); GraphicsPool.release(this.graphics); this.graphics = null; }
         
         if (this.container) {
-            this.container.destroy();
+            this.container.removeChildren();
+            ContainerPool.release(this.container);
             this.container = null;
         }
         
