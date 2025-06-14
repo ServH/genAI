@@ -119,7 +119,7 @@ class MatingEffects {
      * Crea gráfico de pulso temporal
      */
     createPulseGraphic(renderer, x, y, radius, alpha) {
-        const graphics = new PIXI.Graphics();
+        const graphics = GraphicsPool.acquire();
         graphics.lineStyle(2, CONSTANTS.EFFECTS.SEEKING_PULSE.COLOR, alpha);
         graphics.drawCircle(x, y, radius);
         
@@ -137,7 +137,7 @@ class MatingEffects {
      * Crea gráfico de conexión temporal
      */
     createConnectionGraphic(renderer, creature1, creature2, alpha, elapsed) {
-        const graphics = new PIXI.Graphics();
+        const graphics = GraphicsPool.acquire();
         const config = CONSTANTS.EFFECTS.MATING_CONNECTION;
         
         // Línea de conexión
@@ -182,6 +182,8 @@ class MatingEffects {
             if (graphics.parent) {
                 graphics.parent.removeChild(graphics);
             }
+            graphics.clear();
+            GraphicsPool.release(graphics);
         }, 16);
     }
 

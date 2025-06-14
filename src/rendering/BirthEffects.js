@@ -73,7 +73,7 @@ class BirthEffects {
      * Renderiza un efecto simple de nacimiento
      */
     renderSimpleEffect(renderer, effect) {
-        const graphics = new PIXI.Graphics();
+        const graphics = GraphicsPool.acquire();
         const config = CONSTANTS.EFFECTS.BIRTH;
         
         // Círculo simple con fade y scale
@@ -109,6 +109,8 @@ class BirthEffects {
             if (graphics.parent) {
                 graphics.parent.removeChild(graphics);
             }
+            graphics.clear();
+            GraphicsPool.release(graphics);
         }, 16);
     }
 
