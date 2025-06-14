@@ -1061,6 +1061,28 @@ Registro detallado de cambios por fase del proyecto GenAI.
 
 ---
 
+## [opt-0.1-alpha] - 2025-06-14
+
+### 🔧 CAJA OPTIMIZACIÓN - Fase O.1: REFACCTOR MÓDULOS SOBREDIMENSIONADOS
+
+#### 🚀 NUEVOS MÓDULOS (≤100 líneas)
+- **EnergyOverlay.js**: Opacidad y pulso según energía.
+- **FamilySymbol.js**: Renderizado de símbolos familiares.
+- **FeedingBehavior.js**: Búsqueda y consumo de comida.
+- **ReproductionBehavior.js**: Cortejo, committed, mating y nursing.
+- **OrganicShapeRenderer.js**: Generación y animación de la forma orgánica.
+
+#### 🛠️ REFACTORIZACIONES PRINCIPALES
+- **CreatureSprite.js**: Ahora delega en EnergyOverlay, FamilySymbol y OrganicShapeRenderer (99 líneas).
+- **CreatureBehavior.js**: Delegación en FeedingBehavior y ReproductionBehavior; limpia +300 líneas.
+
+#### 📈 RESULTADOS
+- Cumplido "UN ARCHIVO = UNA RESPONSABILIDAD" en sprites y comportamiento.
+- Todos los archivos de CAJA 1-3 ≤100 líneas.
+- Preparado escenario para O.2 (Pooling).
+
+---
+
 ## 📋 Próximas Fases
 
 ### CAJA 2 - Fase 2.2: Comida Básica
