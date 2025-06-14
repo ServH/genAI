@@ -23,11 +23,11 @@ class CreatureSprite {
         this.alpha = 0.8;
         
         // Sistema de identificación visual - fixfeatures
-        this.symbolText = null;
-        this.lastLineageId = null;
+        this.familySymbol = new FamilySymbol(this);
         
         this.setupSprite();
         this.updateVisuals();
+        this.energyOverlay = new EnergyOverlay(this);
         
         console.log(`CreatureSprite: Sprite creado para criatura ${creature.id}`);
     }
@@ -58,11 +58,9 @@ class CreatureSprite {
         this.container.x = this.creature.x;
         this.container.y = this.creature.y;
         
-        // Actualizar opacidad basada en energía
-        this.updateEnergyVisuals();
-        
-        // Actualizar símbolo familiar - fixfeatures
-        this.updateFamilySymbol();
+        // Delegar a módulos
+        this.energyOverlay.update(deltaTime);
+        this.familySymbol.update();
         
         // Redibujar forma orgánica
         this.updateVisuals();
@@ -74,31 +72,6 @@ class CreatureSprite {
                 energy: this.creature.energy
             });
         }
-    }
-
-    /**
-     * Actualiza los efectos visuales basados en energía
-     */
-    updateEnergyVisuals() {
-        if (!this.creature || typeof this.creature.energy === 'undefined') return;
-        
-        // Calcular opacidad basada en energía (0-100 -> 0.1-1.0)
-        const energyPercentage = this.creature.getEnergyPercentage();
-        const minAlpha = 0.1;
-        const maxAlpha = 0.8;
-        this.alpha = minAlpha + (energyPercentage * (maxAlpha - minAlpha));
-        
-        // Efecto de pulso cuando energía es muy baja
-        if (this.creature.isDying() && this.creature.isAlive) {
-            const pulseIntensity = Math.sin(this.animationTime * 8) * 0.2;
-            this.alpha += pulseIntensity;
-        }
-        
-        // Asegurar que alpha esté en rango válido
-        this.alpha = Math.max(0.05, Math.min(1.0, this.alpha));
-        
-        // Aplicar opacidad al container
-        this.container.alpha = this.alpha;
     }
 
     /**
@@ -225,90 +198,6 @@ class CreatureSprite {
     }
 
     /**
-     * Actualiza el símbolo familiar - fixfeatures
-     */
-    updateFamilySymbol() {
-        if (!window.gameVisualId || !this.creature.lineageId) {
-            // Si no hay linaje, remover símbolo si existe
-            if (this.symbolText) {
-                this.container.removeChild(this.symbolText);
-                this.symbolText.destroy();
-                this.symbolText = null;
-            }
-            return;
-        }
-        
-        // Solo actualizar si cambió el linaje
-        if (this.lastLineageId !== this.creature.lineageId) {
-            this.createFamilySymbol();
-            this.lastLineageId = this.creature.lineageId;
-        }
-        
-        // Actualizar posición y escala del símbolo
-        if (this.symbolText) {
-            this.updateSymbolAppearance();
-        }
-    }
-
-    /**
-     * Crea el símbolo familiar - fixfeatures
-     */
-    createFamilySymbol() {
-        // Remover símbolo anterior si existe
-        if (this.symbolText) {
-            this.container.removeChild(this.symbolText);
-            this.symbolText.destroy();
-        }
-        
-        const visualInfo = window.gameVisualId.getVisualInfo(this.creature);
-        if (!visualInfo.symbol) return;
-        
-        // Crear texto del símbolo
-        this.symbolText = new PIXI.Text(visualInfo.symbol, {
-            fontFamily: 'Arial',
-            fontSize: window.gameVisualId.getSymbolSize(this.creature),
-            fill: visualInfo.symbolColor,
-            align: 'center',
-            stroke: '#000000',
-            strokeThickness: 1
-        });
-        
-        // Centrar el símbolo
-        this.symbolText.anchor.set(0.5, 0.5);
-        
-        // Posicionar encima de la criatura
-        this.updateSymbolAppearance();
-        
-        // Agregar al container
-        this.container.addChild(this.symbolText);
-    }
-
-    /**
-     * Actualiza la apariencia del símbolo - fixfeatures
-     */
-    updateSymbolAppearance() {
-        if (!this.symbolText || !window.gameVisualId) return;
-        
-        // Obtener información visual actualizada
-        const visualInfo = window.gameVisualId.getVisualInfo(this.creature);
-        
-        // Actualizar color basado en generación
-        this.symbolText.style.fill = visualInfo.symbolColor;
-        
-        // Actualizar tamaño basado en etapa de crecimiento
-        const symbolSize = window.gameVisualId.getSymbolSize(this.creature);
-        this.symbolText.style.fontSize = symbolSize;
-        
-        // Posicionar encima de la criatura
-        const scale = this.creature.growth ? this.creature.growth.getScale() : 1.0;
-        const offsetY = -(this.baseRadius * scale + symbolSize * 0.5 + 5);
-        this.symbolText.position.set(0, offsetY);
-        
-        // Aplicar escala si la criatura está creciendo
-        this.symbolText.scale.set(scale, scale);
-    }
-
-    /**
      * Obtiene el container para agregar al stage
      */
     getContainer() {
@@ -319,12 +208,9 @@ class CreatureSprite {
      * Destruye el sprite y limpia recursos
      */
     destroy() {
-        // Limpiar símbolo familiar
-        if (this.symbolText) {
-            this.container.removeChild(this.symbolText);
-            this.symbolText.destroy();
-            this.symbolText = null;
-        }
+        // Delegar destrucción a módulos
+        if (this.familySymbol) this.familySymbol.destroy();
+        if (this.energyOverlay) this.energyOverlay.destroy();
         
         if (this.graphics) {
             this.graphics.destroy();
