@@ -36,7 +36,7 @@ class CreatureVisionUtils {
     /**
      * Verifica si un punto está dentro del cono de visión
      */
-    static isInVisionCone(creatureX, creatureY, creatureDirection, targetX, targetY, range, angleRad) {
+    static isInVisionCone(creatureX, creatureY, creatureDirection, targetX, targetY, range, cosHalf) {
         // Calcular distancia² y comparar con rango² para evitar sqrt
         if (mathLUT.dist2(creatureX, creatureY, targetX, targetY) > range * range) {
             return false;
@@ -47,10 +47,11 @@ class CreatureVisionUtils {
         const len = Math.sqrt(dx*dx + dy*dy);
         const nx = dx / len;
         const ny = dy / len;
-        const dirX = Math.cos(creatureDirection);
-        const dirY = Math.sin(creatureDirection);
+        const degDir = creatureDirection * 57.29577951308232; // rad a deg
+        const dirX = mathLUT.fastCos(degDir);
+        const dirY = mathLUT.fastSin(degDir);
         const dot = nx * dirX + ny * dirY;
-        const isVisible = dot >= Math.cos(angleRad / 2);
+        const isVisible = dot >= cosHalf;
         return isVisible;
     }
     

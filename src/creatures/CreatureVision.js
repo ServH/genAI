@@ -14,6 +14,7 @@ class CreatureVision {
         this.angle = config.angle;
         this.range = config.range;
         this.angleRad = config.angleRad;
+        this.cosHalf = Math.cos(this.angleRad / 2);
         
         console.log(`CreatureVision: Sistema inicializado para ${creature.id} - Ángulo: ${this.angle}°, Alcance: ${this.range}px`);
     }
@@ -59,13 +60,13 @@ class CreatureVision {
         return visibleFood.length > 0 ? visibleFood[0].food : null;
     }
 
-        /**
+    /**
      * Verifica si un punto está dentro del cono de visión
      */
     isInVisionCone(x, y) {
         return CreatureVisionUtils.isInVisionCone(
             this.creature.x, this.creature.y, this.creature.direction,
-            x, y, this.range, this.angleRad
+            x, y, this.range, this.cosHalf
         );
     }
     
