@@ -33,13 +33,13 @@ class CreatureManager {
     /**
      * Inicializa el manager con stage y cámara
      */
-    async init(stage, camera) {
+    async init(stage, camera, textureManager) {
         this.stage = stage;
         this.camera = camera;
         
         // Crear factory y pool
         const factory = new CreatureFactory();
-        this.pool = new CreaturePool(factory, this.stage);
+        this.pool = new CreaturePool(factory, this.stage, textureManager);
         
         // Pre-calentar el pool con el número máximo de criaturas
         this.pool.prewarm(this.maxCreatures);

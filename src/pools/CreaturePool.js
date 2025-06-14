@@ -6,9 +6,10 @@
  * la creación/destrucción constante y reducir la carga del Garbage Collector.
  */
 class CreaturePool {
-    constructor(factory, stage) {
+    constructor(factory, stage, textureManager) {
         this.factory = factory;
         this.stage = stage;
+        this.textureManager = textureManager;
 
         this.creaturePool = [];
         this.spritePool = [];
@@ -23,17 +24,15 @@ class CreaturePool {
      */
     prewarm(size) {
         for (let i = 0; i < size; i++) {
-            // Se crea una criatura temporal solo para instanciar el sprite
-            const tempCreature = this.factory.createCreature();
-            const sprite = new CreatureSprite(tempCreature);
+            const creature = this.factory.createCreature();
+            const texture = this.textureManager.getRandomCreatureTexture();
+            const sprite = new CreatureSprite(creature, texture);
             
-            // El sprite se añade al stage pero se mantiene invisible
             sprite.getContainer().visible = false;
             this.stage.addChild(sprite.getContainer());
             
-            // Guardamos el sprite y una criatura 'en blanco' en el pool
             this.spritePool.push(sprite);
-            this.creaturePool.push(tempCreature);
+            this.creaturePool.push(creature);
         }
         console.log(`CreaturePool: Pre-calentado con ${size} criaturas y sprites.`);
     }
@@ -44,7 +43,6 @@ class CreaturePool {
      */
     acquire() {
         if (this.creaturePool.length === 0 || this.spritePool.length === 0) {
-            // Opcional: expandir el pool si se necesita. Por ahora, seremos estrictos.
             console.warn("CreaturePool: ¡El pool está vacío! No se pudo adquirir una nueva criatura.");
             return null;
         }
@@ -52,10 +50,12 @@ class CreaturePool {
         const creature = this.creaturePool.pop();
         const sprite = this.spritePool.pop();
 
+        const newTexture = this.textureManager.getRandomCreatureTexture();
+        sprite.reset(creature, newTexture);
+
         this.activeCreatures.set(creature.id, creature);
         this.activeSprites.set(creature.id, sprite);
 
-        // Reactivar el sprite
         sprite.getContainer().visible = true;
 
         console.log(`CreaturePool: Objeto ${creature.id} adquirido. Pool: ${this.creaturePool.length}`);
@@ -73,15 +73,12 @@ class CreaturePool {
 
         const sprite = this.activeSprites.get(creature.id);
 
-        // Desactivar y ocultar el sprite
         if (sprite) {
             sprite.getContainer().visible = false;
             this.spritePool.push(sprite);
             this.activeSprites.delete(creature.id);
         }
 
-        // Devolver la criatura al pool
-        // La criatura no necesita ser modificada, solo se vuelve a meter al pool
         this.creaturePool.push(creature);
         this.activeCreatures.delete(creature.id);
 
@@ -99,7 +96,6 @@ class CreaturePool {
      * Limpia todos los pools y objetos activos.
      */
     destroy() {
-        // Destruir sprites activos que no fueron liberados
         for (const sprite of this.activeSprites.values()) {
             this.stage.removeChild(sprite.getContainer());
             sprite.destroy();
@@ -107,7 +103,6 @@ class CreaturePool {
         this.activeSprites.clear();
         this.activeCreatures.clear();
 
-        // Destruir objetos en el pool
         for (const sprite of this.spritePool) {
             this.stage.removeChild(sprite.getContainer());
             sprite.destroy();

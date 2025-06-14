@@ -21,6 +21,12 @@ class Engine {
         
         // Sistema de criaturas
         this.creatureManager = null;
+        this.resourceManager = null;
+        this.effects = null;
+        this.reproduction = null;
+        this.lineage = null;
+        this.visualId = null;
+        this.textureManager = null; // OPTIMIZATION: Nuevo manager de texturas
         
         // Esperar a que todos los módulos estén cargados
         this.waitForModules().then(() => {
@@ -70,6 +76,10 @@ class Engine {
             this.renderer = new Renderer();
             await this.renderer.init();
             
+            // OPTIMIZATION: Crear y generar texturas cacheadas
+            this.textureManager = new TextureManager(this.renderer.app.renderer);
+            await this.textureManager.generateAllTextures();
+            
             // Crear contenedor del mundo
             this.worldContainer = new PIXI.Container();
             this.renderer.getStage().addChild(this.worldContainer);
@@ -81,8 +91,8 @@ class Engine {
             this.grid = new Grid();
             this.grid.init(this.worldContainer);
             
-            this.camera = new Camera();
-            this.camera.setContainer(this.worldContainer);
+            this.camera = new Camera(this.renderer.app);
+            this.renderer.app.stage.addChild(this.camera.getViewport());
             
             // Hacer cámara disponible globalmente
             window.gameCamera = this.camera;
@@ -93,21 +103,17 @@ class Engine {
             
             // Inicializar sistemas nuevos - fixfeatures
             this.lineage = new Lineage();
-            window.gameLineage = this.lineage;
-            
             this.visualId = new CreatureVisualId();
-            window.gameVisualId = this.visualId;
             
             // Inicializar sistema de recursos
-            this.gameResources = new Resources();
-            this.gameResources.init(this.worldContainer, this.camera);
+            this.resourceManager = new Resources(this.camera.getViewport());
             
             // Hacer recursos disponible globalmente
-            window.gameResources = this.gameResources;
+            window.gameResources = this.resourceManager;
             
             // Inicializar sistema de criaturas
             this.creatureManager = new CreatureManager();
-            await this.creatureManager.init(this.worldContainer, this.camera);
+            await this.creatureManager.init(this.camera.getViewport(), this.camera, this.textureManager);
             
             // Hacer creatureManager disponible globalmente para reproducción
             window.gameEngine = this;
@@ -206,8 +212,8 @@ class Engine {
                 }
                 
                 // Actualizar recursos
-                if (this.gameResources) {
-                    this.gameResources.update(deltaTime);
+                if (this.resourceManager) {
+                    this.resourceManager.update(deltaTime);
                 }
                 
                 // Actualizar criaturas
@@ -265,8 +271,8 @@ class Engine {
             this.creatureManager.destroy();
         }
         
-        if (this.gameResources) {
-            this.gameResources.destroy();
+        if (this.resourceManager) {
+            this.resourceManager.destroy();
         }
         
         if (this.effects) {
@@ -275,6 +281,10 @@ class Engine {
         
         if (this.renderer) {
             this.renderer.destroy();
+        }
+        
+        if (this.textureManager) {
+            this.textureManager.destroy();
         }
         
         console.log('Engine: Destruido');
