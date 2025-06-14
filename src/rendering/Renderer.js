@@ -28,6 +28,11 @@ class Renderer {
                 autoDensity: true
             });
 
+            // Ajustes globales de batch
+            if (this.app.renderer?.plugins?.batcher) {
+                this.app.renderer.plugins.batcher.maxBatchSize = 4096;
+            }
+
             // Agregar al DOM
             this.setupDOM();
             

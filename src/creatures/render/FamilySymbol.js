@@ -55,6 +55,7 @@ class FamilySymbol {
         });
         this.text.anchor.set(0.5);
         this.sprite.container.addChild(this.text);
+        this.text.cacheAsBitmap = true;
         this._updatePosition();
     }
 
